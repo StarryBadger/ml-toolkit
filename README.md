@@ -1,6 +1,5 @@
 # Statistical Methods in Artificial Intelligence (Monsoon '24)
 
-Name:
+Name: Shaunak Biswas
 
-Roll Number:
-
+Roll Number: 2022111024
