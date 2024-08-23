@@ -1,20 +1,22 @@
 import numpy as np
+
 class KNN:
-    def __init__(self, k: int, distance_metrics: str = "euclidean"):
+    def __init__(self, k: int, distance_metric: str = "euclidean"):
         if k <= 0:
             raise ValueError("k must be greater than 0")
         self.k = k
 
-        if distance_metrics.lower() not in ["euclidean", "cosine", "manhattan"]:
+        if distance_metric.lower() not in ["euclidean", "cosine", "manhattan"]:
             raise ValueError("Distance metric not supported")
-        self.distance_metrics = distance_metrics.lower()
+        self.distance_metric = distance_metric.lower()
 
-        if self.distance_metrics == "euclidean":
-            self.calculate_distance = self._euclidean_distance
-        elif self.distance_metrics == "manhattan":
-            self.calculate_distance = self._manhattan_distance
-        elif self.distance_metrics == "cosine":
-            self.calculate_distance = self._cosine_distance
+        if self.distance_metric == "euclidean":
+            self.calculate_distances = self._euclidean_distances
+        elif self.distance_metric == "manhattan":
+            self.calculate_distances = self._manhattan_distances
+        elif self.distance_metric == "cosine":
+            self.calculate_distances = self._cosine_distances
+            self.norm_X_train = None
 
         self.X_train = None
         self.y_train = None
@@ -22,42 +24,30 @@ class KNN:
     def fit(self, X, y):
         self.X_train = X
         self.y_train = y
+        if self.distance_metric== "cosine":
+            self.norm_X_train = np.linalg.norm(self.X_train, axis=1)
 
     def predict(self, X_test):
         predictions = [self._predict(x) for x in X_test]
         return np.array(predictions)
 
     def _predict(self, x):
-        distances = self.calculate_distance(x)
-        k_indices = np.argsort(distances)[:self.k]
+        distances = self.calculate_distances(x)
+        k_indices = np.argsort(distances)[: self.k]
         k_nearest_labels = self.y_train[k_indices]
-        #? https://stackoverflow.com/questions/16330831/most-efficient-way-to-find-mode-in-numpy-array
-        unique_labels,counts = np.unique(k_nearest_labels, return_counts=True)
+        # ? https://stackoverflow.com/questions/16330831/most-efficient-way-to-find-mode-in-numpy-array
+        unique_labels, counts = np.unique(k_nearest_labels, return_counts=True)
         return unique_labels[np.argmax(counts)]
 
-    def _euclidean_distance(self, x):
-        return np.sqrt(np.sum((self.X_train - x)**2, axis=1))
+    def _euclidean_distances(self, x):
+        return np.sqrt(np.sum((self.X_train - x) ** 2, axis=1))
 
-    def _manhattan_distance(self, x):
+    def _manhattan_distances(self, x):
         return np.sum(np.abs(self.X_train - x), axis=1)
 
-    def _cosine_distance(self, x):
-        dot_product = np.dot(self, x)
+    def _cosine_distances(self, x):
+        dot_product = np.dot(self.X_train, x)
         norm_x = np.linalg.norm(x)
-        norm_y = np.linalg.norm(x)
-        cosine_similarity = dot_product / (norm_x * norm_y)
+        cosine_similarity = dot_product / (self.norm_X_train * norm_x)
         # ? https://stackoverflow.com/questions/18424228/cosine-similarity-between-2-number-lists
         return 1 - cosine_similarity
-
-    # def scoring(self, actual_labels, pred_labels):
-    #     f1 = f1_score(actual_labels, pred_labels, zero_division=0, average="weighted")
-    #     accuracy = accuracy_score(actual_labels, pred_labels)
-    #     precision = precision_score(
-    #         actual_labels, pred_labels, zero_division=0, average="weighted"
-    #     )
-    #     recall = recall_score(
-    #         actual_labels, pred_labels, zero_division=0, average="weighted"
-    #     )
-
-        # Return a dictionary of scores rounded off to 4 decimal places
-        # return {'f1': round(f1, 4), 'accuracy': round(accuracy, 4), 'precision': round(precision, 4), 'recall': round
