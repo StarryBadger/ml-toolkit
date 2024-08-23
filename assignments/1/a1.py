@@ -1,23 +1,24 @@
-import numpy as np
-import pandas as pd
 import time
+import pandas as pd
 from models.knn.knn_suboptimal import KNN
 from performance_measures.classification_metrics import Metrics
 
-data_train = pd.read_csv("data/interim/spotify/split/train.csv")
-data_test = pd.read_csv("data/interim/spotify/split/test.csv")
-data_val = pd.read_csv("data/interim/spotify/split/val.csv")
 
-X_train = data_train.drop(columns=["track_genre"]).to_numpy()
-X_test = data_test.drop(columns=["track_genre"]).to_numpy()
+def main() -> None:
+    for x in {"train", "test", "val"}:
+        globals()[f"data_{x}"] = pd.read_csv(f"data/interim/spotify/split/{x}.csv")
+        globals()[f"X_{x}"] = globals()[f"data_{x}"].drop(columns=["track_genre"]).to_numpy()
+        globals()[f"y_{x}"] = globals()[f"data_{x}"]["track_genre"].to_numpy()
 
-y_train = data_train["track_genre"].to_numpy()
-y_test = data_test["track_genre"].to_numpy()
+    classifier = KNN(k=30, distance_metric="manhattan")
+    classifier.fit(X_train, y_train)
+    y_pred = classifier.predict(X_test)
+    metrics = Metrics(y_true=y_test, y_pred=y_pred)
+    print(f"Accuracy: {metrics.accuracy():.2f}")
 
-start_time = time.time()
-classifier = KNN(k=30, distance_metric="manhattan")
-classifier.fit(X_train, y_train)
-y_pred = classifier.predict(X_test)
-metrics = Metrics(y_true=y_test, y_pred=y_pred)
-print(f"Accuracy: {metrics.accuracy():.2f}")
-print(f"Time: {time.time() - start_time}")
+
+if __name__ == "__main__":
+    start_time = time.time()
+    main()
+    time_taken = time.time() - start_time
+    print(f"{time_taken=}")
