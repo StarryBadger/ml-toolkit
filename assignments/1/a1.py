@@ -5,8 +5,9 @@ from performance_measures.classification_metrics import Metrics
 
 
 def main() -> None:
-    for x in {"train", "test", "val"}:
-        globals()[f"data_{x}"] = pd.read_csv(f"data/interim/spotify/split/{x}.csv")
+    dataset_dir="data/interim/spotify/split"
+    for x in {"train", "test", "validate"}:
+        globals()[f"data_{x}"] = pd.read_csv(f"{dataset_dir}/{x}.csv")
         globals()[f"X_{x}"] = globals()[f"data_{x}"].drop(columns=["track_genre"]).to_numpy()
         globals()[f"y_{x}"] = globals()[f"data_{x}"]["track_genre"].to_numpy()
 

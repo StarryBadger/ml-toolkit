@@ -42,7 +42,7 @@ def split(X, train_ratio=0.8, val_ratio=0.1):
     split_folder="data/interim/spotify/split"
     Path(split_folder).mkdir(parents=True, exist_ok=True)
     X_train.to_csv(f"{split_folder}/train.csv", index=False)
-    X_val.to_csv(f"{split_folder}/val.csv", index=False)
+    X_val.to_csv(f"{split_folder}/validate.csv", index=False)
     X_test.to_csv(f"{split_folder}/test.csv", index=False)
 
     return X_train, X_val, X_test
