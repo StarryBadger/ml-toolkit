@@ -441,10 +441,10 @@ if __name__ == "__main__":
     # k_vs_accuracy()
     # inference_time_plot()
     # inference_time_vs_train_size_plot()
-    # knn_on_spotify("data/interim/1/spotify-2/final")
+    knn_on_spotify("data/interim/1/spotify-2/final")
     
     # visualize_linreg()
-    # regression()
+    regression()
     # hyperparam_tuning_regression()
     # animation()
     # experiment_with_regularization()
