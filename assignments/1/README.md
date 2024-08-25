@@ -247,7 +247,7 @@ Observations:
 
 2. Data preprocessing: To prepare the data, normalization was performed using both StandardScaler and MinMaxScaler. The scaling parameters (min, max, mean, standard deviation) were derived from the training set and then applied to both the validation and test sets. This approach ensures that if there are different distributions of test and validate set features, it does not have different representations of similar data in the different sets.
 
-3. Performance impact: Despite the non-ideal data split, the model's performance was not significantly impacted. The accuracy was slightly lower compared to previous results, but the difference was not substantial. This suggests that the KNN model shows some robustness to the imperfect data distribution.
+3. Performance impact: Despite the non-ideal data split, the model's performance was not significantly impacted. The accuracy was definitely lower compared to previous results, but the difference was not substantial, only around 3%.
 
 4. Importance of stratified sampling: This experience highlights the importance of using stratified sampling when splitting datasets, especially for multi-class classification problems. A stratified split ensures that all classes are represented proportionally in each subset, which is crucial for reliable model training and evaluation.
 

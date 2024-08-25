@@ -147,7 +147,7 @@ def knn_on_spotify(dataset_dir) -> None:
     for x in {"train", "test", "validate"}:
         globals()[f"data_{x}"] = pd.read_csv(f"{dataset_dir}/{x}.csv")
         globals()[f"X_{x}"] = (
-            globals()[f"data_{x}"].drop(columns=["track_genre", "tempo"]).to_numpy()
+            globals()[f"data_{x}"].drop(columns=["track_genre"]).to_numpy()
         )
         globals()[f"y_{x}"] = globals()[f"data_{x}"]["track_genre"].to_numpy()
     classifier = KNN(k=85, distance_metric="manhattan")
@@ -435,18 +435,18 @@ def experiment_with_regularization():
 
 if __name__ == "__main__":
     start_time = time.time()
-    # visualization_spotify()
+    visualization_spotify()
     knn_on_spotify("data/interim/1/spotify/split")
-    # hyperparam_tuning_knn()
-    # k_vs_accuracy()
-    # inference_time_plot()
-    # inference_time_vs_train_size_plot()
+    hyperparam_tuning_knn()
+    k_vs_accuracy()
+    inference_time_plot()
+    inference_time_vs_train_size_plot()
     knn_on_spotify("data/interim/1/spotify-2/final")
     
-    # visualize_linreg()
+    visualize_linreg()
     regression()
-    # hyperparam_tuning_regression()
-    # animation()
-    # experiment_with_regularization()
+    hyperparam_tuning_regression()
+    animation()
+    experiment_with_regularization()
     time_taken = time.time() - start_time
     print(f"{time_taken=}")
