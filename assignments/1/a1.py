@@ -58,9 +58,8 @@ def visualization_spotify():
         axes[row, col].violinplot(df[feature])
         axes[row, col].set_title(feature)
         axes[row, col].set_xticks([])
-    plt.tight_layout()
+
     plt.savefig("assignments/1/figures/violin_plots.png")
-    plt.close()
 
     # Pair plots
     scatter = pd.plotting.scatter_matrix(
@@ -71,9 +70,8 @@ def visualization_spotify():
         ax.set_ylabel(ax.get_ylabel(), fontsize=20)
 
     plt.suptitle("Scatter Plot Matrix of Numerical Features", fontsize=25)
-    plt.tight_layout()
+
     plt.savefig("assignments/1/figures/pair_plots.png")
-    plt.close()
 
     # Correlation heatmap
     # ? https://stackoverflow.com/questions/33282368/plotting-a-2d-heatmap
@@ -96,9 +94,8 @@ def visualization_spotify():
                 va="center",
                 color="black",
             )
-    plt.tight_layout()
+
     plt.savefig("assignments/1/figures/correlation_heatmap.png")
-    plt.close()
 
     # Box plots
     fig, axes = plt.subplots(4, 3, figsize=(20, 20))
@@ -109,9 +106,8 @@ def visualization_spotify():
         axes[row, col].boxplot(df[feature])
         axes[row, col].set_title(feature)
         axes[row, col].set_xticks([])
-    plt.tight_layout()
+
     plt.savefig("assignments/1/figures/box_plots.png")
-    plt.close()
 
     genre_mapping = {genre: idx for idx, genre in enumerate(df["track_genre"].unique())}
     df["genre_mapped"] = df["track_genre"].map(genre_mapping)
@@ -137,7 +133,6 @@ def visualization_spotify():
         )
         plt.colorbar(scatter, label="Track Genre")
         plt.savefig(f"assignments/1/figures/scatter_{x_feature}_{y_feature}.png")
-        plt.close()
 
 
 def knn_on_spotify() -> None:
