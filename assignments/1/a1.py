@@ -142,12 +142,35 @@ def knn_on_spotify(dataset_dir) -> None:
             globals()[f"data_{x}"].drop(columns=["track_genre"]).to_numpy()
         )
         globals()[f"y_{x}"] = globals()[f"data_{x}"]["track_genre"].to_numpy()
-
-    classifier = KNN(k=30, distance_metric="manhattan")
+    classifier = KNN(k=85, distance_metric="cosine")
     classifier.fit(X_train, y_train)
-    y_pred = classifier.predict(X_test)
-    Metrics(y_true=y_test, y_pred=y_pred, task="classification").print_metrics()
+    y_pred = classifier.predict(X_validate)
+    Metrics(y_true=y_validate, y_pred=y_pred, task="classification").print_metrics()
 
+def hyperparam_tuning():
+    for x in {"train", "test", "validate"}:
+        globals()[f"data_{x}"] = pd.read_csv(f"{"data/interim/1/spotify/split"}/{x}.csv")
+        globals()[f"X_{x}"] = (
+            globals()[f"data_{x}"].drop(columns=["track_genre"]).to_numpy()
+        )
+        globals()[f"y_{x}"] = globals()[f"data_{x}"]["track_genre"].to_numpy()
+
+    # GP for values for k from 1 to root N
+    k_values = [1, 2, 4, 8, 16, 32, 64,85, 128, 256]
+    distance_metrics = ["euclidean", "manhattan", "cosine"]
+    results = []
+    for metric in distance_metrics:
+        for k in k_values:        
+            classifier = KNN(k=k, distance_metric=metric)
+            classifier.fit(X_train, y_train)
+            y_pred = classifier.predict(X_validate)
+            accuracy = Metrics(y_true=y_validate, y_pred=y_pred, task="classification").accuracy()
+            results.append((k, metric, accuracy))
+
+    results.sort(key=lambda x: x[2], reverse=True)
+    print("Top 10 {k, distance_metric} pairs:")
+    for i, (k, metric, accuracy) in enumerate(results[:10]):
+        print(f"{i+1}. k={k}, metric={metric}, accuracy={accuracy:.4f}")
 
 def regression() -> None:
     dataset_dir = "data/interim/1/linreg"
@@ -156,7 +179,7 @@ def regression() -> None:
         globals()[f"X_{x}"] = globals()[f"data_{x}"]["x"].to_numpy()
         globals()[f"y_{x}"] = globals()[f"data_{x}"]["y"].to_numpy()
 
-    model = PolynomialRegression(degree=2)
+    model = PolynomialRegression(degree=1)
     model.fit(X_train, y_train)
     y_pred = model.predict(X_validate)
     Metrics(y_true=y_validate, y_pred=y_pred, task="regression").print_metrics()
@@ -166,7 +189,8 @@ if __name__ == "__main__":
     start_time = time.time()
     # visualization_spotify()
     # knn_on_spotify("data/interim/1/spotify/split")
-    knn_on_spotify("data/interim/1/spotify-2/final")
-    # regression()
+    # hyperparam_tuning()
+    # knn_on_spotify("data/interim/1/spotify-2/final")
+    regression()
     time_taken = time.time() - start_time
     print(f"{time_taken=}")

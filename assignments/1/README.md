@@ -96,9 +96,18 @@ Popularity,distribution shows that other than some niche songs, most others foll
 
 Musical key usually is not genre specific.
 
-
-
-
-
-
 **Artists** and **Album Name** can strongly indicate genre but are not useful for distance metrics; using them could be considered cheating. **Track Name** may have also contained hints. However we limit ourselves to only numerical features. Although time signature and mode are numbers, they are also categories.
+
+Top 10 {k, distance_metric} pairs:
+1. k=85, metric=manhattan, accuracy=0.2551
+2. k=64, metric=manhattan, accuracy=0.2538
+3. k=32, metric=manhattan, accuracy=0.2522
+4. k=128, metric=manhattan, accuracy=0.2507
+5. k=16, metric=manhattan, accuracy=0.2462
+6. k=256, metric=manhattan, accuracy=0.2423
+7. k=8, metric=manhattan, accuracy=0.2301
+8. k=64, metric=euclidean, accuracy=0.2294
+9. k=85, metric=euclidean, accuracy=0.2283
+10. k=32, metric=euclidean, accuracy=0.2268
+
+(cosine for k=85 comes to have Accuracy: 0.2174)

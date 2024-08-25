@@ -21,7 +21,7 @@ class Metrics:
         confusion = np.zeros((len(self.classes), len(self.classes)), dtype=int)
         np.add.at(confusion, (true_indices, pred_indices), 1)
         return confusion
-
+    # To handle np.sum(confusion, axis=n) = 0 for n=0 or 1, we add 1e-6 to each element. 
     def accuracy(self):
         return np.sum(self.y_true == self.y_pred) / len(self.y_true)
 
