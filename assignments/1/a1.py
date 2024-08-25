@@ -141,7 +141,6 @@ def visualization_spotify():
         plt.colorbar(scatter, label="Track Genre")
         plt.savefig(f"assignments/1/figures/scatter_{x_feature}_{y_feature}.png")
 
-
 def knn_on_spotify(dataset_dir) -> None:
     for x in {"train", "test", "validate"}:
         globals()[f"data_{x}"] = pd.read_csv(f"{dataset_dir}/{x}.csv")
@@ -186,7 +185,7 @@ def regression() -> None:
         globals()[f"X_{x}"] = globals()[f"data_{x}"]["x"].to_numpy()
         globals()[f"y_{x}"] = globals()[f"data_{x}"]["y"].to_numpy()
 
-    model = PolynomialRegression(degree=1)
+    model = PolynomialRegression(degree=1, learning_rate=0.03)
     model.fit(X_train, y_train)
     y_pred = model.predict(X_validate)
     Metrics(y_true=y_validate, y_pred=y_pred, task="regression").print_metrics()
@@ -198,38 +197,39 @@ def hyperparam_tuning_regression() -> None:
         globals()[f"X_{x}"] = globals()[f"data_{x}"]["x"].to_numpy()
         globals()[f"y_{x}"] = globals()[f"data_{x}"]["y"].to_numpy()
 
-    model = PolynomialRegression(degree=1)
-    model.fit(X_train, y_train)
-    y_pred = model.predict(X_validate)
-    Metrics(y_true=y_validate, y_pred=y_pred, task="regression").print_metrics()
+    degrees = [x for x in range (1,35)]
+    best_k = None
+    best_mse = float('inf')
 
-    degrees = [1, 2, 4, 8, 16, 32]
-    results = []
     for degree in degrees:
         model = PolynomialRegression(degree=degree)
         model.fit(X_train, y_train)
-        y_train_pred = model.predict(X_train)
-        y_test_pred = model.predict(X_test)
-        
-        Metrics(y_true=y_train, y_pred=y_train_pred).print_metrics()
-        Metrics(y_true=y_test, y_pred=y_test_pred).print_metrics()
-        results.append((degree, train_mse, train_std, train_var, test_mse, test_std, test_var))
+        y_pred_train = model.predict(X_train)
+        y_pred_test = model.predict(X_test)
+        print(f"Train with k={degree}")
+        Metrics(y_true=y_train, y_pred=y_pred_train, task="regression").print_metrics()
+        metrics_val = Metrics(y_true=y_test, y_pred=y_pred_test, task="regression")
+        print(f"Test with k={degree}")
+        metrics_val.print_metrics()
+        mse=metrics_val.mse()
 
-    results.sort(key=lambda x: x[4])
+        if mse < best_mse:
+            best_mse = mse
+            best_k = degree
+            best_model = model
 
-    print("Top Polynomial Degrees:")
-    for i, (degree, train_mse, train_std, train_var, test_mse, test_std, test_var) in enumerate(results):
-        print(f"{i+1}. Degree={degree}, Train MSE={train_mse:.4f}, Train STD={train_std:.4f}, Train VAR={train_var:.4f}, Test MSE={test_mse:.4f}, Test STD={test_std:.4f}, Test VAR={test_var:.4f}")
+    print(f"Best degree (k): {best_k} with MSE: {best_mse}")
+    best_model.save_model('assignments/1/best_model_params.csv')
 
-    # Save the parameters of the best model
-    best_degree = results[0][0]
-    best_model = PolynomialRegression(degree=best_degree)
-    best_model.fit(X_train, y_train)
-
-    # Save the model parameters to a CSV file
-    save_model_parameters(best_model.coef_, 'best_model_parameters.csv')
-
-    print(f"Best model with degree={best_degree} saved.")
+def animation()-> None:
+    dataset_dir = "data/interim/1/linreg"
+    for x in {"train", "test", "validate"}:
+        globals()[f"data_{x}"] = pd.read_csv(f"{dataset_dir}/{x}.csv")
+        globals()[f"X_{x}"] = globals()[f"data_{x}"]["x"].to_numpy()
+        globals()[f"y_{x}"] = globals()[f"data_{x}"]["y"].to_numpy()
+    for k in [2,5,10,15,23,32]:
+        model = PolynomialRegression(degree=k, learning_rate=0.03)
+        model.fit_with_gif(X_train, y_train)
 
 
 if __name__ == "__main__":
@@ -238,7 +238,8 @@ if __name__ == "__main__":
     # knn_on_spotify("data/interim/1/spotify/split")
     # hyperparam_tuning_knn()
     # knn_on_spotify("data/interim/1/spotify-2/final")
-    regression()
+    # regression()
     # hyperparam_tuning_regression()
+    animation()
     time_taken = time.time() - start_time
     print(f"{time_taken=}")
