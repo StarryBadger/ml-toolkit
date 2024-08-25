@@ -147,7 +147,7 @@ def knn_on_spotify() -> None:
     classifier = KNN(k=30, distance_metric="manhattan")
     classifier.fit(X_train, y_train)
     y_pred = classifier.predict(X_test)
-    Metrics(y_true=y_test, y_pred=y_pred, task="regression").print_metrics()
+    Metrics(y_true=y_test, y_pred=y_pred, task="classification").print_metrics()
 
 
 def regression() -> None:
@@ -165,8 +165,8 @@ def regression() -> None:
 
 if __name__ == "__main__":
     start_time = time.time()
-    visualization_spotify()
-    # knn_on_spotify()
+    # visualization_spotify()
+    knn_on_spotify()
     # regression()
     time_taken = time.time() - start_time
     print(f"{time_taken=}")
