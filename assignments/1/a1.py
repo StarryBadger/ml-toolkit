@@ -5,6 +5,8 @@ import matplotlib.pyplot as plt
 from models.knn.knn import KNN
 from models.linear_regression.linear_regression import PolynomialRegression
 from performance_measures.classification_metrics import Metrics
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.metrics import accuracy_score
 
 def save_model_parameters(coef, filename):
     df = pd.DataFrame(coef)
@@ -145,10 +147,10 @@ def knn_on_spotify(dataset_dir) -> None:
     for x in {"train", "test", "validate"}:
         globals()[f"data_{x}"] = pd.read_csv(f"{dataset_dir}/{x}.csv")
         globals()[f"X_{x}"] = (
-            globals()[f"data_{x}"].drop(columns=["track_genre"]).to_numpy()
+            globals()[f"data_{x}"].drop(columns=["track_genre", "tempo"]).to_numpy()
         )
         globals()[f"y_{x}"] = globals()[f"data_{x}"]["track_genre"].to_numpy()
-    classifier = KNN(k=85, distance_metric="cosine")
+    classifier = KNN(k=85, distance_metric="manhattan")
     classifier.fit(X_train, y_train)
     y_pred = classifier.predict(X_validate)
     Metrics(y_true=y_validate, y_pred=y_pred, task="classification").print_metrics()
@@ -178,6 +180,153 @@ def hyperparam_tuning_knn():
     for i, (k, metric, accuracy) in enumerate(results[:10]):
         print(f"{i+1}. k={k}, metric={metric}, accuracy={accuracy:.4f}")
 
+def k_vs_accuracy():
+    for x in {"train", "test", "validate"}:
+        globals()[f"data_{x}"] = pd.read_csv(f"{"data/interim/1/spotify/split"}/{x}.csv")
+        globals()[f"X_{x}"] = (
+            globals()[f"data_{x}"].drop(columns=["track_genre"]).to_numpy()
+        )
+        globals()[f"y_{x}"] = globals()[f"data_{x}"]["track_genre"].to_numpy()
+
+    k_values = [x for x in range(1,32,5)]
+    metric = "manhattan"
+    results = []
+    for k in k_values:        
+        classifier = KNN(k=k, distance_metric=metric)
+        classifier.fit(X_train, y_train)
+        y_pred = classifier.predict(X_validate)
+        accuracy = Metrics(y_true=y_validate, y_pred=y_pred, task="classification").accuracy()
+        results.append((k, accuracy))
+    
+    k_vals, accuracies = zip(*results)
+    plt.figure(figsize=(10, 6))
+    plt.plot(k_vals, accuracies, marker='o', linestyle='-', color='b')
+    plt.xlabel('k (Number of Neighbors)')
+    plt.ylabel('Accuracy')
+    plt.title('K vs Accuracy')
+    plt.grid(True)
+    plt.xticks(k_vals)
+    plt.savefig(f"assignments/1/figures/k_vs_accuracy.png")
+
+def inference_time_plot():
+    for x in {"train", "test", "validate"}:
+        globals()[f"data_{x}"] = pd.read_csv(f"{"data/interim/1/spotify/split"}/{x}.csv")
+        globals()[f"X_{x}"] = (
+            globals()[f"data_{x}"].drop(columns=["track_genre"]).to_numpy()
+        )
+        globals()[f"y_{x}"] = globals()[f"data_{x}"]["track_genre"].to_numpy()
+
+    classifier = KNN(k=64, distance_metric="cosine")
+    classifier.fit(X_train, y_train)
+    start_time = time.time()
+    y_pred = classifier.predict(X_validate)
+    end_time = time.time()
+    inference_time_optimal = end_time - start_time
+
+    classifier = KNN(k=85, distance_metric="manhattan")
+    classifier.fit(X_train, y_train)
+    start_time = time.time()
+    y_pred = classifier.predict(X_validate)
+    end_time = time.time()
+    inference_time_best = end_time - start_time
+
+    sklearn_knn = KNeighborsClassifier() # using default
+    sklearn_knn.fit(X_train, y_train)
+    start_time = time.time()
+    y_pred_sklearn = sklearn_knn.predict(X_validate)
+    end_time = time.time()
+    sklearn_inference_time = end_time - start_time
+
+    classifier = KNN(k=85, distance_metric="manhattan")
+    classifier.fit(X_train, y_train)
+    start_time = time.time()
+    y_pred = classifier.predict(X_validate)
+    end_time = time.time()
+    inference_time_best = end_time - start_time
+
+    labels = ['sklearn KNN', 'Best KNN', 'Optimal KNN']
+    times = [sklearn_inference_time, inference_time_best, inference_time_optimal]
+    plt.figure(figsize=(8, 6))
+    plt.bar(labels, times, color=['blue', 'green', 'red'])
+    plt.title('Inference Time Comparison')
+    plt.xlabel('Model')
+    plt.ylabel('Inference Time (seconds)')
+    plt.savefig(f"assignments/1/figures/inference_time_plot.png")
+    plt.close()
+
+def inference_time_vs_train_size_plot():
+    for x in {"train", "test", "validate"}:
+        globals()[f"data_{x}"] = pd.read_csv(f"data/interim/1/spotify/split/{x}.csv")
+        globals()[f"X_{x}"] = (
+            globals()[f"data_{x}"].drop(columns=["track_genre"]).to_numpy()
+        )
+        globals()[f"y_{x}"] = globals()[f"data_{x}"]["track_genre"].to_numpy()
+
+    dataset_sizes = np.linspace(0.2, 1.0, 4)
+    sklearn_times = []
+    best_knn_times = []
+    optimal_knn_times = []
+
+    for size in dataset_sizes:
+        subset_size = int(size * len(X_train))
+        X_train_subset = X_train[:subset_size]
+        y_train_subset = y_train[:subset_size]
+
+        # Optimal KNN
+        classifier_optimal = KNN(k=32, distance_metric="cosine")
+        classifier_optimal.fit(X_train_subset, y_train_subset)
+        start_time = time.time()
+        y_pred_optimal = classifier_optimal.predict(X_validate)
+        end_time = time.time()
+        optimal_knn_times.append(end_time - start_time)
+
+        # Best KNN
+        classifier_best = KNN(k=85, distance_metric="manhattan")
+        classifier_best.fit(X_train_subset, y_train_subset)
+        start_time = time.time()
+        y_pred_best = classifier_best.predict(X_validate)
+        end_time = time.time()
+        best_knn_times.append(end_time - start_time)
+
+        # Sklearn KNN
+        sklearn_knn = KNeighborsClassifier()  # using default
+        sklearn_knn.fit(X_train_subset, y_train_subset)
+        start_time = time.time()
+        y_pred_sklearn = sklearn_knn.predict(X_validate)
+        end_time = time.time()
+        sklearn_times.append(end_time - start_time)
+       
+
+    plt.figure(figsize=(10, 8))
+    plt.plot(dataset_sizes, sklearn_times, label='Sklearn KNN', marker='o', color='blue')
+    plt.plot(dataset_sizes, best_knn_times, label='Best KNN', marker='o', color='green')
+    plt.plot(dataset_sizes, optimal_knn_times, label='Optimal KNN', marker='o', color='red')
+
+    plt.title('Inference Time vs Train Dataset Size')
+    plt.xlabel('Fraction of Training Data Used')
+    plt.ylabel('Inference Time (seconds)')
+    plt.legend()
+    plt.grid(True)
+    plt.savefig(f"assignments/1/figures/inference_time_vs_train_size_plot.png")
+    plt.close()
+
+def visualize_linreg() -> None:
+    dataset_dir = "data/interim/1/linreg"
+    for x in {"train", "test", "validate"}:
+        globals()[f"data_{x}"] = pd.read_csv(f"{dataset_dir}/{x}.csv")
+        globals()[f"X_{x}"] = globals()[f"data_{x}"]["x"].to_numpy()
+        globals()[f"y_{x}"] = globals()[f"data_{x}"]["y"].to_numpy()
+    plt.figure(figsize=(10, 6))
+    plt.scatter(X_train, y_train, color='blue', label='Train', alpha=0.3)
+    plt.scatter(X_validate, y_validate, color='green', label='Validate', alpha=0.5)
+    plt.scatter(X_test, y_test, color='red', label='Test', alpha=0.5)
+    plt.xlabel('X')
+    plt.ylabel('Y')
+    plt.title('Train, Validation, and Test Splits')
+    plt.legend()
+    plt.savefig(f"assignments/1/figures/first_dataset_separate_visualisation.png")
+    plt.close()
+
 def regression() -> None:
     dataset_dir = "data/interim/1/linreg"
     for x in {"train", "test", "validate"}:
@@ -189,6 +338,23 @@ def regression() -> None:
     model.fit(X_train, y_train)
     y_pred = model.predict(X_validate)
     Metrics(y_true=y_validate, y_pred=y_pred, task="regression").print_metrics()
+    w=model.weights[0]
+    b=model.bias
+    plt.figure(figsize=(10, 6))
+    plt.scatter(X_train, y_train, color='blue', label='Train', alpha=0.3)
+    x_line = np.linspace(-1.2, 1.2, 4)
+    y_line = w * x_line + b
+    plt.plot(x_line, y_line, color='red', label=f'Line: y = {w}x + {b}')
+
+    plt.xlabel('X')
+    plt.ylabel('Y')
+    plt.title('Train, Validation, and Test Splits')
+    plt.legend()
+    plt.savefig(f"assignments/1/figures/linreg.png")
+    plt.close()
+
+    
+
 
 def hyperparam_tuning_regression() -> None:
     dataset_dir = "data/interim/1/linreg"
@@ -270,12 +436,17 @@ def experiment_with_regularization():
 if __name__ == "__main__":
     start_time = time.time()
     # visualization_spotify()
-    # knn_on_spotify("data/interim/1/spotify/split")
+    knn_on_spotify("data/interim/1/spotify/split")
     # hyperparam_tuning_knn()
+    # k_vs_accuracy()
+    # inference_time_plot()
+    # inference_time_vs_train_size_plot()
     # knn_on_spotify("data/interim/1/spotify-2/final")
+    
+    # visualize_linreg()
     # regression()
     # hyperparam_tuning_regression()
     # animation()
-    experiment_with_regularization()
+    # experiment_with_regularization()
     time_taken = time.time() - start_time
     print(f"{time_taken=}")

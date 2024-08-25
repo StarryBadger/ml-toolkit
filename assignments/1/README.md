@@ -98,6 +98,8 @@ Musical key usually is not genre specific.
 
 **Artists** and **Album Name** can strongly indicate genre but are not useful for distance metrics; using them could be considered cheating. **Track Name** may have also contained hints. However we limit ourselves to only numerical features. Although time signature and mode are numbers, they are also categories.
 
+## Task 3
+The best {k, distance_metric} pair is k=85, metric=manhattan
 Top 10 {k, distance_metric} pairs:
 1. k=85, metric=manhattan, accuracy=0.2551
 2. k=64, metric=manhattan, accuracy=0.2538
@@ -111,6 +113,141 @@ Top 10 {k, distance_metric} pairs:
 10. k=32, metric=euclidean, accuracy=0.2268
 
 (cosine for k=85 comes to have Accuracy: 0.2174)
+
+#### Plot k vs accuracy given a choice (yours) of any given {k, distance metric} pair with a constant data split.
+
+![K vs Accuracy](./figures/1k_vs_accuracy.png)
+
+#### More data need not necessarily mean best results. Try dropping various columns and check if you get better accuracy. Document the combination with which you get the best results
+
+I had already filtered out categorical data before training my KNN models. To explore the impact of different features on the model's performance, I attempted to drop various numerical fields using the best parameters I found (k=85, metric=manhattan). However, even dropping a single field led to a noticeable fall in accuracy. This indicates that all numerical features in the dataset contribute significantly to the prediction of the target variable.
+
+Moreover, this outcome might be influenced by the shuffled data, as the random distribution of data points across the training and validation sets could cause certain features to be more or less influential depending on the specific split.
+
+Even duration_ms, which I put at the bottom of importance made the accruracy drop from 25% to 23.84%.
+
+My final set of features are  
+- "popularity",
+- "duration_ms",
+- "danceability",
+- "energy",
+- "key",
+- "loudness",
+- "speechiness",
+- "acousticness",
+- "instrumentalness",
+- "liveness",
+- "valence",
+- "tempo"
+
+Documentation of combos:
+
+- For "popularity", "duration_ms", "danceability","energy", "key", "loudness","speechiness","acousticness",instrumentalness","liveness","valence", "tempo"
+Classification Task Scores
+Accuracy: 0.2551
+  Precision (macro): 0.2383
+  Recall (macro): 0.2496
+  F1-Score (macro): 0.2438
+  Precision (micro): 0.2551
+  Recall (micro): 0.2551
+  F1-Score (micro): 0.2551
+- For "popularity", "danceability","energy", "key", "loudness","speechiness","acousticness",instrumentalness","liveness","valence", "tempo"
+Classification Task Scores
+Accuracy: 0.2384
+  Precision (macro): 0.2226
+  Recall (macro): 0.2346
+  F1-Score (macro): 0.2284
+  Precision (micro): 0.2384
+  Recall (micro): 0.2384
+  F1-Score (micro): 0.2384
+
+- For "popularity", "duration_ms", "danceability","energy", "key", "loudness","speechiness","acousticness",instrumentalness","liveness","valence", "tempo"
+
+Classification Task Scores
+Accuracy: 0.2408
+  Precision (macro): 0.2267
+  Recall (macro): 0.2361
+  F1-Score (macro): 0.2313
+  Precision (micro): 0.2408
+  Recall (micro): 0.2408
+  F1-Score (micro): 0.2408
+time_taken=73.59000515937805
+
+- For "popularity", "duration_ms", "danceability","energy", "key", "loudness","speechiness","acousticness",instrumentalness","liveness","valence", 
+
+Classification Task Scores
+Accuracy: 0.2444
+  Precision (macro): 0.2269
+  Recall (macro): 0.2392
+  F1-Score (macro): 0.2329
+  Precision (micro): 0.2444
+  Recall (micro): 0.2444
+  F1-Score (micro): 0.2444
+
+his does not exactly match my hierarchy of which columns are more necessary thanothers for the classification task based on the data exploration.
+
+#### Try for all combinations of columns and see which combination gives the best result. See if that matches with the analysis made during data exploration
+
+I predicted the order, danceability> tempo> duration_ms
+
+Surprisingly duration_ms plays a huge role as is seen by removing it. The order here is duration_ms > danceability> tempo.
+
+Attempting to evaluate all possible combinations of columns to determine the best result is not feasible due to the sheer number of combinations involved. Specifically, the number of combinations grows exponentially with the number of columns, leading to a combinatorial explosion. For example, considering all possible pairs (\( \binom{n}{2} \)) of columns would be impractical for large \( n \). Therefore, we will rely on the insights gained during data exploration to guide the selection of columns, focusing on the most promising combinations.
+
+### 2.5.1 Tasks
+
+1. I have used vectorization from the beginning to improve the execution time of the program, as I intentionally avoided using for loops. As clarified in the tutorial, this question does not require additional work since the implementation is already optimized with an O(n) time complexity.
+
+2. 
+
+![inference time plot](./figures/inference_time_plot.png)
+inference_time_vs_train_size_plot.png
+
+
+3. 
+
+![inference time vs train size plot](./figures/inference_time_vs_train_size_plot.png)
+
+Observations:
+
+- Inference time increases with the fraction of training data used for all models.
+
+- The sklearn KNN model (blue line) has the lowest inference time across all dataset sizes, remaining nearly constant and under 5 seconds even as the dataset grows.
+
+- The optimal KNN model (red line) shows a significant increase in inference time as the dataset size grows, but plateaus around 42 seconds for larger fractions of data.
+
+- The best KNN model (green line) has the highest inference time, increasing linearly with dataset size and reaching over 70 seconds for the full dataset.
+
+- There's a substantial performance gap between the sklearn implementation and the custom implementations, especially for larger datasets.
+
+- The optimal KNN model performs better than the best KNN model in terms of inference time, especially for larger datasets.
+
+- The difference in inference time between the models becomes more pronounced as the dataset size increases.
+
+- Both custom implementations (best and optimal) show a steeper increase in inference time compared to the sklearn model.
+
+### A Second Dataset
+
+1. Class imbalance: Some classes appear in the test set but are absent in the training set. This leads to zero values in the confusion matrix, which was addressed by adding a small constant (1e-6) to avoid division by zero errors. This situation indicates that the data split is not stratified, making it suboptimal for training and testing.
+
+2. Data preprocessing: To prepare the data, normalization was performed using both StandardScaler and MinMaxScaler. The scaling parameters (min, max, mean, standard deviation) were derived from the training set and then applied to both the validation and test sets. This approach ensures that if there are different distributions of test and validate set features, it does not have different representations of similar data in the different sets.
+
+3. Performance impact: Despite the non-ideal data split, the model's performance was not significantly impacted. The accuracy was slightly lower compared to previous results, but the difference was not substantial. This suggests that the KNN model shows some robustness to the imperfect data distribution.
+
+4. Importance of stratified sampling: This experience highlights the importance of using stratified sampling when splitting datasets, especially for multi-class classification problems. A stratified split ensures that all classes are represented proportionally in each subset, which is crucial for reliable model training and evaluation.
+
+## Linear regression 
+
+![Visualisation](./figures/first_dataset_separate_visualisation.png)
+
+Regression Task Scores:
+Mean Squared Error (MSE): 0.2713
+Standard Deviation: 0.5203
+Variance: 0.2707
+
+![Plot](./figures/linreg.png)
+
+#### Reporting MSE, Variance and standard dev for the train and test set:
 
 | k  | Train MSE | Train Std Dev | Train Variance | Test MSE | Test Std Dev | Test Variance |
 |----|-----------|---------------|----------------|----------|--------------|---------------|
@@ -159,6 +296,25 @@ degree,weights,bias
  0.25429941 0.13778543 0.21469155 0.0909681  0.1798861  0.06029258
  0.14688713 0.04395722 0.11296114 0.04113616 0.07544906]",0.4614828326722433
 ```
+
+
+### GIFS:
+#### 2 degree polynomial
+![GIF](./figures/gifs/2_polynomial_fitting.gif)
+#### 5 degree polynomial
+![GIF](./figures/gifs/5_polynomial_fitting.gif)
+#### 10 degree polynomial
+![GIF](./figures/gifs/10_polynomial_fitting.gif)
+#### 15 degree polynomial
+![GIF](./figures/gifs/15_polynomial_fitting.gif)
+#### 23 degree polynomial
+![GIF](./figures/gifs/23_polynomial_fitting.gif)
+#### 32 degree polynomial
+![GIF](./figures/gifs/32_polynomial_fitting.gif)
+
+When I initially experimented with random initialization, I observed that the time to converge for generating GIFs varied depending on the random seed. Now that I am loading data from a file, the convergence time is sonstant everytime. Due to the liner regression being on such a smll dataset, the convergence times do not actually differ much in reality, it is only visiblein the GIFs.
+
+
 #### Second dataset
 ![Regularisation dataset](./figures/second_dataset.png)
 
@@ -233,4 +389,4 @@ L1 and L2 regularization maintains similar performance metrics across polynomial
 
 In my case L1 regularisation performed better for higher degrees (k=20) while L2 performed better for lower degrees (k=10). This may be explained by the fact that L1 regularisation makes the coefficients go to 0 while L2 reduces them. So, although L2 manages to reduce overfitting more effectively compared to both L1 regularization for lower polynomials, for k=20, the polynomial coefficients of higher degrees for L2 end up contributing more to overfitting than if they were set to 0, as for L1.
 
-
+In our case only very low values of lamda seem to work (below 0.01). This may be attributed to the fact of how the test data ha been randomly sampled from the overall data, so the graphs of the train and test set are almost similar. Thus, overfitting train may still give low variances on test as there are no points in ranges of X such that it is not captured by the train dataset.

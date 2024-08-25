@@ -1,6 +1,27 @@
 import numpy as np
 
 class KNN:
+    """
+    K-Nearest Neighbors (KNN) classifier.
+
+    Parameters:
+    -----------
+    k : int
+        The number of nearest neighbors to consider.
+    distance_metric : str, optional (default="euclidean")
+        The distance metric to use. Supported values are "euclidean", "cosine", and "manhattan".
+    
+    Attributes:
+    -----------
+    X_train : np.ndarray
+        Training data features.
+    y_train : np.ndarray
+        Training data labels.
+    norm_X_train : np.ndarray, optional
+        Norms of training data features, used in cosine distance calculation.
+    calculate_distances : function
+        The function used to calculate distances based on the chosen metric.
+    """
     def __init__(self, k: int, distance_metric: str = "euclidean"):
         if k <= 0:
             raise ValueError("k must be greater than 0")
@@ -22,12 +43,35 @@ class KNN:
         self.y_train = None
 
     def fit(self, X, y):
+        """
+        Fit the KNN model using the provided training data.
+
+        Parameters:
+        -----------
+        X : np.ndarray
+            Training data features.
+        y : np.ndarray
+            Training data labels.
+        """
         self.X_train = X
         self.y_train = y
         if self.distance_metric== "cosine":
             self.norm_X_train = np.linalg.norm(self.X_train, axis=1)
 
     def predict(self, X_test):
+        """
+        Predict the labels for the provided test data.
+
+        Parameters:
+        -----------
+        X_test : np.ndarray
+            Test data features.
+
+        Returns:
+        --------
+        np.ndarray
+            Predicted labels for the test data.
+        """
         predictions = [self._predict(x) for x in X_test]
         return np.array(predictions)
 
