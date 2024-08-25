@@ -162,3 +162,75 @@ degree,weights,bias
 #### Second dataset
 ![Regularisation dataset](./figures/second_dataset.png)
 
+| Regularization | Degree (k) | Mean Squared Error (MSE) | Standard Deviation | Variance |
+|----------------|------------|--------------------------|--------------------|----------|
+| None           | 1          | 0.1493                   | 0.3782             | 0.1430   |
+| None           | 2          | 0.0196                   | 0.1301             | 0.0169   |
+| None           | 3          | 0.0193                   | 0.1337             | 0.0179   |
+| None           | 4          | 0.0135                   | 0.1143             | 0.0131   |
+| None           | 5          | 0.0135                   | 0.1141             | 0.0130   |
+| None           | 6          | 0.0122                   | 0.1090             | 0.0119   |
+| None           | 7          | 0.0122                   | 0.1088             | 0.0118   |
+| None           | 8          | 0.0120                   | 0.1076             | 0.0116   |
+| None           | 9          | 0.0122                   | 0.1082             | 0.0117   |
+| None           | 10         | 0.0122                   | 0.1080             | 0.0117   |
+| None           | 11         | 0.0124                   | 0.1090             | 0.0119   |
+| None           | 12         | 0.0125                   | 0.1095             | 0.0120   |
+| None           | 13         | 0.0127                   | 0.1105             | 0.0122   |
+| None           | 14         | 0.0128                   | 0.1111             | 0.0124   |
+| None           | 15         | 0.0130                   | 0.1118             | 0.0125   |
+| None           | 16         | 0.0130                   | 0.1122             | 0.0126   |
+| None           | 17         | 0.0131                   | 0.1123             | 0.0126   |
+| None           | 18         | 0.0130                   | 0.1123             | 0.0126   |
+| None           | 19         | 0.0130                   | 0.1121             | 0.0126   |
+| None           | 20         | 0.0129                   | 0.1119             | 0.0125   |
+| l1             | 1          | 0.1461                   | 0.3742             | 0.1400   |
+| l1             | 2          | 0.0178                   | 0.1226             | 0.0150   |
+| l1             | 3          | 0.0178                   | 0.1224             | 0.0150   |
+| l1             | 4          | 0.0119                   | 0.1052             | 0.0111   |
+| l1             | 5          | 0.0120                   | 0.1053             | 0.0111   |
+| l1             | 6          | 0.0118                   | 0.1060             | 0.0112   |
+| l1             | 7          | 0.0118                   | 0.1059             | 0.0112   |
+| l1             | 8          | 0.0119                   | 0.1064             | 0.0113   |
+| l1             | 9          | 0.0119                   | 0.1063             | 0.0113   |
+| l1             | 10         | 0.0119                   | 0.1061             | 0.0113   |
+| l1             | 11         | 0.0119                   | 0.1061             | 0.0113   |
+| l1             | 12         | 0.0119                   | 0.1061             | 0.0113   |
+| l1             | 13         | 0.0119                   | 0.1061             | 0.0113   |
+| l1             | 14         | 0.0119                   | 0.1061             | 0.0113   |
+| l1             | 15         | 0.0119                   | 0.1061             | 0.0113   |
+| l1             | 16         | 0.0119                   | 0.1061             | 0.0112   |
+| l1             | 17         | 0.0119                   | 0.1061             | 0.0113   |
+| l1             | 18         | 0.0119                   | 0.1061             | 0.0113   |
+| l1             | 19         | 0.0119                   | 0.1061             | 0.0113   |
+| l1             | 20         | 0.0119                   | 0.1061             | 0.0113   |
+| l2             | 1          | 0.1483                   | 0.3769             | 0.1421   |
+| l2             | 2          | 0.0176                   | 0.1215             | 0.0148   |
+| l2             | 3          | 0.0178                   | 0.1272             | 0.0162   |
+| l2             | 4          | 0.0125                   | 0.1092             | 0.0119   |
+| l2             | 5          | 0.0128                   | 0.1109             | 0.0123   |
+| l2             | 6          | 0.0118                   | 0.1071             | 0.0115   |
+| l2             | 7          | 0.0117                   | 0.1067             | 0.0114   |
+| l2             | 8          | 0.0115                   | 0.1060             | 0.0112   |
+| l2             | 9          | 0.0115                   | 0.1057             | 0.0112   |
+| l2             | 10         | 0.0115                   | 0.1055             | 0.0111   |
+| l2             | 11         | 0.0115                   | 0.1057             | 0.0112   |
+| l2             | 12         | 0.0115                   | 0.1058             | 0.0112   |
+| l2             | 13         | 0.0117                   | 0.1065             | 0.0113   |
+| l2             | 14         | 0.0118                   | 0.1068             | 0.0114   |
+| l2             | 15         | 0.0119                   | 0.1075             | 0.0116   |
+| l2             | 16         | 0.0120                   | 0.1079             | 0.0116   |
+| l2             | 17         | 0.0121                   | 0.1084             | 0.0118   |
+| l2             | 18         | 0.0121                   | 0.1087             | 0.0118   |
+| l2             | 19         | 0.0122                   | 0.1089             | 0.0119   |
+| l2             | 20         | 0.0122                   | 0.1089             | 0.0119   |
+
+We evaluated the impact of L1 and L2 regularization on polynomial regression tasks with varying degrees of polynomials. The results for polynomial degree kk ranging from 1 to 20 were analyzed. The original polynomial was of degree 5. The performance metrics assessed include Mean Squared Error (MSE), Standard Deviation, and Variance.
+
+The results show a decreasing trend in MSE with increasing polynomial degree until a certain point, after which the performance metrics stabilize or degrade slightly. This indicates overfitting as the polynomial degree increases, particularly evident from degree 5 onwards where the performance does not improve significantly despite the increase in model complexity.
+
+L1 and L2 regularization maintains similar performance metrics across polynomial degrees, with slight improvements in MSE, standard deviation, and variance compared to no regularization. The regularization helps in reducing the variance of the model, aka overfitting is lowered.
+
+In my case L1 regularisation performed better for higher degrees (k=20) while L2 performed better for lower degrees (k=10). This may be explained by the fact that L1 regularisation makes the coefficients go to 0 while L2 reduces them. So, although L2 manages to reduce overfitting more effectively compared to both L1 regularization for lower polynomials, for k=20, the polynomial coefficients of higher degrees for L2 end up contributing more to overfitting than if they were set to 0, as for L1.
+
+

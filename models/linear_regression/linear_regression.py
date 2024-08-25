@@ -63,7 +63,7 @@ class PolynomialRegression:
         self.weights = np.zeros(n_features)
         self.bias = 0
         frames = []
-        for iteration in range(1,self.iterations+1):
+        for iteration in range(0,self.iterations+1):
 
             y_pred = self._predict(X)
             dw = (1 / n_samples) * np.dot(X_poly.T, (y_pred - y))
@@ -77,7 +77,7 @@ class PolynomialRegression:
             self.weights -= self.learning_rate * dw
             self.bias -= self.learning_rate * db
 
-            if iteration % 100 == 0 or iteration == self.iterations - 1:
+            if iteration % 50 == 0 or iteration == self.iterations - 1:
                 mse = np.mean((y - y_pred) ** 2)
                 std_dev = np.sqrt(np.var(y - y_pred))
                 variance = np.var(y - y_pred)
@@ -91,17 +91,17 @@ class PolynomialRegression:
                 axs[0, 0].legend()
                 axs[0, 0].set_title('Polynomial Fit')
 
-                # Plot MSE
+                # MSE
                 axs[0, 1].bar(['MSE'], [mse], color='green')
                 axs[0, 1].set_ylim(0, max(mse, 0.4))
                 axs[0, 1].set_title('Mean Squared Error')
 
-                # Plot Standard Deviation
+                # Standard Deviation
                 axs[1, 0].bar(['Std Dev'], [std_dev], color='orange')
                 axs[1, 0].set_ylim(0, max(std_dev, 0.4))
                 axs[1, 0].set_title('Standard Deviation')
 
-                # Plot Variance
+                # Variance
                 axs[1, 1].bar(['Variance'], [variance], color='purple')
                 axs[1, 1].set_ylim(0, max(variance, 0.4))
                 axs[1, 1].set_title('Variance')
@@ -109,7 +109,7 @@ class PolynomialRegression:
                 plt.close()
                 frames.append(imageio.imread(f'assignments/1/figures/gifs/temp_images/frame_{iteration}.png'))
         imageio.mimsave(f'assignments/1/figures/gifs/{self.degree}_polynomial_fitting.gif', frames, fps=5)
-        # print(f"GIF saved at assignments/1/figures/{self.degree}_polynomial_fitting.gif")
+        print(f"GIF saved at assignments/1/figures/{self.degree}_polynomial_fitting.gif")
 
 
     

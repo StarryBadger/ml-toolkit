@@ -231,6 +231,41 @@ def animation()-> None:
         model = PolynomialRegression(degree=k, learning_rate=0.03)
         model.fit_with_gif(X_train, y_train)
 
+def experiment_with_regularization():
+    dataset_dir = "data/interim/1/regularisation"
+    for x in {"train", "test", "validate"}:
+        globals()[f"data_{x}"] = pd.read_csv(f"{dataset_dir}/{x}.csv")
+        globals()[f"X_{x}"] = globals()[f"data_{x}"]["x"].to_numpy()
+        globals()[f"y_{x}"] = globals()[f"data_{x}"]["y"].to_numpy()
+
+    degrees = list(range(1, 21))
+
+    for reg in [None, 'l1', 'l2']:
+        reg_label = 'None' if reg is None else reg
+        fig, axes = plt.subplots(len(degrees), 1, figsize=(10, 5 * len(degrees)), sharex=True)
+        for idx, degree in enumerate(degrees):
+            ax = axes[idx] 
+            model = PolynomialRegression(degree=degree, regularization=reg, lamda=0.01)
+            model.fit(X_train, y_train)
+            y_pred = model.predict(X_test)
+            
+            ax.scatter(X_test, y_test, color='blue', label='True Values')
+
+            sorted_indices = np.argsort(X_test)
+            X_sorted = X_test[sorted_indices]
+            y_pred_sorted = y_pred[sorted_indices]
+
+            ax.plot(X_sorted, y_pred_sorted, color='red', label=f'Predicted (Degree {degree})')
+            
+            metrics = Metrics(y_true=y_test, y_pred=y_pred, task="regression")
+            print(f"{reg_label} regularization on k={degree}")
+            metrics.print_metrics()
+            ax.set_title(f'Degree {degree} with {reg} Regularization')
+            ax.set_ylabel("y")
+            ax.legend()
+
+        fig.text(0.5, 0.04, 'X_test', ha='center')
+        plt.savefig(f"assignments/1/figures/polynomial_regression_{reg_label}.png")
 
 if __name__ == "__main__":
     start_time = time.time()
@@ -240,6 +275,7 @@ if __name__ == "__main__":
     # knn_on_spotify("data/interim/1/spotify-2/final")
     # regression()
     # hyperparam_tuning_regression()
-    animation()
+    # animation()
+    experiment_with_regularization()
     time_taken = time.time() - start_time
     print(f"{time_taken=}")
