@@ -27,7 +27,7 @@ class Metrics:
 
     def precision_score(self, average="macro"):
         confusion = self.confusion_matrix()
-        precisions = np.diagonal(confusion) / np.sum(confusion, axis=0)
+        precisions = np.diagonal(confusion) / (np.sum(confusion, axis=0)+1e-6)
         if average == "macro":
             return np.mean(precisions)
         elif average == "micro":
@@ -35,7 +35,7 @@ class Metrics:
 
     def recall_score(self, average="macro"):
         confusion = self.confusion_matrix()
-        recalls = np.diagonal(confusion) / np.sum(confusion, axis=1)
+        recalls = np.diagonal(confusion) / (np.sum(confusion, axis=1)+1e-6)
         if average == "macro":
             return np.mean(recalls)
         elif average == "micro":

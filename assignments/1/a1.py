@@ -135,8 +135,7 @@ def visualization_spotify():
         plt.savefig(f"assignments/1/figures/scatter_{x_feature}_{y_feature}.png")
 
 
-def knn_on_spotify() -> None:
-    dataset_dir = "data/interim/1/spotify/split"
+def knn_on_spotify(dataset_dir) -> None:
     for x in {"train", "test", "validate"}:
         globals()[f"data_{x}"] = pd.read_csv(f"{dataset_dir}/{x}.csv")
         globals()[f"X_{x}"] = (
@@ -166,7 +165,8 @@ def regression() -> None:
 if __name__ == "__main__":
     start_time = time.time()
     # visualization_spotify()
-    knn_on_spotify()
+    # knn_on_spotify("data/interim/1/spotify/split")
+    knn_on_spotify("data/interim/1/spotify-2/final")
     # regression()
     time_taken = time.time() - start_time
     print(f"{time_taken=}")

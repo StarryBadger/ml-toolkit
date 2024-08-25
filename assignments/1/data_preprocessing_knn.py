@@ -115,11 +115,10 @@ def normalize_splits(df_train, df_val, df_test, path, scaler="standard"):
     
     df_test_normalized = pd.DataFrame(X_test_normalized, columns=df_test.columns[:-1], index=df_test.index)
     df_test_normalized = df_test_normalized.join(y_test)
-    
-    # Save the normalized DataFrames to CSV files
-    df_train_normalized.to_csv(f'{path}/df_train_normalized.csv', index=False)
-    df_val_normalized.to_csv(f'{path}/df_val_normalized.csv', index=False)
-    df_test_normalized.to_csv(f'{path}/df_test_normalized.csv', index=False)
+
+    df_train_normalized.to_csv(f'{path}/train.csv', index=False)
+    df_val_normalized.to_csv(f'{path}/validate.csv', index=False)
+    df_test_normalized.to_csv(f'{path}/test.csv', index=False)
     
     return df_train_normalized, df_val_normalized, df_test_normalized
 
@@ -180,6 +179,5 @@ test = drop_duplicates(
 
 # normalize on train
 Path("data/interim/1/spotify-2/final").mkdir(parents=True, exist_ok=True)
-# Path("data/interim/1/spotify-2/final").mkdir(parents=True, exist_ok=True)
-normalize_splits(train,val,test,"data/interim/1/spotify-2/final")
+normalize_splits(train,val,test,"data/interim/1/spotify-2/final", scaler="minmax")
 
