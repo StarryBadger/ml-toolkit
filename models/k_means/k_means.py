@@ -11,12 +11,11 @@ class KMeans:
         self.centroids = None
 
     def fit(self, X):
-        # 100, 102, 105
-        # np.random.seed(1024) # k = 8
-        np.random.seed(43)  # k = 8
-        # np.random.seed(33) # k = 5
         # np.random.seed(35) # k = 4
+        # np.random.seed(33) # k = 5
         # np.random.seed(36) # k = 5
+        np.random.seed(43)  # k = 8
+        # np.random.seed(1024) # k = 8
 
         random_indices = np.random.choice(X.shape[0], self.k, replace=False)
         self.centroids = X[random_indices]
@@ -44,7 +43,4 @@ class KMeans:
         return np.sum(min_distances**2)
 
     def _compute_distances(self, X):
-        distances = np.zeros((X.shape[0], self.k))
-        for i, centroid in enumerate(self.centroids):
-            distances[:, i] = np.linalg.norm(X - centroid, axis=1)
-        return distances
+        return np.linalg.norm(X[:, np.newaxis, :] - self.centroids, axis=2)
