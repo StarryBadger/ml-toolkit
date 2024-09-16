@@ -12,9 +12,10 @@ class KMeans:
 
     def fit(self, X):
         # np.random.seed(35) # k = 4
-        # np.random.seed(33) # k = 5
+        np.random.seed(33) # k = 5
+        # np.random.seed(43)  # k = 8
+        
         # np.random.seed(36) # k = 5
-        np.random.seed(43)  # k = 8
         # np.random.seed(1024) # k = 8
 
         random_indices = np.random.choice(X.shape[0], self.k, replace=False)
