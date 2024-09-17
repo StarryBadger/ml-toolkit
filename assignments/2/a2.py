@@ -24,7 +24,10 @@ def load_embeddings(file_path):
     """https://pandas.pydata.org/docs/reference/api/pandas.read_feather.html"""
     df = pd.read_feather(file_path)
     embeddings = np.vstack(df.iloc[:, 1].values)
-    return embeddings
+    words = df.iloc[:, 0].values
+    return words, embeddings
+
+
 
 def load_csv_data(file_path):
     df = pd.read_csv(file_path)
@@ -55,13 +58,18 @@ def elbow_method(embeddings, max_k=25, save_path="assignments/2/figures/elbow_km
     plt.grid(True)
     plt.savefig(save_path)
 
-def k_means_tasks(embeddings):
+def k_means_tasks(words,embeddings):
     elbow_method(embeddings, max_k=25)
+    clusters = {}
     cluster_labels, cost = perform_kmeans_clustering(embeddings, K_KMEANS_1)
-
+    for cluster in np.unique(cluster_labels):
+        print(f"Cluster {cluster}")
+        words_in_cluster= words[cluster_labels == cluster].tolist()
+        print(', '.join(words_in_cluster))
     print(f"Optimal number of clusters (k_kmeans1): {K_KMEANS_1}")
     print(f"Cluster labels: {cluster_labels}")
     print(f"WCSS cost for optimal k: {cost}")
+    print(clusters)
     
 def perform_gmm_clustering(embeddings, k):
     print("Custom GMM:")
@@ -277,10 +285,10 @@ def main():
 
     file_path = "data/interim/2/word-embeddings.feather"
     file_path_kaggle = "data/interim/2/2d_clustering_kaggle.csv"
-    embeddings = load_embeddings(file_path)
+    words, embeddings = load_embeddings(file_path)
     # embeddings = load_csv_data(file_path_kaggle) #? uncomment to test on 2D dataset
     
-    # k_means_tasks(embeddings)
+    k_means_tasks(words,embeddings)
     # gmm_tasks(embeddings)
     # pca_tasks(embeddings)
 
@@ -289,7 +297,7 @@ def main():
     # determine_optimal_kgmm3(embeddings)
     # pca_gmm_tasks(embeddings)
 
-    knn_pca_task()
+    # knn_pca_task()
 
     
 
