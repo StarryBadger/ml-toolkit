@@ -203,26 +203,32 @@ Explained Variance Ratio: 0.1325
 Reconstruction Error: 0.03692622888597155
 Explained Variance Ratio: 0.1649
 
+--- 
 
-Optimal number of dimensions based on 85% explained variance: 9
-Reconstruction Error: 0.13712198288339003
-Explained Variance Ratio: 0.8629
-Classification Task Scores
-Accuracy: 0.2561
-  Precision (macro): 0.2340
-  Recall (macro): 0.2472
-  F1-Score (macro): 0.2405
-  Precision (micro): 0.2561
-  Recall (micro): 0.2561
-  F1-Score (micro): 0.2561
-time_taken=65.20476651191711
+# KNN + PCA
 
-Classification Task Scores
-Accuracy: 0.2167
-  Precision (macro): 0.1884
-  Recall (macro): 0.2089
-  F1-Score (macro): 0.1981
-  Precision (micro): 0.2167
-  Recall (micro): 0.2167
-  F1-Score (micro): 0.2167
-time_taken=40.58926296234131
+![Cumulative](./figures/spotify_scree_plot_cumulative.png)
+![Individual](./figures/spotify_scree_plot_individual.png)
+
+Optimal number of dimensions based on 85% explained    variance: 9  
+Reconstruction Error: 0.13712198288339003  
+Explained Variance Ratio: 0.8629  
+Classification Task Scores  
+Accuracy: 0.2561  
+  Precision (macro): 0.2340  
+  Recall (macro): 0.2472  
+  F1-Score (macro): 0.2405  
+  Precision (micro): 0.2561  
+  Recall (micro): 0.2561  
+  F1-Score (micro): 0.2561  
+**Time Taken:** 65.20476651191711  
+  
+Classification Task Scores  
+Accuracy: 0.2207  
+  Precision (macro): 0.1941  
+  Recall (macro): 0.2135  
+  F1-Score (macro): 0.2033  
+  Precision (micro): 0.2207  
+  Recall (micro): 0.2207  
+  F1-Score (micro): 0.2207  
+**Time Taken:** 53.93823790550232

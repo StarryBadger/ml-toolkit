@@ -249,8 +249,8 @@ def knn_pca_task():
     df=pd.read_csv(file_path_spotify)
     genres = df['track_genre'].values
     features = df.drop(columns=['track_genre']).values
-    generate_scree_plot(features)
-    reduced_features=fit_transform_pca(features, 8)
+    reduced_dim = generate_scree_plot(features, "assignments/2/figures/spotify_scree_plot")
+    reduced_features=fit_transform_pca(features, 7)
     features_df = pd.DataFrame(reduced_features)
     result_df = features_df.copy()
     result_df['track_genre'] = genres
@@ -287,9 +287,9 @@ def main():
     # scree_and_reduced_kmeans_tasks(embeddings)
 
     # determine_optimal_kgmm3(embeddings)
-    pca_gmm_tasks(embeddings)
+    # pca_gmm_tasks(embeddings)
 
-    # knn_pca_task()
+    knn_pca_task()
 
     
 
