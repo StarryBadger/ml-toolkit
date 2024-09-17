@@ -424,18 +424,17 @@ def main():
     words, embeddings = load_embeddings(file_path)
     # embeddings = load_csv_data(file_path_kaggle) #? uncomment to test on 2D dataset
     
-    # k_means_tasks(words,embeddings)
-    # gmm_tasks(words, embeddings)
+    k_means_tasks(words,embeddings)
+    gmm_tasks(words, embeddings)
     pca_tasks(words, embeddings)
 
-    # scree_and_reduced_kmeans_tasks(embeddings)
+    scree_and_reduced_kmeans_tasks(embeddings)
 
-    # determine_optimal_kgmm3(embeddings)
-    # pca_gmm_tasks(embeddings)
+    pca_gmm_tasks(embeddings)
 
-    # k_means_cluster_analysis(words, embeddings, to_reduce=False)
-    # gmm_cluster_analysis(words, embeddings, to_reduce=False)
-    # hierarchical_tasks(words,embeddings)
+    k_means_cluster_analysis(words, embeddings, to_reduce=False)
+    gmm_cluster_analysis(words, embeddings, to_reduce=False)
+    hierarchical_tasks(words,embeddings)
 
     knn_pca_task()
 
