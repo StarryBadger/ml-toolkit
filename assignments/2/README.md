@@ -904,7 +904,7 @@ drive, rose, helicopter, needle, table, fishing, bullet, mug, postcard, call, la
 ![Cumulative](./figures/spotify_scree_plot_cumulative.png)
 ![Individual](./figures/spotify_scree_plot_individual.png)
 
-Optimal number of dimensions based on 90% explained variance: 9
+**Optimal number of dimensions based on 90% explained variance: 9**
 Reconstruction Error: 0.07658321607853308
 Explained Variance Ratio: 0.9234
 
