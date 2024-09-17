@@ -3,14 +3,12 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from scipy.cluster import hierarchy as hc
 from scipy.spatial.distance import pdist
-from sklearn.datasets import make_blobs
-from sklearn.preprocessing import StandardScaler
 
 file_path = "data/interim/2/word-embeddings.feather"
 df = pd.read_feather(file_path)
 embeddings = np.vstack(df.iloc[:, 1].values)
 
-linkage_methods = ['single', 'complete', 'average', 'ward']
+linkage_methods = ['single', 'complete', 'average', 'ward', 'centroid']
 distance_metrics = ['euclidean', 'cityblock', 'cosine']
 
 def plot_dendrogram(Z, title, save_as):

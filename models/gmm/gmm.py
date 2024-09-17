@@ -83,6 +83,11 @@ class GMM:
         log_likelihood = logsumexp([np.log(self.weights[k] + 1e-15) + self._log_multivariate_normal_density(X, self.means[k], self.covariances[k]) for k in range(self.k)], axis=0)
         return np.sum(log_likelihood)
     
+    def getHardAssignments(self, X):
+        membership_probabilities = self.getMembership(X)
+        return np.argmax(membership_probabilities, axis=1)
+    
+
     def aic(self):
         num_means = self.k * self.n_features
         num_covariances = self.k * (self.n_features * (self.n_features + 1)) // 2 

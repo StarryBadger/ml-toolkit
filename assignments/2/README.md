@@ -371,7 +371,8 @@ Cluster 2
 needle, eraser, brush, feather, spoon, pencil, knit, cigarette, flute, scissor, badminton, finger, hammer, toothbrush, screwdriver, fingerprints, teaspoon, length, sword, knife, toothpaste, comb, fork, paintbrush  
 
 Cluster 3
-deer, panda, ape, rose, helicopter, cat, carrot, fishing, bear, spider, shark, grass, giraffe, forest, lizard, frog, puppet, lake, monkey, rifle, cow, starfish, plant, sun, puppy, boat, pear, peacock, fish, saturn, fruit, grape, mouse, ant, goldfish, bird, spiderman, bee, tree, beetle, snake, rain, airplane, pizza, tomato, dragonfly, parachute, butterfly, elephant, pant, rainy, bicycle, windmill, potato, crocodile
+deer, panda, ape, rose, helicopter, cat, carrot, fishing, bear, spider, shark, grass, giraffe, forest, lizard, frog, puppet, lake, monkey, rifle, cow, starfish, plant, sun, puppy, boat, pear, peacock, fish, saturn, fruit, grape, mouse, ant, goldfish, bird, spiderman, bee, tree, beetle, snake, rain, airplane, pizza, tomato, dragonfly, parachute, butterfly, elephant, pant, rainy, bicycle, windmill, potato, crocodile  
+
 Cluster 4
 listen, flame, sit, knock, bury, download, eat, postcard, hard, fight, call, hit, paint, far, dig, cry, run, clap, pull, clean, sad, draw, pray, arrest, email, buy, burn, fire, close, scary, book, enter, happy, loud, love, recycle, cut
 Cluster labels: [1 1 3 3 3 4 3 1 4 3 4 4 3 2 2 0 3 1 1 3 1 3 3 1 3 3 3 4 4 3 3 2 0 2 4 4 4
@@ -388,7 +389,7 @@ WCSS cost for optimal k: 3966.973318266988
    - Examples: table, mug, microwave, bed, chair, oven
    - Theme: Primarily indoor and household items
 
-2. Cluster 1: Actions 
+2. Cluster 1: Actions (most of which are also nouns)
    - Examples: drive, sing, dive, smile, climb, sleep
 
 3. Cluster 2: Small Tools and Instruments
@@ -412,7 +413,7 @@ WCSS cost for optimal k: 3966.973318266988
    - Examples: needle, eraser, brush, spoon, pencil, hammer
    - Theme: Identical to Cluster 2 in k=5
 
-4. Cluster 3: Concrete Objects and Actions (most of which are also nouns)
+4. Cluster 3: Objects, Animals and Actions (most of which are also nouns)
    - Examples: drive, deer, panda, rose, smile, boat
 
 ## Evaluation
@@ -422,25 +423,415 @@ WCSS cost for optimal k: 3966.973318266988
    - k=4 combines some categories, making interpretation slightly less straightforward.
 
 2. Homogeneity:
-   - k=5 appears to have more homogeneous clusters, especially in separating abstract actions from concrete actions.
-   - k=4 has more mixed clusters, particularly in Cluster 3.
+   - k=5 appears to have more homogeneous clusters.
+   - k=4 has more mixed clusters, particularly in Cluster 3, which 
 
 3. WCSS (Within-Cluster Sum of Squares) Cost:
    - k=5: 3966.97
    - k=4: 4063.22
-   - The lower WCSS for k=5 indicates tighter, more compact clusters.
+   - The lower WCSS for k=5 indicates more compact clusters, which is expected when k is increased.
 
 4. Granularity:
    - k=5 provides a finer granularity, which might be beneficial for more detailed analysis.
    - k=4 offers a simpler, more general categorization.
 
+Thus, $K_{kmeans}$ = 5.
+
 # GMM Cluster Analysis
+
+Number of clusters = k_gmm1 = 1
+Custom GMM:
+Cluster 0
+drive, sing, deer, panda, ape, listen, rose, dive, flame, helicopter, sit, knock, cat, needle, eraser, table, carrot, exit, brick, fishing, smile, bear, spider, bullet, shark, grass, giraffe, bury, download, forest, lizard, brush, mug, feather, eat, postcard, hard, spoon, bend, frog, fight, puppet, call, fly, gym, lake, face, climb, kneel, scream, monkey, kiss, passport, selfie, roof, stairs, rifle, catch, cow, hit, pencil, bed, starfish, paint, plant, far, microwave, dig, cry, notebook, run, clap, pull, sleep, knit, van, sweater, cigarette, microphone, baseball, hollow, jacket, bench, sun, bucket, puppy, clean, feet, boat, pear, basket, sad, empty, peacock, fish, saturn, slide, flute, fruit, drink, scissor, grape, laptop, door, draw, calendar, badminton, chair, mouse, ladder, pray, arrest, finger, email, candle, ant, buy, igloo, goldfish, bird, clock, oven, calculator, spiderman, bee, burn, pillow, fire, close, angry, lazy, scary, tree, hang, beetle, envelope, skate, hammer, toothbrush, book, screwdriver, snake, tattoo, earth, fingerprints, teaspoon, length, dustbin, rain, tank, airplane, ambulance, pizza, enter, television, throne, key, swim, tent, camera, zip, tomato, dragonfly, parachute, butterfly, car, sword, loudspeaker, happy, lantern, telephone, loud, elephant, love, pant, stove, rainy, knife, cook, toothpaste, basketball, wheel, bicycle, windmill, arrow, recycle, toaster, potato, comb, cut, crocodile, shoe, walk, keyboard, fork, sunny, radio, truck, suitcase, paintbrush
+Cluster labels: [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+ 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+ 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+ 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+ 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+ 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]
+_______________________
+Number of clusters = K_2 = 4
+Custom GMM:
+Cluster 0
+drive, sing, listen, dive, flame, sit, knock, exit, fishing, smile, bury, download, brush, postcard, hard, bend, fight, puppet, call, fly, face, scream, passport, selfie, catch, hit, paint, far, dig, cry, notebook, run, pull, sleep, clean, sad, empty, fish, slide, door, draw, calendar, pray, arrest, buy, burn, fire, close, angry, lazy, scary, hang, skate, hammer, book, tattoo, earth, fingerprints, rain, tank, enter, key, swim, happy, loud, love, pant, cook, recycle, cut, walk, sunny, radio, paintbrush
+Cluster 1
+ape, rose, cat, eraser, carrot, brick, bear, grass, mug, spoon, frog, lake, kneel, monkey, plant, clap, puppy, feet, pear, fruit, grape, laptop, mouse, bee, snake, length, zip, tomato, car, rainy, toaster, potato, suitcase
+Cluster 2
+bullet, eat, kiss, rifle, pencil, knit, cigarette, microphone, baseball, hollow, flute, drink, finger, email, candle, calculator, envelope, toothbrush, teaspoon, dustbin, pizza, television, camera, telephone, knife, toothpaste, arrow, shoe, keyboard, fork
+Cluster 3
+deer, panda, helicopter, needle, table, spider, shark, giraffe, forest, lizard, feather, gym, climb, roof, stairs, cow, bed, starfish, microwave, van, sweater, jacket, bench, sun, bucket, boat, basket, peacock, saturn, scissor, badminton, chair, ladder, ant, igloo, goldfish, bird, clock, oven, spiderman, pillow, tree, beetle, screwdriver, airplane, ambulance, throne, tent, dragonfly, parachute, butterfly, sword, loudspeaker, lantern, elephant, stove, basketball, wheel, bicycle, windmill, comb, crocodile, truck
+Cluster labels: [0 0 3 3 1 0 1 0 0 3 0 0 1 3 1 3 1 0 1 0 0 1 3 2 3 1 3 0 0 3 3 0 1 3 2 0 0
+ 1 0 1 0 0 0 0 3 1 0 3 1 0 1 2 0 0 3 3 2 0 3 0 2 3 3 0 1 0 3 0 0 0 0 1 0 0
+ 2 3 3 2 2 2 2 3 3 3 3 1 0 1 3 1 3 0 0 3 0 3 0 2 1 2 3 1 1 0 0 0 3 3 1 3 0
+ 0 2 2 2 3 0 3 3 3 3 3 2 3 1 0 3 0 0 0 0 0 3 0 3 2 0 0 2 0 3 1 0 0 0 2 1 2
+ 0 0 3 3 2 0 2 3 0 0 3 2 1 1 3 3 3 1 3 3 0 3 2 0 3 0 0 3 1 2 0 2 3 3 3 3 2
+ 0 1 1 3 0 3 2 0 2 2 0 0 3 1 0]
+_______________________
+Number of clusters = k_gmm3 = 4
+Custom GMM:
+Cluster 0
+deer, panda, ape, helicopter, sit, cat, needle, eraser, fishing, bullet, giraffe, mug, eat, gym, lake, stairs, rifle, cow, pencil, bed, starfish, dig, run, van, baseball, jacket, bench, sun, feet, peacock, flute, fruit, laptop, calendar, chair, ladder, ant, bee, pillow, tree, hammer, length, tent, camera, zip, dragonfly, parachute, car, sword, lantern, elephant, pant, knife, bicycle, windmill, potato, crocodile, fork, truck
+Cluster 1
+rose, bear, spider, shark, grass, forest, lizard, frog, monkey, kiss, roof, plant, bucket, puppy, boat, pear, basket, saturn, scissor, grape, goldfish, snake, tattoo, rain, pizza, key, tomato, butterfly, rainy, basketball
+Cluster 2
+sing, listen, dive, flame, knock, exit, brick, smile, bury, download, postcard, hard, bend, fight, fly, face, climb, kneel, scream, selfie, catch, hit, paint, far, cry, notebook, clap, pull, sleep, hollow, clean, sad, empty, fish, slide, drink, draw, pray, arrest, email, buy, bird, oven, burn, fire, close, angry, lazy, scary, hang, book, earth, dustbin, enter, swim, happy, loud, love, stove, cook, arrow, recycle, cut, walk, sunny
+Cluster 3
+drive, table, carrot, brush, feather, spoon, puppet, call, passport, microwave, knit, sweater, cigarette, microphone, door, badminton, mouse, finger, candle, igloo, clock, calculator, spiderman, beetle, envelope, skate, toothbrush, screwdriver, fingerprints, teaspoon, tank, airplane, ambulance, television, throne, loudspeaker, telephone, toothpaste, wheel, toaster, comb, shoe, keyboard, radio, suitcase, paintbrush
+Cluster labels: [3 2 0 0 0 2 1 2 2 0 0 2 0 0 0 3 3 2 2 0 2 1 1 0 1 1 0 2 2 1 1 3 0 3 0 2 2
+ 3 2 1 2 3 3 2 0 0 2 2 2 2 1 1 3 2 1 0 0 2 0 2 0 0 0 2 1 2 3 0 2 2 0 2 2 2
+ 3 0 3 3 3 0 2 0 0 0 1 1 2 0 1 1 1 2 2 0 2 1 2 0 0 2 1 1 0 3 2 0 3 0 3 0 2
+ 2 3 2 3 0 2 3 1 2 3 2 3 3 0 2 0 2 2 2 2 2 0 2 3 3 3 0 3 2 3 1 1 2 3 3 0 2
+ 1 3 3 3 1 2 3 3 1 2 0 0 0 1 0 0 1 0 0 3 2 0 3 2 0 2 0 2 1 0 2 3 1 3 0 0 2
+ 2 3 0 3 2 0 3 2 3 0 2 3 0 3 3]
+
+ # Cluster Analysis
+
+# Gaussian Mixture Model (GMM) Cluster Analysis Report
+
+- GMM successfully identified broad conceptual categories, separating natural elements, man-made objects, and actions/emotions.
+- The model captured some nuanced relationships, such as grouping household items and technology-related objects together.
+- However some clusters particularly Cluster 0 has = seemingly unrelated itemsand a high degree of diversity.
+
+## Cluster Summaries
+
+### Cluster 0: Diverse Objects with Animal and Tool Focus
+- Broad idea: A mixed category with emphasis on animals and everyday objects
+- Key components: Animals, tools, vehicles, and various concrete nouns
+- Examples: deer, panda, helicopter, needle, eraser
+
+### Cluster 1: Nature and Food
+- Broad idea: Items related to the natural world and edible objects
+- Key components: Animals, plants, natural elements, and food items
+- Examples: rose, bear, forest, grape, tomato, pear
+
+### Cluster 2: Actions, Emotions, and Abstract Concepts
+- Broad idea: Human experiences and behaviors
+- Key components: Verbs, emotional states, and abstract ideas
+- Examples: sing, smile, cry, hollow, angry
+
+### Cluster 3: Household and Technological Items
+- Broad idea: Man-made objects, particularly those found in homes and offices
+- Key components: Household items, technological devices, and some vehicles
+- Examples: table, microwave, calculator, airplane, toothbrush
 
 ---
 
 # Hierarchical Clustering
 
+## Metrics and Methods
+
+- **Metrics**: `euclidean`, `cityblock`, `cosine`
+- **Methods**: `single`, `complete`, `average`, `ward`, `centroid`, `median`
+
+Note: The methods "ward", "centroid", and "median" are only applicable with the "euclidean" metric.
+
+### Euclidean Distance
+
+#### Single Linkage
+Linkage matrix shape: `(199, 4)`
+```
+[[148.         176.           2.08776529   2.        ]
+ [  8.         127.           2.5120195    2.        ]
+ [ 22.         123.           3.76979249   2.        ]
+ [ 36.          59.           3.8860424    2.        ]
+ [125.         201.           3.91276439   3.        ]]
+```
+![Euclidean Single Linkage Dendrogram](figures/dendrograms/euclidean_single.png)
+
+#### Complete Linkage
+Linkage matrix shape: `(199, 4)`
+```
+[[148.         176.           2.08776529   2.        ]
+ [  8.         127.           2.5120195    2.        ]
+ [ 22.         123.           3.76979249   2.        ]
+ [ 36.          59.           3.8860424    2.        ]
+ [ 90.         180.           4.02718737   2.        ]]
+```
+![Euclidean Complete Linkage Dendrogram](figures/dendrograms/euclidean_complete.png)
+
+#### Average Linkage
+Linkage matrix shape: `(199, 4)`
+```
+[[148.         176.           2.08776529   2.        ]
+ [  8.         127.           2.5120195    2.        ]
+ [ 22.         123.           3.76979249   2.        ]
+ [ 36.          59.           3.8860424    2.        ]
+ [125.         201.           4.00966176   3.        ]]
+```
+![Euclidean Average Linkage Dendrogram](figures/dendrograms/euclidean_average.png)
+
+#### Ward Linkage
+Linkage matrix shape: `(199, 4)`
+```
+[[148.         176.           2.08776529   2.        ]
+ [  8.         127.           2.5120195    2.        ]
+ [ 22.         123.           3.76979249   2.        ]
+ [ 36.          59.           3.8860424    2.        ]
+ [ 90.         180.           4.02718737   2.        ]]
+```
+![Euclidean Ward Linkage Dendrogram](figures/dendrograms/euclidean_ward.png)
+
+#### Centroid Linkage
+Linkage matrix shape: `(199, 4)`
+```
+[[148.         176.           2.08776529   2.        ]
+ [  8.         127.           2.5120195    2.        ]
+ [ 22.         123.           3.76979249   2.        ]
+ [125.         201.           3.80909648   3.        ]
+ [ 36.          59.           3.8860424    2.        ]]
+```
+![Euclidean Centroid Linkage Dendrogram](figures/dendrograms/euclidean_centroid.png)
+
+#### Median Linkage
+Linkage matrix shape: `(199, 4)`
+```
+[[148.         176.           2.08776529   2.        ]
+ [  8.         127.           2.5120195    2.        ]
+ [ 22.         123.           3.76979249   2.        ]
+ [125.         201.           3.80909648   3.        ]
+ [ 36.          59.           3.8860424    2.        ]]
+```
+![Euclidean Median Linkage Dendrogram](figures/dendrograms/euclidean_median.png)
+
+### Cityblock Distance
+
+#### Single Linkage
+Linkage matrix shape: `(199, 4)`
+```
+[[148.         176.          37.97104677   2.        ]
+ [  8.         127.          45.31089746   2.        ]
+ [ 22.         123.          68.90832999   2.        ]
+ [ 36.          59.          69.24541447   2.        ]
+ [125.         201.          69.6822987    3.        ]]
+```
+![Cityblock Single Linkage Dendrogram](figures/dendrograms/cityblock_single.png)
+
+#### Complete Linkage
+Linkage matrix shape: `(199, 4)`
+```
+[[148.         176.          37.97104677   2.        ]
+ [  8.         127.          45.31089746   2.        ]
+ [ 22.         123.          68.90832999   2.        ]
+ [ 36.          59.          69.24541447   2.        ]
+ [ 90.         180.          71.40514299   2.        ]]
+```
+![Cityblock Complete Linkage Dendrogram](figures/dendrograms/cityblock_complete.png)
+
+#### Average Linkage
+Linkage matrix shape: `(199, 4)`
+```
+[[148.         176.          37.97104677   2.        ]
+ [  8.         127.          45.31089746   2.        ]
+ [ 22.         123.          68.90832999   2.        ]
+ [ 36.          59.          69.24541447   2.        ]
+ [ 90.         180.          71.40514299   2.        ]]
+```
+![Cityblock Average Linkage Dendrogram](figures/dendrograms/cityblock_average.png)
+
+### Cosine Distance
+
+#### Single Linkage
+Linkage matrix shape: `(199, 4)`
+```
+[[1.48000000e+02 1.76000000e+02 2.03264290e-02 2.00000000e+00]
+ [8.00000000e+00 1.27000000e+02 2.06957833e-02 2.00000000e+00]
+ [3.60000000e+01 5.90000000e+01 4.50194997e-02 2.00000000e+00]
+ [5.00000000e+00 2.02000000e+02 4.77875955e-02 3.00000000e+00]
+ [1.25000000e+02 2.01000000e+02 4.96769522e-02 3.00000000e+00]]
+```
+![Cosine Single Linkage Dendrogram](figures/dendrograms/cosine_single.png)
+
+#### Complete Linkage
+Linkage matrix shape: `(199, 4)`
+```
+[[1.48000000e+02 1.76000000e+02 2.03264290e-02 2.00000000e+00]
+ [8.00000000e+00 1.27000000e+02 2.06957833e-02 2.00000000e+00]
+ [3.60000000e+01 5.90000000e+01 4.50194997e-02 2.00000000e+00]
+ [1.68000000e+02 1.73000000e+02 5.33126479e-02 2.00000000e+00]
+ [6.80000000e+01 2.02000000e+02 5.47828520e-02 3.00000000e+00]]
+```
+![Cosine Complete Linkage Dendrogram](figures/dendrograms/cosine_complete.png)
+
+#### Average Linkage
+Linkage matrix shape: `(199, 4)`
+```
+[[1.48000000e+02 1.76000000e+02 2.03264290e-02 2.00000000e+
+
+00]
+ [8.00000000e+00 1.27000000e+02 2.06957833e-02 2.00000000e+00]
+ [3.60000000e+01 5.90000000e+01 4.50194997e-02 2.00000000e+00]
+ [1.25000000e+02 2.01000000e+02 5.23835887e-02 3.00000000e+00]
+ [1.68000000e+02 1.73000000e+02 5.33126479e-02 2.00000000e+00]]
+```
+![Cosine Average Linkage Dendrogram](figures/dendrograms/cosine_average.png)
+
+Some of the initial merges:
+
+Words merged: rain and rainy
+Words merged: flame and fire
+Words merged: hard and hit
+Words merged: spider and spiderman
+
+Comparing using Euclidean distance as that allows for all linkages:
+1. Average Linkage:
+   - Shows a balanced hierarchical structure
+   - Clusters form gradually, with many small merges at lower distances
+   - Preserves intermediate distances well
+   - Less susceptible to outliers compared to single linkage
+   - Tends to produce compact, spherical clusters
+
+2. Complete Linkage:
+   - Forms more distinct, separated clusters
+   - Larger jumps between merges, especially at higher distances
+   - Sensitive to outliers, as it considers the maximum distance between clusters
+   - Tends to produce tighter, more evenly sized clusters
+   - Can sometimes break large clusters incorrectly
+
+3. Single Linkage:
+   - Shows a "chaining" effect, with many points joining existing clusters individually
+   - Prone to producing elongated, straggly clusters
+   - Very sensitive to noise and outliers
+   - Preserves small distances well, but can distort larger distances
+   - Useful for detecting elongated or non-spherical clusters
+
+4. Ward Linkag:
+   - Forms compact, spherical clusters
+   - Minimizes within-cluster variance
+   - Shows a clear hierarchical structure with distinct levels
+   - Less sensitive to outliers compared to complete linkage
+   - Tends to produce clusters of similar sizes
+
+Euclidean distance is used in all four dendrograms, however it is often appropriate for = low-dimensional spaces.
+
+Best dendrogram:
+The **Ward linkage** appears to be the best overall. The dendogram for Ward Linkage clearly shows distinct, meaningful clusters. The clusters are well-separated, and there are clear cuts where merging occurs at higher distances. These significant gaps between the clusters at higher levels indicate strong cluster separation.
+1. It shows a clear hierarchical structure with distinct clusters
+2. Provides a good balance between small and large clusters
+3. Less prone to chaining or outlier effects
+4. Tends to produce more interpretable results for many real-world datasets
+
+However, the "best" dendrogram depends on the specific dataset and clustering goals. For example:
+- Single linkage might be preferable for detecting elongated clusters
+- Average linkage could be better for datasets with varying cluster sizes
+- Complete linkage might be useful when very compact clusters are desired
+
 ---
+
+## Using Ward Linkage and euclidean distance
+
+**Cluster assignments for k = $k_{best1} = 5:**
+
+[5 1 2 3 3 1 5 1 1 5 3 1 3 5 3 5 3 1 1 5 1 3 2 5 2 3 2 1 1 3 2 4 5 2 3 5 1
+ 4 1 2 1 3 5 2 3 5 1 5 3 1 3 1 5 1 5 5 5 1 3 1 3 5 2 1 3 1 5 3 1 5 3 3 3 1
+ 5 5 5 5 5 5 1 5 5 3 5 3 1 3 5 3 5 1 1 2 2 5 1 5 3 1 4 3 5 1 1 5 5 5 5 5 1
+ 1 3 5 5 2 1 5 2 2 5 5 5 2 2 1 5 1 1 1 1 1 3 1 2 5 5 4 4 5 4 2 1 1 3 4 4 5
+ 3 5 5 5 5 1 5 5 1 1 5 5 3 3 2 5 2 5 4 5 1 5 5 1 3 1 3 5 3 4 1 4 5 5 5 5 5
+ 5 5 3 4 1 2 3 5 5 4 3 5 5 5 4]  
+**Cluster 1**  
+sing, listen, dive, flame, knock, exit, brick, smile, bury, download, hard, bend, fight, face, scream, kiss, selfie, catch, hit, paint, far, cry, sleep, hollow, clean, sad, empty, slide, drink, door, draw, pray, arrest, buy, burn, fire, close, angry, lazy, scary, hang, tattoo, earth, enter, key, swim, happy, loud, love, cook, cut  
+**Cluster 2**  
+deer, spider, shark, giraffe, lizard, feather, frog, fly, starfish, peacock, fish, ant, goldfish, bird, spiderman, bee, beetle, snake, dragonfly, butterfly, crocodile  
+**Cluster 3**  
+panda, ape, sit, cat, eraser, carrot, bear, grass, forest, eat, puppet, gym, kneel, monkey, cow, pencil, plant, dig, run, clap, pull, sun, puppy, feet, pear, fruit, grape, finger, tree, fingerprints, rain, zip, tomato, elephant, pant, rainy, potato, shoe, sunny  
+**Cluster 4**  
+brush, spoon, scissor, hammer, toothbrush, screwdriver, teaspoon, length, sword, knife, toothpaste, comb, fork, paintbrush  
+**Cluster 5**  
+drive, rose, helicopter, needle, table, fishing, bullet, mug, postcard, call, lake, climb, passport, roof, stairs, rifle, bed, microwave, notebook, knit, van, sweater, cigarette, microphone, baseball, jacket, bench, bucket, boat, basket, saturn, flute, laptop, calendar, badminton, chair, mouse, ladder, email, candle, igloo, clock, oven, calculator, pillow, envelope, skate, book, dustbin, tank, airplane, ambulance, pizza, television, throne, tent, camera, parachute, car, loudspeaker, lantern, telephone, stove, basketball, wheel, bicycle, windmill, arrow, recycle, toaster, walk, keyboard, radio, truck, suitcase  
+
+### Hierarchical Cluster 1 vs K-Means Clusters 1 and 4
+- Alignment: Hierarchical Cluster 1 closely aligns with K-Means Cluster 4 (Abstract Actions and Concepts).
+- Difference: K-Means separates some concrete actions (e.g., "sleep", "cook") into Cluster 1 (Actions and States), while hierarchical clustering keeps these with abstract concepts.
+
+### Hierarchical Cluster 2 vs K-Means Cluster 3
+- Alignment: Both clusters focus on animals and insects.
+- Difference: Hierarchical clustering is more specific, focusing on smaller animals and insects, while K-Means Cluster 3 includes all animals and nature-related words.
+
+### Hierarchical Cluster 3 vs K-Means Clusters 3 and 1
+- Alignment: Partially aligns with K-Means Cluster 3 (Animals and Nature).
+- Difference: Hierarchical clustering includes some body parts and actions that K-Means places in Cluster 1 (Actions and States) or Cluster 0 (Indoor/Household Objects).
+
+### Hierarchical Cluster 4 vs K-Means Cluster 2
+- Strong Alignment: Both methods identify a distinct cluster for small tools and utensils.
+- Difference: Minimal. This category shows the strongest consistency between the two methods.
+
+### Hierarchical Cluster 5 vs K-Means Clusters 0 and 1
+- Partial Alignment: Many indoor/household objects in Hierarchical Cluster 5 align with K-Means Cluster 0.
+- Major Difference: Hierarchical Cluster 5 is much more heterogeneous, including items that K-Means distributes across multiple clusters (mainly 0 and 1).
+
+1. Consistency in Tools Category:
+   Both methods agree on a distinct cluster for small tools and utensils (Hierarchical Cluster 4, K-Means Cluster 2).
+
+2. Treatment of Animals and Nature:
+   Hierarchical clustering provides more granular distinctions (small vs. large animals), while K-Means groups all animals and nature words together.
+
+3. Abstract vs. Concrete Concepts:
+   K-Means tends to separate abstract concepts and concrete actions/objects more clearly. Hierarchical clustering often combines these, particularly in Clusters 1 and 5.
+
+4. Heterogeneity in Hierarchical Clustering:
+   Hierarchical Cluster 5 is notably more mixed, combining objects and concepts that K-Means separates into distinct clusters.
+
+5. Action Words:
+   K-Means has a more focused cluster for actions (Cluster 1), while hierarchical clustering distributes action words across multiple clusters (mainly 1 and 5).
+
+
+**Cluster assignments for k = $k_{best2} = 4:**  
+[4 1 2 2 2 1 4 1 1 4 2 1 2 4 2 4 2 1 1 4 1 2 2 4 2 2 2 1 1 2 2 3 4 2 2 4 1
+ 3 1 2 1 2 4 2 2 4 1 4 2 1 2 1 4 1 4 4 4 1 2 1 2 4 2 1 2 1 4 2 1 4 2 2 2 1
+ 4 4 4 4 4 4 1 4 4 2 4 2 1 2 4 2 4 1 1 2 2 4 1 4 2 1 3 2 4 1 1 4 4 4 4 4 1
+ 1 2 4 4 2 1 4 2 2 4 4 4 2 2 1 4 1 1 1 1 1 2 1 2 4 4 3 3 4 3 2 1 1 2 3 3 4
+ 2 4 4 4 4 1 4 4 1 1 4 4 2 2 2 4 2 4 3 4 1 4 4 1 2 1 2 4 2 3 1 3 4 4 4 4 4
+ 4 4 2 3 1 2 2 4 4 3 2 4 4 4 3]  
+**Cluster 1**  
+sing, listen, dive, flame, knock, exit, brick, smile, bury, download, hard, bend, fight, face, scream, kiss, selfie, catch, hit, paint, far, cry, sleep, hollow, clean, sad, empty, slide, drink, door, draw, pray, arrest, buy, burn, fire, close, angry, lazy, scary, hang, tattoo, earth, enter, key, swim, happy, loud, love, cook, cut  
+**Cluster 2**  
+deer, panda, ape, sit, cat, eraser, carrot, bear, spider, shark, grass, giraffe, forest, lizard, feather, eat, frog, puppet, fly, gym, kneel, monkey, cow, pencil, starfish, plant, dig, run, clap, pull, sun, puppy, feet, pear, peacock, fish, fruit, grape, finger, ant, goldfish, bird, spiderman, bee, tree, beetle, snake, fingerprints, rain, zip, tomato, dragonfly, butterfly, elephant, pant, rainy, potato, crocodile, shoe, sunny  
+**Cluster 3**  
+brush, spoon, scissor, hammer, toothbrush, screwdriver, teaspoon, length, sword, knife, toothpaste, comb, fork, paintbrush  
+**Cluster 4**  
+drive, rose, helicopter, needle, table, fishing, bullet, mug, postcard, call, lake, climb, passport, roof, stairs, rifle, bed, microwave, notebook, knit, van, sweater, cigarette, microphone, baseball, jacket, bench, bucket, boat, basket, saturn, flute, laptop, calendar, badminton, chair, mouse, ladder, email, candle, igloo, clock, oven, calculator, pillow, envelope, skate, book, dustbin, tank, airplane, ambulance, pizza, television, throne, tent, camera, parachute, car, loudspeaker, lantern, telephone, stove, basketball, wheel, bicycle, windmill, arrow, recycle, toaster, walk, keyboard, radio, truck, suitcase
+  
+### Cluster 1 (Hierarchical)
+**Content:** Primarily actions, emotions, and abstract concepts (e.g., sing, listen, smile, fight, cry, angry)
+
+**Comparison with GMM:**
+- Aligns closely with GMM Cluster 2, which also focused on actions, emotions, and abstract concepts.
+- Notable differences:
+  - Includes some concrete nouns (e.g., flame, brick, door) that were in different GMM clusters.
+  - Contains "tattoo" and "key," which were in GMM Cluster 1 (nature and food).
+
+### Cluster 2 (Hierarchical)
+**Content:** Predominantly animals and nature-related items, with some body parts and insects.
+
+**Comparison with GMM:**
+- Combines elements from GMM Cluster 0 (animals) and GMM Cluster 1 (nature items).
+- Notable differences:
+  - Includes more diverse elements like "eraser," "pencil," and "spiderman," which were in different GMM clusters.
+  - Contains weather-related terms (rain, sunny) that were split across GMM clusters.
+
+### Cluster 3 (Hierarchical)
+**Content:** Tools and utensils, primarily those used for writing, grooming, and eating.
+
+**Comparison with GMM:**
+- Most closely aligns with parts of GMM Cluster 3 (household items) and Cluster 0 (tools).
+- Notable differences:
+  - Much more focused and specific than any single GMM cluster.
+  - Excludes larger household items and technology that were present in GMM Cluster 3.
+
+### Cluster 4 (Hierarchical)
+**Content:** Man-made objects, including vehicles, furniture, buildings, and technology.
+
+**Comparison with GMM:**
+- Combines elements from GMM Cluster 0 (diverse objects) and Cluster 3 (household and technology items).
+- Notable differences:
+  - Includes "rose" and "pizza," which were in GMM Cluster 1 (nature and food).
+  - Contains a broader range of man-made objects than any single GMM cluster.
+
+**Natural vs. Man-made Division:** Hierarchical clustering more clearly separates natural elements (Cluster 2) from man-made objects (Cluster 4), whereas GMM had this distinction but with more overlap.
+
+**Granularity:** Hierarchical Cluster 3 (tools) demonstrates finer granularity than GMM, focusing specifically on handheld tools and utensils.
+
+**Diverse Cluster Handling:** GMM's Cluster 0 was highly diverse, while hierarchical clustering distributes these diverse elements more evenly across its clusters.
+
 
 # KNN + PCA
 

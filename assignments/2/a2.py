@@ -2,15 +2,14 @@ import time
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+from scipy.cluster import hierarchy as hc
+from scipy.spatial.distance import pdist
 from models.k_means.k_means import KMeans
 from models.gmm.gmm import GMM
 from models.pca.pca import PCA
 from models.knn.knn import KNN
 from sklearn.mixture import GaussianMixture
 from performance_measures.classification_metrics import Metrics
-
-
-# from sklearn.decomposition import PCA as SklearnPCA
 from mpl_toolkits.mplot3d import Axes3D
 
 K_KMEANS_1 = 5
@@ -79,9 +78,11 @@ def perform_gmm_clustering(embeddings, k):
     params = gmm.getParams()
     membership = gmm.getMembership(embeddings)
     likelihood = gmm.getLikelihood(embeddings)
-    print("Custom GMM Parameters:", params)
-    print("Custom GMM Membership:", membership)
-    print("Custom GMM Log Likelihood:", likelihood)
+    cluster_labels = gmm.getHardAssignments(embeddings)
+    # print("Custom GMM Parameters:", params)
+    # print("Custom GMM Membership:", membership)
+    # print("Custom GMM Log Likelihood:", likelihood)
+    return cluster_labels
     
 def perform_gmm_clustering_sklearn(embeddings, k):
     print("\nSklearn GMM:")
@@ -285,7 +286,82 @@ def k_means_cluster_analysis(words, embeddings, to_reduce=False):
     print("_______________________")
 
 def gmm_cluster_analysis(words, embeddings, to_reduce=False):
-    pass
+    if to_reduce:
+        embeddings = fit_transform_pca(embeddings, OPTIMAL_DIMS)
+    print(f"Number of clusters = k_gmm1 = {K_GMM_1}")
+    cluster_labels = perform_gmm_clustering(embeddings, K_GMM_1)
+    print_clusters(words, cluster_labels)
+    print(f"Cluster labels: {cluster_labels}")
+    print("_______________________")
+
+    print(f"Number of clusters = K_2 = {K_2}")
+    cluster_labels = perform_gmm_clustering(embeddings, K_2)
+    print_clusters(words, cluster_labels)
+    print(f"Cluster labels: {cluster_labels}")
+    print("_______________________")
+
+    print(f"Number of clusters = k_gmm3 = {K_GMM_3}")
+    cluster_labels= perform_gmm_clustering(embeddings, K_GMM_3)
+    print_clusters(words, cluster_labels)
+    print(f"Cluster labels: {cluster_labels}")
+    print("_______________________")
+
+def plot_dendrogram(Z, title, save_as):
+    plt.figure(figsize=(10, 7))
+    hc.dendrogram(Z)
+    plt.title(title)
+    plt.xlabel('Sample Index')
+    plt.ylabel('Distance')
+    plt.savefig(save_as)
+    plt.close()
+
+def generate_dendrograms(words, embeddings, linkage_methods, distance_metrics, output_dir):
+    for metric in distance_metrics:
+        for method in linkage_methods:
+             if (method != "ward" and method != "centroid" and method != "median") \
+             or metric == "euclidean":
+                linkage_matrix = pdist(embeddings, metric=metric)
+                print(linkage_matrix)
+                Z = hc.linkage(embeddings, method=method, metric=metric)
+                # for i in range(3):  # Print the first 5 merges
+                #     pair = Z[i]
+                #     print(f"Merge {i + 1}:")
+                #     print(f"Words merged: {words[int(pair[0])]} and {words[int(pair[1])]}")
+                #     print(f"Distance: {pair[2]}")
+                #     print()
+
+                save_as = f"{output_dir}/{metric}_{method}.png"
+                plot_dendrogram(Z, f'Dendrogram ({metric} distance, {method} linkage)', save_as)
+                print(f"Linkage matrix shape for {metric} distance and {method} linkage: {Z.shape}")
+                print("First few rows of the linkage matrix:")
+                print(Z[:5])
+                print("\n")
+
+def hierarchical_clustering(words, embeddings, best_linkage, kbest1, kbest2):
+    Z_best = hc.linkage(embeddings, method=best_linkage, metric='euclidean')
+    
+    clusters_kbest1 = hc.fcluster(Z_best, t=kbest1, criterion='maxclust')
+    clusters_kbest2 = hc.fcluster(Z_best, t=kbest2, criterion='maxclust')
+    print(f"Cluster assignments for k={kbest1}:")
+    print(clusters_kbest1)
+    print_clusters(words, clusters_kbest1)
+    print(f"\nCluster assignments for k={kbest2}:")
+    print(clusters_kbest2)
+    print_clusters(words, clusters_kbest2)
+
+    return clusters_kbest1, clusters_kbest2
+
+def hierarchical_tasks(words, embeddings):
+    linkage_methods = ['single', 'complete', 'average', 'ward', 'centroid', 'median']
+    distance_metrics = ['euclidean', 'cityblock', 'cosine']
+    output_dir = "assignments/2/figures/dendrograms"
+    generate_dendrograms(words, embeddings, linkage_methods, distance_metrics, output_dir)
+
+    best_linkage = 'ward'
+    kbest1 = 4
+    kbest2 = 5
+    hierarchical_clustering(words, embeddings, best_linkage, kbest1, kbest2)
+
 
 def split(X, train_ratio=0.8, val_ratio=0.1):
     np.random.seed(1)
@@ -337,7 +413,7 @@ def main():
     # embeddings = load_csv_data(file_path_kaggle) #? uncomment to test on 2D dataset
     
     # k_means_tasks(words,embeddings)
-    # gmm_tasks(embeddings)
+    # gmm_tasks(words, embeddings)
     # pca_tasks(words, embeddings)
 
     # scree_and_reduced_kmeans_tasks(embeddings)
@@ -345,12 +421,9 @@ def main():
     # determine_optimal_kgmm3(embeddings)
     # pca_gmm_tasks(embeddings)
 
-    k_means_cluster_analysis(words, embeddings, to_reduce=False)
-    # k_means_cluster_analysis(words, embeddings, to_reduce=True)
-
+    # k_means_cluster_analysis(words, embeddings, to_reduce=False)
     # gmm_cluster_analysis(words, embeddings, to_reduce=False)
-    # gmm_cluster_analysis(words, embeddings, to_reduce=True)
-
+    hierarchical_tasks(words,embeddings)
 
     # knn_pca_task()
 

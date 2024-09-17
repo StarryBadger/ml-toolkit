@@ -38,15 +38,4 @@ class PCA:
         print(f"Reconstruction Error: {reconstruction_error}")
         print(f"Explained Variance Ratio: {explained_variance_ratio:.4f}")
         
-        if self.X.shape[1] == 2:
-            plt.figure(figsize=(12, 5))
-            plt.subplot(121)
-            plt.scatter(self.X[:, 0], self.X[:, 1], alpha=0.7)
-            plt.title("Original Data")
-            plt.subplot(122)
-            plt.scatter(X_reconstructed[:, 0], X_reconstructed[:, 1], alpha=0.7)
-            plt.title("Reconstructed Data")
-            plt.tight_layout()
-            plt.show()
-        
-        return explained_variance_ratio>0.8
+        return reconstruction_error<0.15
