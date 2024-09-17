@@ -135,6 +135,39 @@ Covariances: [[[ 2.98234736e-02,  7.82239280e-05,  3.55016624e-03, ...,
 
 By observation I was able to identify 4 distinct clusters. Thus, $$k_2 = 4$$
 
+# PCA + KMeans Clustering
+
+K-Means on $k_2 = 4$
+Clusters:
+3 1 3 3 3 1 3 3 1 3 3 1 3 2 2 0 3 3 3 3 3 3 3 3 3 3 3 1 1 3 3 2 0 2 1 1 1
+ 2 3 3 1 3 1 3 0 3 3 3 3 3 3 3 0 1 0 0 3 1 3 1 2 0 3 1 3 1 0 3 1 0 3 1 3 1
+ 2 0 0 3 0 3 3 0 0 3 0 3 1 0 3 3 3 1 3 3 3 3 1 2 3 1 2 3 0 0 1 0 2 0 3 0 1
+ 1 2 1 0 3 1 0 3 3 0 0 0 3 3 1 0 1 1 1 1 1 3 1 3 0 3 2 2 1 2 3 3 3 3 2 2 0
+ 3 3 3 0 3 1 0 0 2 3 0 0 3 3 3 3 3 0 2 0 1 0 0 1 3 1 3 0 3 2 1 2 3 0 3 3 3
+ 1 0 3 2 1 3 3 3 0 2 3 0 0 0 2
+WCSS cost for k=4: 4063.222058671721
+
+## Scree Plot for Optimal Dimensions:
+
+![Cumulative](./figures/scree_plot_cumulative.png)
+![Individual](./figures/scree_plot_individual.png)
+
+**Optimal number of dimensions based on 90% explained variance: 107**
+
+![Elbow](figures/elbow_kmeans_optimal_clusters_5.png)
+
+Observing the elbow plot,$k_{kmeans3} = 5$
+
+Performing K-Means clustering with k=5 on the reduced dataset, we get:
+
+Cluster labels for reduced dataset (k=5): [1 1 3 3 3 4 3 1 4 3 4 4 3 2 2 0 3 1 0 3 1 3 3 1 3 3 3 4 4 3 3 2 0 2 4 4 4
+ 2 1 3 4 3 4 1 0 3 1 1 1 1 3 1 0 1 0 2 3 1 3 4 2 0 3 1 3 4 0 4 4 0 4 4 1 1
+ 2 0 0 2 0 1 1 0 0 3 0 3 4 0 3 3 1 4 1 3 3 3 1 2 3 1 2 3 0 2 4 0 2 0 3 2 4
+ 4 2 4 0 3 4 0 3 3 0 0 0 3 3 4 0 4 4 1 1 4 3 1 3 0 1 2 2 4 2 3 1 1 2 2 2 0
+ 3 1 3 0 3 4 0 0 1 1 0 0 1 3 3 3 3 0 2 0 4 0 0 4 3 4 3 0 3 2 1 2 1 0 3 3 1
+ 4 0 3 2 4 3 0 1 0 2 1 0 0 0 2]
+WCSS cost for reduced dataset (k=5): 3530.4813079576106
+
 Reconstruction Error: 0.03835961161605422
 Explained Variance Ratio: 0.1325
 Reconstruction Error: 0.03692622888597155

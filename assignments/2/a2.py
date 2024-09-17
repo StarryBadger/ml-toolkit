@@ -16,7 +16,8 @@ from mpl_toolkits.mplot3d import Axes3D
 K_KMEANS_1 = 5
 K_GMM_1 = 1
 K_2 = 4
-K_KMEANS_3 = 11
+OPTIMAL_DIMS =107
+K_KMEANS_3 = 5
 K_GMM_3 = 1
 
 def load_embeddings(file_path):
@@ -167,7 +168,8 @@ def perform_kmeans_clustering_K2(embeddings):
     print(f"WCSS cost for k={K_2}: {cost}")
     return cluster_labels
 
-def generate_scree_plot(embeddings):
+def generate_scree_plot(embeddings, save_path="assignments/2/figures/scree_plot"):
+    global OPTIMAL_DIMS
     pca = PCA(n_components=embeddings.shape[1])
     pca.fit(embeddings)
 
@@ -179,25 +181,29 @@ def generate_scree_plot(embeddings):
         explained_variance_ratios.append(explained_variance_ratio)
 
     plt.figure(figsize=(10, 6))
-    plt.plot(range(1, len(explained_variance_ratios) + 1), explained_variance_ratios, marker='o', alpha=0.5)
+    plt.plot(range(1, len(explained_variance_ratios) + 1), explained_variance_ratios, marker='o', alpha=0.7)
     plt.title('Scree Plot: Cumulative Explained Variance by Principal Components')
     plt.xlabel('Number of Principal Components')
     plt.ylabel('Cumulative Explained Variance Ratio')
     plt.grid(True)
-    plt.savefig("assignments/2/figures/scree_plot.png")
-    optimal_dims = np.argmax(np.array(explained_variance_ratios) >= 0.90) + 1
-    print(f"Optimal number of dimensions based on 85% explained variance: {optimal_dims}")
+    OPTIMAL_DIMS = np.argmax(np.array(explained_variance_ratios) >= 0.90) + 1
+    print(f"Optimal number of dimensions based on 90% explained variance: {OPTIMAL_DIMS}")
+    plt.axhline(y=0.9, color='blue', linestyle=':', label=f'Explained Variance >= 90%')
+    plt.axvline(x=OPTIMAL_DIMS, color='red', linestyle='--', label=f'Optimal Dims: {OPTIMAL_DIMS}')
+    plt.legend()
+    plt.savefig(f"{save_path}_cumulative.png")
+    plt.close()
 
     explained_variance = pca.eigenvalues / np.sum(pca.eigenvalues)
     # explained_variance=explained_variance[:100]
     plt.figure(figsize=(10, 6))
-    plt.plot(range(1, len(explained_variance) + 1), explained_variance, marker='o', alpha=0.5)
+    plt.plot(range(1, len(explained_variance) + 1), explained_variance, marker='o', alpha=0.7)
     plt.title('Scree Plot: Variance Explained by Each Principal Component')
     plt.xlabel('Principal Component')
     plt.ylabel('Explained Variance Ratio')
     plt.grid(True)
-    plt.savefig("assignments/2/figures/scree_plot_individual.png")
-    return optimal_dims
+    plt.savefig(f"{save_path}_individual.png")
+    return OPTIMAL_DIMS
 
 def perform_kmeans_on_reduced_data(embeddings, optimal_dims):
     print(f"Applying PCA to reduce dataset to {optimal_dims} dimensions.")
@@ -279,10 +285,9 @@ def main():
     
     # k_means_tasks(embeddings)
     # gmm_tasks(embeddings)
-    pca_tasks(embeddings)
+    # pca_tasks(embeddings)
 
-    # perform_kmeans_clustering_K2(embeddings)
-    # scree_and_reduced_kmeans_tasks(embeddings)
+    scree_and_reduced_kmeans_tasks(embeddings)
 
     # perform_gmm_clustering(embeddings, K_2)
     # determine_optimal_kgmm3(embeddings)
