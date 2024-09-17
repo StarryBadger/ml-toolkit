@@ -144,6 +144,110 @@ Covariances: [[[ 2.98234736e-02,  7.82239280e-05,  3.55016624e-03, ...,
 ![Large](./figures/pca_2d.png)
 ![Upto 20](./figures/pca_3d.png)
 
+## Analysis of PCA Axes
+
+**Words sorted along PCA Axis 1:**  
+['peacock' 'lantern' 'crocodile' 'dragonfly' 'panda' 'giraffe' 'starfish'
+ 'elephant' 'sweater' 'pencil' 'windmill' 'beetle' 'toothbrush' 'eraser'
+ 'stairs' 'goldfish' 'bee' 'ant' 'badminton' 'pear' 'bench' 'cow' 'sun'
+ 'chair' 'deer' 'saturn' 'jacket' 'helicopter' 'parachute' 'flute'
+ 'microphone' 'tent' 'igloo' 'suitcase' 'tomato' 'feather' 'van' 'fruit'
+ 'gym' 'knit' 'paintbrush' 'butterfly' 'cat' 'bed' 'rifle' 'microwave'
+ 'tree' 'toothpaste' 'screwdriver' 'carrot' 'bicycle' 'spoon' 'grape'
+ 'lizard' 'ladder' 'pillow' 'throne' 'needle' 'ambulance' 'teaspoon'
+ 'fork' 'comb' 'length' 'feet' 'frog' 'stove' 'roof' 'candle' 'scissor'
+ 'mug' 'spider' 'grass' 'car' 'toaster' 'fishing' 'laptop' 'shark'
+ 'potato' 'pant' 'boat' 'airplane' 'spiderman' 'bucket' 'ape' 'forest'
+ 'table' 'mouse' 'television' 'door' 'loudspeaker' 'oven' 'camera'
+ 'finger' 'rainy' 'lake' 'monkey' 'telephone' 'brush' 'calculator'
+ 'calendar' 'plant' 'puppet' 'envelope' 'wheel' 'sword' 'keyboard' 'bear'
+ 'cigarette' 'skate' 'rain' 'rose' 'clock' 'pizza' 'dustbin'
+ 'fingerprints' 'snake' 'passport' 'bird' 'climb' 'shoe' 'basketball'
+ 'arrow' 'hammer' 'truck' 'baseball' 'walk' 'kneel' 'fish' 'knife' 'radio'
+ 'basket' 'scream' 'brick' 'swim' 'zip' 'puppy' 'tattoo' 'drive' 'kiss'
+ 'notebook' 'bend' 'sunny' 'sit' 'bullet' 'pull' 'dig' 'fly' 'exit' 'tank'
+ 'face' 'run' 'hollow' 'dive' 'smile' 'earth' 'empty' 'key' 'clap' 'eat'
+ 'selfie' 'postcard' 'paint' 'catch' 'drink' 'sing' 'slide' 'cook' 'angry'
+ 'arrest' 'recycle' 'bury' 'knock' 'book' 'sleep' 'far' 'email' 'lazy'
+ 'draw' 'enter' 'cut' 'hang' 'loud' 'call' 'sad' 'clean' 'close' 'flame'
+ 'fight' 'fire' 'pray' 'burn' 'happy' 'buy' 'hard' 'scary' 'download'
+ 'listen' 'love' 'cry' 'hit']
+
+**Words sorted along PCA Axis 2:**  
+['sad' 'cat' 'run' 'cow' 'eat' 'bee' 'panda' 'ape' 'dig' 'potato' 'sun'
+ 'pant' 'van' 'car' 'gym' 'tomato' 'buy' 'sit' 'camera' 'ant' 'rifle'
+ 'bed' 'elephant' 'clap' 'calendar' 'pencil' 'feet' 'mug' 'fly'
+ 'crocodile' 'bear' 'fruit' 'cry' 'starfish' 'lantern' 'pull' 'television'
+ 'cut' 'peacock' 'puppy' 'deer' 'frog' 'arrest' 'selfie' 'monkey' 'smile'
+ 'hard' 'face' 'bird' 'zip' 'plant' 'grape' 'happy' 'calculator' 'earth'
+ 'ambulance' 'angry' 'laptop' 'shoe' 'scary' 'rose' 'tree' 'fish'
+ 'helicopter' 'chair' 'radio' 'fire' 'roof' 'sweater' 'boat' 'close' 'far'
+ 'kneel' 'sleep' 'enter' 'hit' 'lake' 'lazy' 'parachute' 'clean' 'forest'
+ 'pray' 'rain' 'truck' 'jacket' 'spider' 'tank' 'burn' 'hang' 'love'
+ 'sunny' 'bench' 'table' 'snake' 'shark' 'pizza' 'email' 'grass' 'tattoo'
+ 'lizard' 'book' 'kiss' 'tent' 'microphone' 'rainy' 'flame' 'bicycle'
+ 'butterfly' 'listen' 'mouse' 'empty' 'paint' 'stove' 'drink' 'hammer'
+ 'pear' 'door' 'fight' 'swim' 'postcard' 'puppet' 'walk' 'draw' 'finger'
+ 'giraffe' 'toaster' 'download' 'exit' 'cigarette' 'spiderman' 'bend'
+ 'beetle' 'oven' 'recycle' 'climb' 'wheel' 'slide' 'baseball' 'goldfish'
+ 'cook' 'loud' 'bury' 'dive' 'pillow' 'throne' 'length' 'fork' 'fishing'
+ 'ladder' 'eraser' 'basketball' 'keyboard' 'suitcase' 'carrot' 'candle'
+ 'hollow' 'call' 'saturn' 'sing' 'stairs' 'brick' 'clock' 'catch' 'bucket'
+ 'key' 'drive' 'scissor' 'windmill' 'dragonfly' 'skate' 'knock' 'bullet'
+ 'envelope' 'knit' 'scream' 'igloo' 'airplane' 'microwave' 'toothpaste'
+ 'basket' 'arrow' 'knife' 'fingerprints' 'passport' 'telephone' 'sword'
+ 'dustbin' 'needle' 'notebook' 'flute' 'feather' 'comb' 'brush' 'spoon'
+ 'toothbrush' 'loudspeaker' 'screwdriver' 'teaspoon' 'badminton'
+ 'paintbrush']
+
+**Words sorted along PCA Axis 3:**  
+['laptop' 'chair' 'calendar' 'calculator' 'television' 'mug' 'bench'
+ 'envelope' 'pencil' 'microphone' 'stove' 'microwave' 'keyboard' 'pillow'
+ 'camera' 'table' 'suitcase' 'radio' 'bed' 'toaster' 'loudspeaker'
+ 'throne' 'van' 'tent' 'gym' 'email' 'oven' 'car' 'telephone' 'toothbrush'
+ 'sweater' 'notebook' 'potato' 'call' 'stairs' 'jacket' 'comb' 'book'
+ 'postcard' 'sit' 'eraser' 'passport' 'ambulance' 'fork' 'brush' 'pull'
+ 'dig' 'door' 'ladder' 'eat' 'lantern' 'toothpaste' 'sad' 'dustbin'
+ 'clock' 'candle' 'rifle' 'run' 'shoe' 'teaspoon' 'selfie' 'feet' 'bucket'
+ 'buy' 'flute' 'cut' 'cigarette' 'recycle' 'draw' 'length' 'listen'
+ 'drink' 'roof' 'truck' 'sun' 'paintbrush' 'knit' 'download' 'pant' 'clap'
+ 'wheel' 'knock' 'tattoo' 'igloo' 'badminton' 'cook' 'finger' 'exit'
+ 'hammer' 'brick' 'screwdriver' 'arrest' 'kneel' 'enter' 'smile' 'tomato'
+ 'spoon' 'key' 'slide' 'basketball' 'face' 'knife' 'bend' 'sing'
+ 'fingerprints' 'bury' 'burn' 'paint' 'happy' 'fruit' 'boat' 'baseball'
+ 'far' 'basket' 'scissor' 'zip' 'walk' 'close' 'tank' 'parachute' 'hit'
+ 'cry' 'drive' 'empty' 'bicycle' 'loud' 'kiss' 'scary' 'skate' 'sword'
+ 'sleep' 'catch' 'needle' 'helicopter' 'cat' 'plant' 'tree' 'pizza'
+ 'fight' 'cow' 'lazy' 'puppet' 'fire' 'windmill' 'love' 'sunny' 'hard'
+ 'grass' 'hang' 'hollow' 'pear' 'peacock' 'bullet' 'scream' 'clean'
+ 'carrot' 'pray' 'angry' 'fishing' 'mouse' 'rose' 'feather' 'flame'
+ 'earth' 'ape' 'swim' 'rain' 'grape' 'panda' 'bee' 'rainy' 'ant' 'climb'
+ 'dive' 'saturn' 'lake' 'arrow' 'starfish' 'airplane' 'forest' 'fly'
+ 'elephant' 'goldfish' 'crocodile' 'puppy' 'beetle' 'fish' 'snake' 'bird'
+ 'bear' 'spiderman' 'deer' 'monkey' 'butterfly' 'shark' 'spider' 'giraffe'
+ 'lizard' 'frog' 'dragonfly']
+
+### PCA Axis 1: Abstraction Level
+This axis appears to represent a continuum from concrete, tangible objects to abstract concepts and actions.
+
+- Starts with: Concrete nouns (e.g., peacock, lantern, crocodile)
+- Ends with: Abstract verbs and concepts (e.g., love, cry, hit)
+
+
+### PCA Axis 2: Animacy and Mobility
+
+This axis seems to capture the distinction between things that can move or have agency and those that are typically stationary or used as tools.
+
+- Starts with: Living creatures and dynamic objects (e.g., sad, cat, run, cow)
+- Ends with: Static tools and small objects (e.g., paintbrush, teaspoon, screwdriver)
+
+
+### PCA Axis 3: Human-Centric vs. Nature-Centric
+This axis seems to move from human-made, indoor items from natural, outdoor elements.
+
+- Starts with: Man-made, indoor objects (e.g., laptop, chair, calendar)
+- Ends with: Natural, outdoor elements (e.g., butterfly, shark, spider, giraffe)
+
 By observation I was able to identify 4 distinct clusters. Thus, $$k_2 = 4$$
 
 # PCA + KMeans Clustering

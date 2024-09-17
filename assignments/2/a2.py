@@ -150,6 +150,25 @@ def visualize_2D(data, save_path="assignments/2/figures/pca_2d.png"):
     plt.savefig(save_path)
     plt.close()
 
+def sort_words_along_axes(pca_3D_data, words):
+    sorted_indices_axis_1 = np.argsort(pca_3D_data[:, 0])
+    sorted_words_axis_1 = words[sorted_indices_axis_1]
+
+    sorted_indices_axis_2 = np.argsort(pca_3D_data[:, 1])
+    sorted_words_axis_2 = words[sorted_indices_axis_2]
+
+    sorted_indices_axis_3 = np.argsort(pca_3D_data[:, 2])
+    sorted_words_axis_3 = words[sorted_indices_axis_3]
+
+    print("Words sorted along PCA Axis 1:")
+    print(sorted_words_axis_1)
+    
+    print("\nWords sorted along PCA Axis 2:")
+    print(sorted_words_axis_2)
+    
+    print("\nWords sorted along PCA Axis 3:")
+    print(sorted_words_axis_3)
+
 def visualize_3D(data,save_path="assignments/2/figures/pca_3d.png"):
     data = np.real(data)
 
@@ -164,11 +183,12 @@ def visualize_3D(data,save_path="assignments/2/figures/pca_3d.png"):
     plt.savefig(save_path)
     plt.close()
 
-def pca_tasks(embeddings):
+def pca_tasks(words, embeddings):
     pca_2D_data = fit_transform_pca(embeddings, 2)
     visualize_2D(pca_2D_data)
     pca_3D_data = fit_transform_pca(embeddings, 3)
     visualize_3D(pca_3D_data)
+    sort_words_along_axes(pca_3D_data, words)
     
 def perform_kmeans_clustering_K2(embeddings):
     cluster_labels, cost = perform_kmeans_clustering(embeddings, K_2)
@@ -290,7 +310,7 @@ def main():
     
     k_means_tasks(words,embeddings)
     # gmm_tasks(embeddings)
-    # pca_tasks(embeddings)
+    pca_tasks(words, embeddings)
 
     # scree_and_reduced_kmeans_tasks(embeddings)
 
