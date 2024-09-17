@@ -133,6 +133,8 @@ Covariances: [[[ 2.98234736e-02,  7.82239280e-05,  3.55016624e-03, ...,
 ![Large](./figures/pca_2d.png)
 ![Upto 20](./figures/pca_3d.png)
 
+By observation I was able to identify 4 distinct clusters. Thus, $$k_2 = 4$$
+
 Reconstruction Error: 0.03835961161605422
 Explained Variance Ratio: 0.1325
 Reconstruction Error: 0.03692622888597155
