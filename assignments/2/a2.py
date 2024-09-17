@@ -26,8 +26,6 @@ def load_embeddings(file_path):
     words = df.iloc[:, 0].values
     return words, embeddings
 
-
-
 def load_csv_data(file_path):
     df = pd.read_csv(file_path)
     embeddings = df[["x", "y"]].values
@@ -90,11 +88,11 @@ def perform_gmm_clustering_sklearn(embeddings, k):
     sklearn_gmm.fit(embeddings)
 
     soft_membership = sklearn_gmm.predict_proba(embeddings) 
-    # hard_membership = sklearn_gmm.predict(embeddings)
+    hard_membership = sklearn_gmm.predict(embeddings)
     likelihood = sklearn_gmm.score_samples(embeddings).sum() 
     
     print("Sklearn GMM Soft Membership:", soft_membership)
-    # print("Sklearn GMM Hard Membership:", hard_membership)
+    print("Sklearn GMM Hard Membership:", hard_membership)
     print("Sklearn GMM Log Likelihood:", likelihood)
   
 def plot_aic_bic_for_k(embeddings, save_path="assignments/2/figures/aic_bic_gmm.png"):
@@ -139,7 +137,11 @@ def fit_transform_pca(data, n_components):
     pca = PCA(n_components=n_components)
     pca.fit(data)
     transformed_data = pca.transform()
-    pca.checkPCA()
+    if (pca.checkPCA()):
+        print("PCA Implemented Correctly and with sufficient dimensions")
+    else:
+        print("PCA Implemention inorrect")
+
     return transformed_data
 
 def visualize_2D(data, save_path="assignments/2/figures/pca_2d.png"):
@@ -382,7 +384,7 @@ def knn_pca_task():
     genres = df['track_genre'].values
     features = df.drop(columns=['track_genre']).values
     reduced_dim = generate_scree_plot(features, "assignments/2/figures/spotify_scree_plot")
-    reduced_features=fit_transform_pca(features, 7)
+    reduced_features=fit_transform_pca(features, reduced_dim)
     features_df = pd.DataFrame(reduced_features)
     result_df = features_df.copy()
     result_df['track_genre'] = genres
@@ -392,18 +394,28 @@ def knn_pca_task():
     classifier.fit(train.drop(columns=['track_genre']).values, train['track_genre'].values)
     start_time = time.time()
     y_pred = classifier.predict(val.drop(columns=['track_genre']).values)
-    time_taken = time.time() - start_time
+    time_taken1 = time.time() - start_time
     Metrics(y_true=val['track_genre'].values, y_pred=y_pred, task="classification").print_metrics()
-    print(f"{time_taken=}")
+    print(f"{time_taken1=}")
 
     train, val, _ = split(result_df)
     classifier = KNN(k=64, distance_metric="manhattan")
     classifier.fit(train.drop(columns=['track_genre']).values, train['track_genre'].values)
     start_time = time.time()
     y_pred = classifier.predict(val.drop(columns=['track_genre']).values)
-    time_taken = time.time() - start_time
+    time_taken2 = time.time() - start_time
     Metrics(y_true=val['track_genre'].values, y_pred=y_pred, task="classification").print_metrics()
-    print(f"{time_taken=}")
+    print(f"{time_taken2=}")
+
+    models = [f'Original (12 dim)', 'PCA ({reduced_dim} dim)']
+    times = [time_taken1, time_taken2]
+
+    plt.figure(figsize=(8, 5))
+    plt.bar(models, times, color=['skyblue', 'lightgreen'])
+    plt.ylabel('Inference Time (seconds)')
+    plt.title('KNN Inference Time Comparison (Original vs PCA)')
+    plt.savefig("assignments/2/figures/knn_og_vs_pca_bar.png")
+
 
 def main():
 
@@ -414,7 +426,7 @@ def main():
     
     # k_means_tasks(words,embeddings)
     # gmm_tasks(words, embeddings)
-    # pca_tasks(words, embeddings)
+    pca_tasks(words, embeddings)
 
     # scree_and_reduced_kmeans_tasks(embeddings)
 
@@ -423,9 +435,9 @@ def main():
 
     # k_means_cluster_analysis(words, embeddings, to_reduce=False)
     # gmm_cluster_analysis(words, embeddings, to_reduce=False)
-    hierarchical_tasks(words,embeddings)
+    # hierarchical_tasks(words,embeddings)
 
-    # knn_pca_task()
+    knn_pca_task()
 
     
 

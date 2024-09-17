@@ -35,7 +35,7 @@ WCSS cost for optimal k: 3800.3406663064675
 
 ![Elbow Plot](./figures/elbow_kmeans_5.png)
 
-Optimal number of clusters (k_kmeans1): 5
+Optimal number of clusters (k_kmeans1): 5   
 Cluster labels: [1 1 3 3 3 4 3 1 4 3 4 4 3 2 2 0 3 1 1 3 1 3 3 1 3 3 3 4 4 3 3 2 0 2 4 4 4
  2 1 3 4 3 4 1 0 3 1 1 1 1 3 1 0 1 0 0 3 1 3 4 2 0 3 4 3 4 0 4 4 0 4 4 4 1
  2 0 0 2 0 1 1 0 0 3 0 3 4 0 3 3 1 4 1 3 3 3 1 2 3 1 2 3 0 0 4 0 2 0 3 0 4
@@ -285,6 +285,23 @@ Cluster labels for reduced dataset (k=5): [1 1 3 3 3 4 3 1 4 3 4 4 3 2 2 0 3 1 0
  4 0 3 2 4 3 0 1 0 2 1 0 0 0 2]
 WCSS cost for reduced dataset (k=5): 3530.4813079576106
 
+Number of clusters = k_kmeans3 = 5
+Cluster 0
+table, mug, gym, passport, roof, stairs, bed, microwave, notebook, van, sweater, microphone, jacket, bench, bucket, feet, laptop, door, calendar, chair, ladder, candle, igloo, clock, oven, calculator, pillow, envelope, dustbin, ambulance, television, throne, tent, camera, car, loudspeaker, lantern, telephone, stove, wheel, toaster, shoe, keyboard, radio, truck, suitcase  
+
+Cluster 1
+drive, sing, dive, exit, brick, smile, bullet, bend, fly, face, climb, kneel, scream, kiss, selfie, catch, sleep, baseball, hollow, basket, empty, slide, drink, angry, lazy, hang, skate, tattoo, earth, tank, key, swim, zip, cook, basketball, arrow, walk, sunny  
+
+Cluster 2
+needle, eraser, brush, feather, spoon, pencil, knit, cigarette, flute, scissor, badminton, finger, hammer, toothbrush, screwdriver, fingerprints, teaspoon, length, sword, knife, toothpaste, comb, fork, paintbrush  
+
+Cluster 3
+deer, panda, ape, rose, helicopter, cat, carrot, fishing, bear, spider, shark, grass, giraffe, forest, lizard, frog, puppet, lake, monkey, rifle, cow, starfish, plant, sun, puppy, boat, pear, peacock, fish, saturn, fruit, grape, mouse, ant, goldfish, bird, spiderman, bee, tree, beetle, snake, rain, airplane, pizza, tomato, dragonfly, parachute, butterfly, elephant, pant, rainy, bicycle, windmill, potato, crocodile  
+
+Cluster 4
+listen, flame, sit, knock, bury, download, eat, postcard, hard, fight, call, hit, paint, far, dig, cry, run, clap, pull, clean, sad, draw, pray, arrest, email, buy, burn, fire, close, scary, book, enter, happy, loud, love, recycle, cut
+
+
 ---
 
 # PCA + GMM
@@ -312,6 +329,16 @@ Optimal number of clusters based on AIC: 6
 Applying $k_{gmm3} = 4$  
 **Log Likelihood using my implementation**: 57082.45751057781
 **Log Likelihood using Sklearn**: 57393.64792527589
+
+
+Cluster 0
+deer, panda, ape, helicopter, sit, cat, needle, eraser, fishing, bullet, giraffe, mug, eat, gym, lake, stairs, rifle, cow, pencil, bed, starfish, dig, run, van, baseball, jacket, bench, sun, feet, peacock, flute, fruit, laptop, calendar, chair, ladder, ant, bee, pillow, tree, hammer, length, tent, camera, zip, dragonfly, parachute, car, sword, lantern, elephant, pant, knife, bicycle, windmill, potato, crocodile, fork, truck
+Cluster 1
+rose, bear, spider, shark, grass, forest, lizard, frog, monkey, kiss, roof, plant, bucket, puppy, boat, pear, basket, saturn, scissor, grape, goldfish, snake, tattoo, rain, pizza, key, tomato, butterfly, rainy, basketball
+Cluster 2
+sing, listen, dive, flame, knock, exit, brick, smile, bury, download, postcard, hard, bend, fight, fly, face, climb, kneel, scream, selfie, catch, hit, paint, far, cry, notebook, clap, pull, sleep, hollow, clean, sad, empty, fish, slide, drink, draw, pray, arrest, email, buy, bird, oven, burn, fire, close, angry, lazy, scary, hang, book, earth, dustbin, enter, swim, happy, loud, love, stove, cook, arrow, recycle, cut, walk, sunny
+Cluster 3
+drive, table, carrot, brush, feather, spoon, puppet, call, passport, microwave, knit, sweater, cigarette, microphone, door, badminton, mouse, finger, candle, igloo, clock, calculator, spiderman, beetle, envelope, skate, toothbrush, screwdriver, fingerprints, teaspoon, tank, airplane, ambulance, television, throne, loudspeaker, telephone, toothpaste, wheel, toaster, comb, shoe, keyboard, radio, suitcase, paintbrush
 
 Reconstruction Error: 0.03835961161605422
 Explained Variance Ratio: 0.1325
@@ -468,7 +495,6 @@ Cluster labels: [0 0 3 3 1 0 1 0 0 3 0 0 1 3 1 3 1 0 1 0 0 1 3 2 3 1 3 0 0 3 3 0
  0 1 1 3 0 3 2 0 2 2 0 0 3 1 0]
 _______________________
 Number of clusters = k_gmm3 = 4
-Custom GMM:
 Cluster 0
 deer, panda, ape, helicopter, sit, cat, needle, eraser, fishing, bullet, giraffe, mug, eat, gym, lake, stairs, rifle, cow, pencil, bed, starfish, dig, run, van, baseball, jacket, bench, sun, feet, peacock, flute, fruit, laptop, calendar, chair, ladder, ant, bee, pillow, tree, hammer, length, tent, camera, zip, dragonfly, parachute, car, sword, lantern, elephant, pant, knife, bicycle, windmill, potato, crocodile, fork, truck
 Cluster 1
@@ -515,6 +541,46 @@ Cluster labels: [3 2 0 0 0 2 1 2 2 0 0 2 0 0 0 3 3 2 2 0 2 1 1 0 1 1 0 2 2 1 1 3
 - Examples: table, microwave, calculator, airplane, toothbrush
 
 ---
+
+$K_{gmm} = 4$ as K=1 does not make sense and K=2 also does not capture much.
+
+To evaluate how KMeans clustering performs better than GMM in this context, let's examine the effectiveness of each approach by looking at the groupings they produce and considering factors like the similarity within clusters and the separation between different clusters.
+
+### Similarity Within Clusters
+
+**GMM:**
+- **Cluster 0:** This cluster mixes animals with tools and other concrete nouns, which results in a diverse range of objects that don’t share a clear commonality, making it less coherent.
+- **Cluster 1:** This cluster has a reasonable grouping of nature-related items and food, though it includes both animals and plants, which could be seen as slightly overlapping categories.
+- **Cluster 2:** Contains actions, emotions, and abstract concepts, which are related but span a broad range of different kinds of words (verbs, states, ideas).
+- **Cluster 3:** This cluster includes household and technological items, showing some coherence, though it also includes a few vehicles, which might not fit as well with household items.
+
+**KMeans:**
+- **Cluster 0:** Contains a diverse array of household items, technological devices, and other man-made objects. Although broad, these items are related through their utility and context of use.
+- **Cluster 1:** Groups actions, verbs, and states together. This clustering is effective in grouping words with similar functions or contexts (e.g., actions and emotional expressions).
+- **Cluster 2:** Contains mostly tools and objects used in specific tasks. Items here are more focused on functional or practical uses.
+- **Cluster 3:** Includes a wide range of natural elements, animals, and food. While diverse, there is a clear focus on natural and living things.
+
+### Separation Between Clusters
+
+**GMM:**
+- The separation between clusters is less pronounced because GMM assumes that clusters can overlap and that data points can belong to multiple clusters with varying degrees of membership. This can lead to less distinct boundaries and more overlapping categories.
+
+**KMeans:**
+- KMeans creates more distinct and non-overlapping clusters, which often results in clearer boundaries between clusters. For instance:
+  - **Cluster 0** (household and tech) is clearly distinct from **Cluster 1** (actions and states).
+  - **Cluster 2** (tools) is distinct from **Cluster 3** (natural elements and animals).
+
+### Evaluating the Effectiveness
+
+**Grouping Quality:**
+- KMeans clusters show a more meaningful and coherent grouping for specific contexts (household items, actions, tools). The distinct clusters facilitate understanding and using the grouped items based on their common properties or contexts.
+
+**Cluster Meaningfulness:**
+- KMeans clusters align better with intuitive categories, making it easier to see relationships between items within the same cluster. For example, having all household items in one cluster and actions in another is more practical and meaningful for certain applications compared to the mixed categories seen in GMM.
+
+**Overall Comparison:**
+KMeans generally provides better results than GMM in this scenario due to its ability to create well-separated, non-overlapping clusters that more clearly define specific categories. The meaningfulness of the clusters in KMeans comes from their more defined and coherent groupings, which enhances their practical utility in applications requiring clear distinctions between categories. GMM, while useful in scenarios where overlapping clusters might be expected, results in less distinct and less interpretable groupings in this case.
+
 
 # Hierarchical Clustering
 
@@ -838,25 +904,44 @@ drive, rose, helicopter, needle, table, fishing, bullet, mug, postcard, call, la
 ![Cumulative](./figures/spotify_scree_plot_cumulative.png)
 ![Individual](./figures/spotify_scree_plot_individual.png)
 
-Optimal number of dimensions based on 85% explained    variance: 9  
-Reconstruction Error: 0.13712198288339003  
-Explained Variance Ratio: 0.8629  
-Classification Task Scores  
-Accuracy: 0.2561  
-  Precision (macro): 0.2340  
-  Recall (macro): 0.2472  
-  F1-Score (macro): 0.2405  
-  Precision (micro): 0.2561  
-  Recall (micro): 0.2561  
-  F1-Score (micro): 0.2561  
-**Time Taken:** 65.20476651191711  
-  
-Classification Task Scores  
-Accuracy: 0.2207  
-  Precision (macro): 0.1941  
-  Recall (macro): 0.2135  
-  F1-Score (macro): 0.2033  
-  Precision (micro): 0.2207  
-  Recall (micro): 0.2207  
-  F1-Score (micro): 0.2207  
-**Time Taken:** 53.93823790550232
+Optimal number of dimensions based on 90% explained variance: 9
+Reconstruction Error: 0.07658321607853308
+Explained Variance Ratio: 0.9234
+
+### Comparison of Metrics (Original vs PCA)
+
+- **Accuracy**:
+  - **Original (12 dim)**: 0.2561
+  - **PCA (9 dim)**: 0.2207
+  - **Analysis**: There is a slight drop in accuracy (~3.5%) when using PCA. This can happen because dimensionality reduction may lose some information that is important for classification tasks.
+
+- **Macro Precision, Recall, and F1-Score**:
+  - **Precision (macro)**: 
+    - Original: 0.2340
+    - PCA: 0.1941
+  - **Recall (macro)**:
+    - Original: 0.2472
+    - PCA: 0.2135
+  - **F1-Score (macro)**:
+    - Original: 0.2405
+    - PCA: 0.2033
+  - **Analysis**: The macro scores all drop when using PCA. Macro scores are more sensitive to class imbalance since they compute the metric independently for each class and then take the average. Some features may have contributed more to minority classes, and reducing dimensions could negatively impact performance.
+
+- **Micro Precision, Recall, and F1-Score**:
+  - **Precision (micro)**: 
+    - Original: 0.2561
+    - PCA: 0.2207
+  - **Recall (micro)**: 
+    - Original: 0.2561
+    - PCA: 0.2207
+  - **F1-Score (micro)**: 
+    - Original: 0.2561
+    - PCA: 0.2207
+  - **Analysis**: The micro scores drop similarly to accuracy. Since micro-averaging accounts for all instances equally, the drop suggests that reducing dimensions impacted the overall classification ability of the model across all classes.
+
+- **Time Taken**:
+  - **Original**: 66.57 seconds
+  - **PCA (9 dim)**: 51.34 seconds
+  - **Analysis**: PCA reduces the inference time by ~23%. The dimensionality reduction lowers the computational cost, but there’s a tradeoff with the slight reduction in classification performance. This is expected in most cases when applying PCA—faster inference at the cost of some accuracy.
+
+![time](figures/knn_og_vs_pca.png)

@@ -38,4 +38,4 @@ class PCA:
         print(f"Reconstruction Error: {reconstruction_error}")
         print(f"Explained Variance Ratio: {explained_variance_ratio:.4f}")
         
-        return reconstruction_error<0.15
+        return reconstruction_error<0.1
