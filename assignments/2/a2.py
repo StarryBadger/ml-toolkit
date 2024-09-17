@@ -18,7 +18,7 @@ K_GMM_1 = 1
 K_2 = 4
 OPTIMAL_DIMS =107
 K_KMEANS_3 = 5
-K_GMM_3 = 1
+K_GMM_3 = 4
 
 def load_embeddings(file_path):
     """https://pandas.pydata.org/docs/reference/api/pandas.read_feather.html"""
@@ -212,7 +212,6 @@ def perform_kmeans_on_reduced_data(embeddings, optimal_dims):
     elbow_method(reduced_data, save_path="assignments/2/figures/elbow_kmeans_optimal_clusters.png")
     print(f"Performing K-Means clustering with k={K_KMEANS_3} on the reduced dataset.")
     cluster_labels, cost = perform_kmeans_clustering(reduced_data, K_KMEANS_3)
-    
     print(f"Cluster labels for reduced dataset (k={K_KMEANS_3}): {cluster_labels}")
     print(f"WCSS cost for reduced dataset (k={K_KMEANS_3}): {cost}")
     return reduced_data, cluster_labels
@@ -223,16 +222,14 @@ def scree_and_reduced_kmeans_tasks(embeddings):
     reduced_data, reduced_cluster_labels = perform_kmeans_on_reduced_data(embeddings, optimal_dims)
     return reduced_data, reduced_cluster_labels
 
-def determine_optimal_kgmm3(embeddings):
-    global K_GMM_3
-    optimal_k_bic, optimal_k_aic = plot_aic_bic_for_k(embeddings)
-    K_GMM_3 = optimal_k_bic
-    print(f"Optimal number of clusters based on BIC: {K_GMM_3}")
-
 def pca_gmm_tasks(embeddings):
-    optimal_dims = generate_scree_plot(embeddings)
-    reduced_data = fit_transform_pca(embeddings, optimal_dims)
+    global K_GMM_3
+    # perform_gmm_clustering(embeddings, K_2)
+    reduced_data = fit_transform_pca(embeddings, OPTIMAL_DIMS)
+    optimal_k_bic, _=plot_aic_bic_for_k(reduced_data, save_path="assignments/2/figures/aic_bic_pca_gmm.png")
+    K_GMM_3=optimal_k_bic
     perform_gmm_clustering(reduced_data, K_GMM_3)
+    perform_gmm_clustering_sklearn(reduced_data, K_GMM_3)
 
 def split(X, train_ratio=0.8, val_ratio=0.1):
     np.random.seed(1)
@@ -287,11 +284,10 @@ def main():
     # gmm_tasks(embeddings)
     # pca_tasks(embeddings)
 
-    scree_and_reduced_kmeans_tasks(embeddings)
+    # scree_and_reduced_kmeans_tasks(embeddings)
 
-    # perform_gmm_clustering(embeddings, K_2)
     # determine_optimal_kgmm3(embeddings)
-    # pca_gmm_tasks(embeddings)
+    pca_gmm_tasks(embeddings)
 
     # knn_pca_task()
 

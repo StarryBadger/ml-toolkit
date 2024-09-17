@@ -154,6 +154,8 @@ WCSS cost for k=4: 4063.222058671721
 
 **Optimal number of dimensions based on 90% explained variance: 107**
 
+## Elbow plot with reduced dataset
+
 ![Elbow](figures/elbow_kmeans_optimal_clusters_5.png)
 
 Observing the elbow plot,$k_{kmeans3} = 5$
@@ -167,6 +169,34 @@ Cluster labels for reduced dataset (k=5): [1 1 3 3 3 4 3 1 4 3 4 4 3 2 2 0 3 1 0
  3 1 3 0 3 4 0 0 1 1 0 0 1 3 3 3 3 0 2 0 4 0 0 4 3 4 3 0 3 2 1 2 1 0 3 3 1
  4 0 3 2 4 3 0 1 0 2 1 0 0 0 2]
 WCSS cost for reduced dataset (k=5): 3530.4813079576106
+
+---
+
+# PCA + GMM
+
+GMM on $k_2 = 4$ gives log likelihood 544089.8358658948
+
+## AIC/BIC with reduced dataset
+
+### Using My Implementation
+
+Optimal number of clusters based on BIC: 4  
+Optimal number of clusters based on AIC: 6
+
+![AIC-BIC-My_Version](figures/aic_bic_pca_gmm_4_6.png)
+
+### Using Sklearn
+
+Optimal number of clusters based on BIC: 4  
+Optimal number of clusters based on AIC: 6
+
+![AIC-BIC-SKLEARN](figures/aic_bic_pca_gmm_sklearn_4_6.png)
+
+**We take $k_{gmm3} = argmin_k BIC = 4$**   
+
+Applying $k_{gmm3} = 4$  
+**Log Likelihood using my implementation**: 57082.45751057781
+**Log Likelihood using Sklearn**: 57393.64792527589
 
 Reconstruction Error: 0.03835961161605422
 Explained Variance Ratio: 0.1325
