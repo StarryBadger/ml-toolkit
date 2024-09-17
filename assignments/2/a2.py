@@ -58,18 +58,19 @@ def elbow_method(embeddings, max_k=25, save_path="assignments/2/figures/elbow_km
     plt.grid(True)
     plt.savefig(save_path)
 
-def k_means_tasks(words,embeddings):
-    elbow_method(embeddings, max_k=25)
-    clusters = {}
-    cluster_labels, cost = perform_kmeans_clustering(embeddings, K_KMEANS_1)
+def print_clusters(words, cluster_labels):
     for cluster in np.unique(cluster_labels):
         print(f"Cluster {cluster}")
         words_in_cluster= words[cluster_labels == cluster].tolist()
         print(', '.join(words_in_cluster))
+
+def k_means_tasks(words,embeddings):
+    elbow_method(embeddings, max_k=25)
+    cluster_labels, cost = perform_kmeans_clustering(embeddings, K_KMEANS_1)
+    print_clusters(words, cluster_labels)
     print(f"Optimal number of clusters (k_kmeans1): {K_KMEANS_1}")
     print(f"Cluster labels: {cluster_labels}")
     print(f"WCSS cost for optimal k: {cost}")
-    print(clusters)
     
 def perform_gmm_clustering(embeddings, k):
     print("Custom GMM:")
@@ -127,7 +128,7 @@ def plot_aic_bic_for_k(embeddings, save_path="assignments/2/figures/aic_bic_gmm.
     print(f"Optimal number of clusters based on AIC: {optimal_k_aic}")
     return optimal_k_bic, optimal_k_aic
 
-def gmm_tasks(embeddings):
+def gmm_tasks(words, embeddings):
     perform_gmm_clustering(embeddings, K_KMEANS_1)
     perform_gmm_clustering_sklearn(embeddings, K_KMEANS_1)
     plot_aic_bic_for_k(embeddings)
@@ -259,6 +260,33 @@ def pca_gmm_tasks(embeddings):
     perform_gmm_clustering(reduced_data, K_GMM_3)
     perform_gmm_clustering_sklearn(reduced_data, K_GMM_3)
 
+def k_means_cluster_analysis(words, embeddings, to_reduce=False):
+    if to_reduce:
+        embeddings = fit_transform_pca(embeddings, OPTIMAL_DIMS)
+    print(f"Number of clusters = k_kmeans1 = {K_KMEANS_1}")
+    cluster_labels, cost = perform_kmeans_clustering(embeddings, K_KMEANS_1)
+    print_clusters(words, cluster_labels)
+    print(f"Cluster labels: {cluster_labels}")
+    print(f"WCSS cost for optimal k: {cost}")
+    print("_______________________")
+
+    print(f"Number of clusters = K_2 = {K_2}")
+    cluster_labels, cost = perform_kmeans_clustering(embeddings, K_2)
+    print_clusters(words, cluster_labels)
+    print(f"Cluster labels: {cluster_labels}")
+    print(f"WCSS cost for optimal k: {cost}")
+    print("_______________________")
+
+    print(f"Number of clusters = k_kmeans3 = {K_KMEANS_3}")
+    cluster_labels, cost = perform_kmeans_clustering(embeddings, K_KMEANS_3)
+    print_clusters(words, cluster_labels)
+    print(f"Cluster labels: {cluster_labels}")
+    print(f"WCSS cost for optimal k: {cost}")
+    print("_______________________")
+
+def gmm_cluster_analysis(words, embeddings, to_reduce=False):
+    pass
+
 def split(X, train_ratio=0.8, val_ratio=0.1):
     np.random.seed(1)
     indices = np.random.permutation(len(X))
@@ -308,14 +336,21 @@ def main():
     words, embeddings = load_embeddings(file_path)
     # embeddings = load_csv_data(file_path_kaggle) #? uncomment to test on 2D dataset
     
-    k_means_tasks(words,embeddings)
+    # k_means_tasks(words,embeddings)
     # gmm_tasks(embeddings)
-    pca_tasks(words, embeddings)
+    # pca_tasks(words, embeddings)
 
     # scree_and_reduced_kmeans_tasks(embeddings)
 
     # determine_optimal_kgmm3(embeddings)
     # pca_gmm_tasks(embeddings)
+
+    k_means_cluster_analysis(words, embeddings, to_reduce=False)
+    # k_means_cluster_analysis(words, embeddings, to_reduce=True)
+
+    # gmm_cluster_analysis(words, embeddings, to_reduce=False)
+    # gmm_cluster_analysis(words, embeddings, to_reduce=True)
+
 
     # knn_pca_task()
 

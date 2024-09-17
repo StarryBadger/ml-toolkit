@@ -252,7 +252,7 @@ By observation I was able to identify 4 distinct clusters. Thus, $$k_2 = 4$$
 
 # PCA + KMeans Clustering
 
-K-Means on $k_2 = 4$
+K-Means on $k_2 = 4$  
 Clusters:
 3 1 3 3 3 1 3 3 1 3 3 1 3 2 2 0 3 3 3 3 3 3 3 3 3 3 3 1 1 3 3 2 0 2 1 1 1
  2 3 3 1 3 1 3 0 3 3 3 3 3 3 3 0 1 0 0 3 1 3 1 2 0 3 1 3 1 0 3 1 0 3 1 3 1
@@ -319,6 +319,128 @@ Reconstruction Error: 0.03692622888597155
 Explained Variance Ratio: 0.1649
 
 --- 
+
+# K- Means Cluster Analysis
+
+Number of clusters = k_kmeans1 = 5
+Cluster 0
+table, mug, gym, passport, roof, stairs, bed, microwave, notebook, van, sweater, microphone, jacket, bench, bucket, feet, laptop, door, calendar, chair, ladder, candle, igloo, clock, oven, calculator, pillow, envelope, dustbin, ambulance, television, throne, tent, camera, car, loudspeaker, lantern, telephone, stove, wheel, toaster, shoe, keyboard, radio, truck, suitcase
+Cluster 1
+drive, sing, dive, exit, brick, smile, bullet, bend, fly, face, climb, kneel, scream, kiss, selfie, catch, sleep, baseball, hollow, basket, empty, slide, drink, angry, lazy, hang, skate, tattoo, earth, tank, key, swim, zip, cook, basketball, arrow, walk, sunny
+Cluster 2
+needle, eraser, brush, feather, spoon, pencil, knit, cigarette, flute, scissor, badminton, finger, hammer, toothbrush, screwdriver, fingerprints, teaspoon, length, sword, knife, toothpaste, comb, fork, paintbrush
+Cluster 3
+deer, panda, ape, rose, helicopter, cat, carrot, fishing, bear, spider, shark, grass, giraffe, forest, lizard, frog, puppet, lake, monkey, rifle, cow, starfish, plant, sun, puppy, boat, pear, peacock, fish, saturn, fruit, grape, mouse, ant, goldfish, bird, spiderman, bee, tree, beetle, snake, rain, airplane, pizza, tomato, dragonfly, parachute, butterfly, elephant, pant, rainy, bicycle, windmill, potato, crocodile
+Cluster 4
+listen, flame, sit, knock, bury, download, eat, postcard, hard, fight, call, hit, paint, far, dig, cry, run, clap, pull, clean, sad, draw, pray, arrest, email, buy, burn, fire, close, scary, book, enter, happy, loud, love, recycle, cut
+Cluster labels: [1 1 3 3 3 4 3 1 4 3 4 4 3 2 2 0 3 1 1 3 1 3 3 1 3 3 3 4 4 3 3 2 0 2 4 4 4
+ 2 1 3 4 3 4 1 0 3 1 1 1 1 3 1 0 1 0 0 3 1 3 4 2 0 3 4 3 4 0 4 4 0 4 4 4 1
+ 2 0 0 2 0 1 1 0 0 3 0 3 4 0 3 3 1 4 1 3 3 3 1 2 3 1 2 3 0 0 4 0 2 0 3 0 4
+ 4 2 4 0 3 4 0 3 3 0 0 0 3 3 4 0 4 4 1 1 4 3 1 3 0 1 2 2 4 2 3 1 1 2 2 2 0
+ 3 1 3 0 3 4 0 0 1 1 0 0 1 3 3 3 3 0 2 0 4 0 0 4 3 4 3 0 3 2 1 2 1 0 3 3 1
+ 4 0 3 2 4 3 0 1 0 2 1 0 0 0 2]
+WCSS cost for optimal k: 3966.973318266988
+_______________________
+Number of clusters = K_2 = 4
+Cluster 0
+table, mug, gym, passport, roof, stairs, bed, microwave, notebook, van, sweater, microphone, jacket, bench, bucket, feet, laptop, door, calendar, chair, ladder, candle, igloo, clock, oven, calculator, pillow, envelope, dustbin, ambulance, television, throne, tent, camera, car, loudspeaker, lantern, telephone, stove, wheel, toaster, keyboard, radio, truck, suitcase
+Cluster 1
+sing, listen, flame, knock, bury, download, eat, postcard, hard, fight, call, selfie, catch, hit, paint, far, cry, clap, sleep, clean, sad, slide, drink, draw, pray, arrest, email, buy, burn, fire, close, angry, lazy, scary, hang, book, enter, happy, loud, love, cook, recycle, cut
+Cluster 2
+needle, eraser, brush, feather, spoon, pencil, knit, flute, scissor, badminton, finger, hammer, toothbrush, screwdriver, teaspoon, length, key, sword, knife, toothpaste, comb, fork, paintbrush
+Cluster 3
+drive, deer, panda, ape, rose, dive, helicopter, sit, cat, carrot, exit, brick, fishing, smile, bear, spider, bullet, shark, grass, giraffe, forest, lizard, bend, frog, puppet, fly, lake, face, climb, kneel, scream, monkey, kiss, rifle, cow, starfish, plant, dig, run, pull, cigarette, baseball, hollow, sun, puppy, boat, pear, basket, empty, peacock, fish, saturn, fruit, grape, mouse, ant, goldfish, bird, spiderman, bee, tree, beetle, skate, snake, tattoo, earth, fingerprints, rain, tank, airplane, pizza, swim, zip, tomato, dragonfly, parachute, butterfly, elephant, pant, rainy, basketball, bicycle, windmill, arrow, potato, crocodile, shoe, walk, sunny
+Cluster labels: [3 1 3 3 3 1 3 3 1 3 3 1 3 2 2 0 3 3 3 3 3 3 3 3 3 3 3 1 1 3 3 2 0 2 1 1 1
+ 2 3 3 1 3 1 3 0 3 3 3 3 3 3 3 0 1 0 0 3 1 3 1 2 0 3 1 3 1 0 3 1 0 3 1 3 1
+ 2 0 0 3 0 3 3 0 0 3 0 3 1 0 3 3 3 1 3 3 3 3 1 2 3 1 2 3 0 0 1 0 2 0 3 0 1
+ 1 2 1 0 3 1 0 3 3 0 0 0 3 3 1 0 1 1 1 1 1 3 1 3 0 3 2 2 1 2 3 3 3 3 2 2 0
+ 3 3 3 0 3 1 0 0 2 3 0 0 3 3 3 3 3 0 2 0 1 0 0 1 3 1 3 0 3 2 1 2 3 0 3 3 3
+ 1 0 3 2 1 3 3 3 0 2 3 0 0 0 2]
+WCSS cost for optimal k: 4063.222058671721
+
+---
+
+Number of clusters = k_kmeans3 = 5
+Cluster 0
+table, mug, gym, passport, roof, stairs, bed, microwave, notebook, van, sweater, microphone, jacket, bench, bucket, feet, laptop, door, calendar, chair, ladder, candle, igloo, clock, oven, calculator, pillow, envelope, dustbin, ambulance, television, throne, tent, camera, car, loudspeaker, lantern, telephone, stove, wheel, toaster, shoe, keyboard, radio, truck, suitcase  
+
+Cluster 1
+drive, sing, dive, exit, brick, smile, bullet, bend, fly, face, climb, kneel, scream, kiss, selfie, catch, sleep, baseball, hollow, basket, empty, slide, drink, angry, lazy, hang, skate, tattoo, earth, tank, key, swim, zip, cook, basketball, arrow, walk, sunny  
+
+Cluster 2
+needle, eraser, brush, feather, spoon, pencil, knit, cigarette, flute, scissor, badminton, finger, hammer, toothbrush, screwdriver, fingerprints, teaspoon, length, sword, knife, toothpaste, comb, fork, paintbrush  
+
+Cluster 3
+deer, panda, ape, rose, helicopter, cat, carrot, fishing, bear, spider, shark, grass, giraffe, forest, lizard, frog, puppet, lake, monkey, rifle, cow, starfish, plant, sun, puppy, boat, pear, peacock, fish, saturn, fruit, grape, mouse, ant, goldfish, bird, spiderman, bee, tree, beetle, snake, rain, airplane, pizza, tomato, dragonfly, parachute, butterfly, elephant, pant, rainy, bicycle, windmill, potato, crocodile
+Cluster 4
+listen, flame, sit, knock, bury, download, eat, postcard, hard, fight, call, hit, paint, far, dig, cry, run, clap, pull, clean, sad, draw, pray, arrest, email, buy, burn, fire, close, scary, book, enter, happy, loud, love, recycle, cut
+Cluster labels: [1 1 3 3 3 4 3 1 4 3 4 4 3 2 2 0 3 1 1 3 1 3 3 1 3 3 3 4 4 3 3 2 0 2 4 4 4
+ 2 1 3 4 3 4 1 0 3 1 1 1 1 3 1 0 1 0 0 3 1 3 4 2 0 3 4 3 4 0 4 4 0 4 4 4 1
+ 2 0 0 2 0 1 1 0 0 3 0 3 4 0 3 3 1 4 1 3 3 3 1 2 3 1 2 3 0 0 4 0 2 0 3 0 4
+ 4 2 4 0 3 4 0 3 3 0 0 0 3 3 4 0 4 4 1 1 4 3 1 3 0 1 2 2 4 2 3 1 1 2 2 2 0
+ 3 1 3 0 3 4 0 0 1 1 0 0 1 3 3 3 3 0 2 0 4 0 0 4 3 4 3 0 3 2 1 2 1 0 3 3 1
+ 4 0 3 2 4 3 0 1 0 2 1 0 0 0 2]
+WCSS cost for optimal k: 3966.973318266988
+
+## Analysis of k=5 Clustering (= $K_{kmeans1}$ = $K_{kmeans3}$)
+
+1. Cluster 0: Indoor/Household Objects
+   - Examples: table, mug, microwave, bed, chair, oven
+   - Theme: Primarily indoor and household items
+
+2. Cluster 1: Actions 
+   - Examples: drive, sing, dive, smile, climb, sleep
+
+3. Cluster 2: Small Tools and Instruments
+   - Examples: needle, eraser, brush, spoon, pencil, hammer
+
+4. Cluster 3: Animals and Nature
+   - Examples: deer, panda, rose, cat, grass, tree
+
+5. Cluster 4: Activities
+   - Examples: listen, flame, bury, fight, pray, love
+
+## Analysis of k=4 Clustering (= $K_2$)
+
+1. Cluster 0: Indoor/Household Objects
+   - Examples: table, mug, microwave, bed, chair, oven
+
+2. Cluster 1: Actions
+   - Examples: sing, listen, flame, fight, pray, love
+
+3. Cluster 2: Small Tools and Instruments
+   - Examples: needle, eraser, brush, spoon, pencil, hammer
+   - Theme: Identical to Cluster 2 in k=5
+
+4. Cluster 3: Concrete Objects and Actions (most of which are also nouns)
+   - Examples: drive, deer, panda, rose, smile, boat
+
+## Evaluation
+
+1. Interpretability:
+   - k=5 offers more distinct and interpretable clusters, separating actions, abstract concepts, and concrete objects more clearly.
+   - k=4 combines some categories, making interpretation slightly less straightforward.
+
+2. Homogeneity:
+   - k=5 appears to have more homogeneous clusters, especially in separating abstract actions from concrete actions.
+   - k=4 has more mixed clusters, particularly in Cluster 3.
+
+3. WCSS (Within-Cluster Sum of Squares) Cost:
+   - k=5: 3966.97
+   - k=4: 4063.22
+   - The lower WCSS for k=5 indicates tighter, more compact clusters.
+
+4. Granularity:
+   - k=5 provides a finer granularity, which might be beneficial for more detailed analysis.
+   - k=4 offers a simpler, more general categorization.
+
+# GMM Cluster Analysis
+
+---
+
+# Hierarchical Clustering
+
+---
 
 # KNN + PCA
 
