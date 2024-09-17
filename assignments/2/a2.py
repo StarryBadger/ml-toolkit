@@ -277,8 +277,8 @@ def main():
     # embeddings = load_csv_data(file_path_kaggle) #? uncomment to test on 2D dataset
     
     # k_means_tasks(embeddings)
-    gmm_tasks(embeddings)
-    # pca_tasks(embeddings)
+    # gmm_tasks(embeddings)
+    pca_tasks(embeddings)
 
     # perform_kmeans_clustering_K2(embeddings)
     # scree_and_reduced_kmeans_tasks(embeddings)

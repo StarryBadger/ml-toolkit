@@ -15,7 +15,7 @@ class PCA:
         self.mean = np.mean(self.X, axis=0)
         X_centered = self.X - self.mean
         cov_matrix = np.cov(X_centered, rowvar=False)
-        eigenvalues, eigenvectors = np.linalg.eig(cov_matrix)
+        eigenvalues, eigenvectors = np.linalg.eigh(cov_matrix)
         sorted_indices = np.argsort(eigenvalues)[::-1]
         self.eigenvalues = eigenvalues[sorted_indices]
         eigenvectors = eigenvectors[:, sorted_indices]
