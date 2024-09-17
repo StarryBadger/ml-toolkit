@@ -131,16 +131,17 @@ def fit_transform_pca(data, n_components):
     pca.checkPCA()
     return transformed_data
 
-def visualize_2D(data):
+def visualize_2D(data, save_path="assignments/2/figures/pca_2d.png"):
     plt.figure(figsize=(10, 6))
     plt.scatter(data[:, 0], data[:, 1], color="green", label="PCA 2D Data")
     plt.title("PCA Transformed Data (2D)")
     plt.xlabel("Principal Component 1")
     plt.ylabel("Principal Component 2")
     plt.grid(True)
-    plt.show()
+    plt.savefig(save_path)
+    plt.close()
 
-def visualize_3D(data):
+def visualize_3D(data,save_path="assignments/2/figures/pca_3d.png"):
     data = np.real(data)
 
     fig = plt.figure(figsize=(10, 6))
@@ -151,8 +152,8 @@ def visualize_3D(data):
     ax.set_xlabel("Principal Component 1")
     ax.set_ylabel("Principal Component 2")
     ax.set_zlabel("Principal Component 3")
-
-    plt.show()
+    plt.savefig(save_path)
+    plt.close()
 
 def pca_tasks(embeddings):
     pca_2D_data = fit_transform_pca(embeddings, 2)

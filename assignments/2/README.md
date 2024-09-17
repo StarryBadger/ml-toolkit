@@ -128,6 +128,16 @@ Covariances: [[[ 2.98234736e-02,  7.82239280e-05,  3.55016624e-03, ...,
 
 ---
 
+# Dimensionality Reduction and Visualization
+
+![Large](./figures/pca_2d.png)
+![Upto 20](./figures/pca_3d.png)
+
+Reconstruction Error: 0.03835961161605422
+Explained Variance Ratio: 0.1325
+Reconstruction Error: 0.03692622888597155
+Explained Variance Ratio: 0.1649
+
 
 Optimal number of dimensions based on 85% explained variance: 9
 Reconstruction Error: 0.13712198288339003
