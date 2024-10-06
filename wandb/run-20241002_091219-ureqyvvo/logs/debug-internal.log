@@ -1,0 +1,18 @@
+{"time":"2024-10-02T09:12:19.678657809+05:30","level":"INFO","msg":"using version","core version":"0.18.3"}
+{"time":"2024-10-02T09:12:19.678693035+05:30","level":"INFO","msg":"created symlink","path":"/home/shaunak/semester5/smai/assignments/smai-m24-assignments-StarryBadger/wandb/run-20241002_091219-ureqyvvo/logs/debug-core.log"}
+{"time":"2024-10-02T09:12:19.690035446+05:30","level":"ERROR","msg":"dialing: google: could not find default credentials. See https://cloud.google.com/docs/authentication/external/set-up-adc for more information"}
+{"time":"2024-10-02T09:12:19.692685651+05:30","level":"INFO","msg":"created new stream","id":"ureqyvvo"}
+{"time":"2024-10-02T09:12:19.692708749+05:30","level":"INFO","msg":"stream: started","id":"ureqyvvo"}
+{"time":"2024-10-02T09:12:19.692729509+05:30","level":"INFO","msg":"handler: started","stream_id":{"value":"ureqyvvo"}}
+{"time":"2024-10-02T09:12:19.692780446+05:30","level":"INFO","msg":"writer: Do: started","stream_id":{"value":"ureqyvvo"}}
+{"time":"2024-10-02T09:12:19.692833423+05:30","level":"INFO","msg":"sender: started","stream_id":{"value":"ureqyvvo"}}
+{"time":"2024-10-02T09:12:20.095618261+05:30","level":"INFO","msg":"wandb-core","!BADKEY":null}
+{"time":"2024-10-02T09:12:20.096224409+05:30","level":"INFO","msg":"Starting system monitor"}
+{"time":"2024-10-02T09:12:20.174327199+05:30","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2024-10-02T09:12:20.17449344+05:30","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2024-10-02T09:12:22.704045439+05:30","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2024-10-02T09:12:24.202118147+05:30","level":"INFO","msg":"stream: closing","id":"ureqyvvo"}
+{"time":"2024-10-02T09:12:24.202219328+05:30","level":"INFO","msg":"handler: closed","stream_id":{"value":"ureqyvvo"}}
+{"time":"2024-10-02T09:12:24.202346565+05:30","level":"INFO","msg":"writer: Close: closed","stream_id":{"value":"ureqyvvo"}}
+{"time":"2024-10-02T09:12:24.202422676+05:30","level":"INFO","msg":"sender: closed","stream_id":{"value":"ureqyvvo"}}
+{"time":"2024-10-02T09:12:24.202616358+05:30","level":"INFO","msg":"stream: closed","id":"ureqyvvo"}

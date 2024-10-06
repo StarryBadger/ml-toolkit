@@ -15,6 +15,8 @@ python3 -m assignments.3.a3 # (without .py extension)
 ```
 Website references are mentioned in the code.
 
+## 3.1 Data Preprocessing
+### 1. Describe the dataset using mean, standard deviation, min, and max values for all attributes
 
 
 | Attribute            |       Mean |   Standard Deviation |     Min |       Max |
@@ -31,3 +33,9 @@ Website references are mentioned in the code.
 | sulphates            |  0.657708  |           0.170324   | 0.33    |   2       |
 | alcohol              | 10.4421    |           1.08172    | 8.4     |  14.9     |
 | quality              |  5.65704   |           0.805472   | 3       |   8       |
+
+### 2. Draw a graph that shows the distribution of the various labels across the entire dataset. You are allowed to use standard libraries like Matplotlib
+
+![Quality Distribution](./figures/quality_distribution.png)
+
+![Feature Histograms](./figures/distributions.png)

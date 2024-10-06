@@ -1,0 +1,30 @@
+{
+  "os":  "Linux-6.11.1-arch1-1-x86_64-with-glibc2.40",
+  "python":  "3.12.6",
+  "startedAt":  "2024-10-05T18:38:09.103511Z",
+  "program":  "-m assignments.3.a3",
+  "git":  {
+    "remote":  "https://github.com/smai-monsoon-24/smai-m24-assignments-StarryBadger.git",
+    "commit":  "3b6c80531d352cec2eed7ba3d40e19345da5b23e"
+  },
+  "email":  "shaunak.biswas@research.iiit.ac.in",
+  "root":  "/home/shaunak/semester5/smai/assignments/smai-m24-assignments-StarryBadger",
+  "host":  "biswarch",
+  "username":  "shaunak",
+  "executable":  "/home/shaunak/semester5/smai/assignments/smai-m24-assignments-StarryBadger/venv/bin/python3",
+  "cpu_count":  12,
+  "cpu_count_logical":  16,
+  "disk":  {
+    "/":  {
+      "total":  "232966795264",
+      "used":  "150602641408"
+    }
+  },
+  "memory":  {
+    "total":  "7997194240"
+  },
+  "cpu":  {
+    "count":  12,
+    "countLogical":  16
+  }
+}

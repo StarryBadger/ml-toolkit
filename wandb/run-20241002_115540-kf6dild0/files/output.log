@@ -1,0 +1,99 @@
+bgd_sigmoid_1_0.0001_32_50000
+Cost after 100 epochs: 0.9693654266958425
+Cost after 200 epochs: 0.9671772428884027
+Cost after 300 epochs: 0.9606126914660832
+Cost after 400 epochs: 0.9573304157549234
+Cost after 500 epochs: 0.949671772428884
+Cost after 600 epochs: 0.9321663019693655
+Cost after 700 epochs: 0.9179431072210066
+Cost after 800 epochs: 0.8971553610503282
+Cost after 900 epochs: 0.8665207877461707
+Cost after 1000 epochs: 0.824945295404814
+Cost after 1100 epochs: 0.7768052516411379
+Cost after 1200 epochs: 0.725382932166302
+Cost after 1300 epochs: 0.7013129102844639
+Cost after 1400 epochs: 0.6597374179431073
+Cost after 1500 epochs: 0.6269146608315098
+Cost after 1600 epochs: 0.6028446389496718
+Cost after 1700 epochs: 0.5798687089715536
+Cost after 1800 epochs: 0.5612691466083151
+Cost after 1900 epochs: 0.550328227571116
+Cost after 2000 epochs: 0.5382932166301969
+Cost after 2100 epochs: 0.5273522975929978
+Cost after 2200 epochs: 0.5196936542669585
+Cost after 2300 epochs: 0.513129102844639
+Cost after 2400 epochs: 0.5109409190371991
+Cost after 2500 epochs: 0.5098468271334792
+Cost after 2600 epochs: 0.5098468271334792
+Cost after 2700 epochs: 0.5087527352297593
+Cost after 2800 epochs: 0.5054704595185996
+Cost after 2900 epochs: 0.5021881838074398
+Cost after 3000 epochs: 0.5010940919037199
+Cost after 3100 epochs: 0.49562363238512036
+Cost after 3200 epochs: 0.4912472647702407
+Cost after 3300 epochs: 0.4890590809628009
+Cost after 3400 epochs: 0.4824945295404814
+Cost after 3500 epochs: 0.486870897155361
+Cost after 3600 epochs: 0.487964989059081
+Cost after 3700 epochs: 0.48468271334792123
+Cost after 3800 epochs: 0.48468271334792123
+Cost after 3900 epochs: 0.4824945295404814
+Cost after 4000 epochs: 0.4814004376367615
+Cost after 4100 epochs: 0.4803063457330416
+Cost after 4200 epochs: 0.4803063457330416
+Cost after 4300 epochs: 0.4803063457330416
+Cost after 4400 epochs: 0.47811816192560175
+Cost after 4500 epochs: 0.47921225382932164
+Cost after 4600 epochs: 0.47811816192560175
+Cost after 4700 epochs: 0.47921225382932164
+Cost after 4800 epochs: 0.4759299781181619
+Cost after 4900 epochs: 0.4737417943107221
+Cost after 5000 epochs: 0.47045951859956237
+Cost after 5100 epochs: 0.47045951859956237
+Cost after 5200 epochs: 0.4682713347921225
+Cost after 5300 epochs: 0.4649890590809628
+Cost after 5400 epochs: 0.4638949671772429
+Cost after 5500 epochs: 0.4617067833698031
+Cost after 5600 epochs: 0.45842450765864334
+Cost after 5700 epochs: 0.4573304157549234
+Cost after 5800 epochs: 0.4573304157549234
+Cost after 5900 epochs: 0.45842450765864334
+Cost after 6000 epochs: 0.45951859956236324
+Cost after 6100 epochs: 0.45842450765864334
+Cost after 6200 epochs: 0.4562363238512035
+Cost after 6300 epochs: 0.45295404814004375
+Cost after 6400 epochs: 0.4540481400437637
+Cost after 6500 epochs: 0.45295404814004375
+Cost after 6600 epochs: 0.45185995623632386
+Cost after 6700 epochs: 0.45076586433260396
+Cost after 6800 epochs: 0.4485776805251641
+Cost after 6900 epochs: 0.4474835886214442
+Cost after 7000 epochs: 0.4442013129102845
+Cost after 7100 epochs: 0.44529540481400437
+Cost after 7200 epochs: 0.4431072210065646
+Cost after 7300 epochs: 0.4442013129102845
+Cost after 7400 epochs: 0.4442013129102845
+Cost after 7500 epochs: 0.44091903719912473
+Cost after 7600 epochs: 0.43982494529540483
+Cost after 7700 epochs: 0.437636761487965
+Cost after 7800 epochs: 0.437636761487965
+Cost after 7900 epochs: 0.43544857768052514
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/shaunak/semester5/smai/assignments/smai-m24-assignments-StarryBadger/assignments/3/a3.py", line 116, in <module>
+    costs = model.train(X_train_std, y_train, max_epochs=max_epochs, batch_size=batch_size, X_validation=X_validation_std, y_validation=y_validation)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shaunak/semester5/smai/assignments/smai-m24-assignments-StarryBadger/models/MLP/MLP_Classifier.py", line 231, in train
+    A = self.predict(X_validation)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shaunak/semester5/smai/assignments/smai-m24-assignments-StarryBadger/models/MLP/MLP_Classifier.py", line 184, in predict
+    A, _ = self._forward_propagation(X)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shaunak/semester5/smai/assignments/smai-m24-assignments-StarryBadger/models/MLP/MLP_Classifier.py", line 135, in _forward_propagation
+    A = self.activation_func(Z)
+        ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shaunak/semester5/smai/assignments/smai-m24-assignments-StarryBadger/models/MLP/MLP_Classifier.py", line 37, in _sigmoid
+    return 1 / (1 + np.exp(-x))
+                    ^^^^^^^^^^
+KeyboardInterrupt
