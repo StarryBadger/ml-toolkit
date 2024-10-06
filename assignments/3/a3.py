@@ -152,7 +152,7 @@ def wandb_init(lr, max_epochs, optimizer, activation, hidden_layers, batch_size)
 if __name__ == "__main__":
     X_train, y_train, X_validation, y_validation, X_test, y_test = data_preprocessing()
 
-    lr = 0.001
+    lr = 0.1
     max_epochs = 10000
     optimizer = 'bgd'
     activation = 'sigmoid'
@@ -162,7 +162,8 @@ if __name__ == "__main__":
     # wandb_init(lr, max_epochs, optimizer, activation, hidden_layers, batch_size)
     model = MLP_Classifier(X_train.shape[1], hidden_layers, 6, learning_rate=lr, activation=activation, optimizer=optimizer, print_every=100, wandb_log=False)
     # model.gradient_check(X_train[:5], y_train[:5]) 
-    costs = model.fit(X_train, y_train, max_epochs=max_epochs, batch_size=batch_size, X_validation=X_validation, y_validation=y_validation, early_stopping=False)
+    costs = model.fit(X_train, y_train-3, max_epochs=max_epochs, batch_size=batch_size, X_validation=X_validation, y_validation=y_validation-3, early_stopping=True)
+    print(model.calculate_accuracy(X_test, y_test-3))
     # wandb.finish()
     # plt.figure(figsize=(8, 6))
     # plt.plot(costs)

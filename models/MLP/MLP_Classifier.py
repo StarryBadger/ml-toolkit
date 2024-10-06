@@ -130,14 +130,10 @@ class MLP_Classifier:
             b = self.biases[i]
             Z = np.dot(A, W) + b
             
-            if Z.shape[1] == 1:
-                Z = Z.reshape(-1)
             caches.append((A, W, b, Z))
 
             A = self.activation_func(Z)
         
-        if len(A.shape) == 1:
-            A = A.reshape(-1)
         return A, caches
 
     def _backward_propagation(self, A, Y, caches):
@@ -164,66 +160,48 @@ class MLP_Classifier:
 
         return grads
     
-    def _calculate_cost(self, A, Y):
-        cost = np.mean(np.not_equal(A, Y))
-        return cost
-
     def predict(self, X):
         A, _ = self._forward_propagation(X)
         A = np.exp(A) / np.sum(np.exp(A), axis=1, keepdims=True)
-
-        A = np.argmax(A,axis=1)
-        return A
-
+        return np.argmax(A, axis=1)
+    
+    def calculate_accuracy(self, X, y):
+        predictions = self.predict(X)
+        return np.mean(predictions == y)
+    
     def _one_hot_encode(self, Y, num_classes):
-        print(Y.size)
-        one_hot = np.zeros((Y.size, num_classes))
-        print(one_hot)
-        one_hot[np.arange(Y.size), Y] = 1
-        return one_hot
+        return np.eye(num_classes)[Y]
 
-    
-    def gradient_check(self, X, Y, epsilon=1e-7):
-        A, caches = self._forward_propagation(X)
-        grads = self._backward_propagation(A, Y, caches)
+    def _calculate_cost(self, A, Y):
+        m = Y.shape[0]
+        epsilon = 1e-15  # Small value to avoid log(0)
+        
+        # print(f"Shape of A: {A.shape}")
+        # print(f"Shape of Y: {Y.shape}")
+        
+        # Ensure A has the same number of samples as Y
+        if A.shape[0] != m:
+            A = A[:m]
+        
+        # Apply softmax to get probabilities
+        A = np.exp(A) / np.sum(np.exp(A), axis=1, keepdims=True)
+        
+        cross_entropy = -np.sum(Y * np.log(A + epsilon)) / m
+        return cross_entropy
 
-        for i in range(len(self.weights)):
-            W = self.weights[i]
-            dW_approx = np.zeros_like(W)
-            for j in range(W.shape[0]):
-                for k in range(W.shape[1]):
-                    W_plus = W.copy()
-                    W_plus[j, k] += epsilon
-                    W_minus = W.copy()
-                    W_minus[j, k] -= epsilon
-
-                    self.weights[i] = W_plus
-                    A_plus, _ = self._forward_propagation(X)
-                    cost_plus = self._calculate_cost(A_plus, Y)
-
-                    self.weights[i] = W_minus
-                    A_minus, _ = self._forward_propagation(X)
-                    cost_minus = self._calculate_cost(A_minus, Y)
-
-                    dW_approx[j, k] = (cost_plus - cost_minus) / (2 * epsilon)
-
-            difference = np.linalg.norm(grads['dW'][i] - dW_approx) / (np.linalg.norm(grads['dW'][i]) + np.linalg.norm(dW_approx))
-            if difference > epsilon:
-                print(f"Gradient check failed for layer {i} with difference {difference}")
-            else:
-                print(f"Gradient check passed for layer {i}")
-        self.weights = caches
-
-    
-    def fit(self, X, Y, max_epochs=10, batch_size=32, X_validation=None, y_validation=None, early_stopping=False, patience=1000):
+    def fit(self, X, Y, max_epochs=10, batch_size=32, X_validation=None, y_validation=None, early_stopping=False, patience=100):
         num_samples = X.shape[0]
         best_loss = float('inf')
         patience_counter = 0
         costs = []
-        shift = np.min(Y)
-        Y= Y- shift
-        y_validation = shift
-        y_new = self._one_hot_encode(Y, self.output_size)
+        
+        print(f"Shape of X: {X.shape}")
+        print(f"Shape of Y: {Y.shape}")
+        print(f"Unique values in Y: {np.unique(Y)}")
+        
+        Y_one_hot = self._one_hot_encode(Y, self.output_size)
+        
+        print(f"Shape of Y_one_hot: {Y_one_hot.shape}")
         
         for i in range(max_epochs):
             if self.optimizer == "bgd":
@@ -242,11 +220,11 @@ class MLP_Classifier:
                 end = start + batch_size
                 
                 A, caches = self._forward_propagation(X[start:end])
-                grads = self._backward_propagation(A, y_new[start:end], caches)
+                grads = self._backward_propagation(A, Y_one_hot[start:end], caches)
                 self.optimizer_func(grads)
             
-            A = self.predict(X)
-            cost = self._calculate_cost(A, Y)
+            A, _ = self._forward_propagation(X)
+            cost = self._calculate_cost(A, Y_one_hot)
             costs.append(cost)
 
             data_to_log = {
@@ -255,8 +233,9 @@ class MLP_Classifier:
             }
 
             if X_validation is not None and y_validation is not None:
-                A = self.predict(X_validation)
-                val_loss = self._calculate_cost(A, y_validation)
+                A_val, _ = self._forward_propagation(X_validation)
+                y_validation_one_hot = self._one_hot_encode(y_validation, self.output_size)
+                val_loss = self._calculate_cost(A_val, y_validation_one_hot)
                 data_to_log["val_loss"] = val_loss
                 if val_loss < best_loss:
                     best_loss = val_loss
@@ -268,13 +247,131 @@ class MLP_Classifier:
                     print(f"Early stopping at epoch {i+1}")
                     break
 
-
             if self.wandb_log:
                 wandb.log(data_to_log)
             
             if self.print_every and (i+1) % self.print_every == 0:
                 print(f"Cost after {i+1} epochs: {cost}")
+        
+        return costs
+    
+    
+    
+    # def _calculate_cost(self, A, Y):
+    #     print("This is A")
+    #     print(A)
+    #     print("This is Y")
+    #     print(Y)
+    #     cost = np.mean(np.not_equal(A, Y))
+    #     return cost
+
+    # def predict(self, X):
+    #     A, _ = self._forward_propagation(X)
+    #     A = np.exp(A) / np.sum(np.exp(A), axis=1, keepdims=True)
+
+    #     A = np.argmax(A,axis=1)
+    #     return A
+
+    # def _one_hot_encode(self, Y, num_classes):
+    #     print(Y.size)
+    #     one_hot = np.zeros((Y.size, num_classes))
+    #     print(one_hot)
+    #     one_hot[np.arange(Y.size), Y] = 1
+    #     return one_hot
+
+    
+    # def gradient_check(self, X, Y, epsilon=1e-7):
+    #     A, caches = self._forward_propagation(X)
+    #     grads = self._backward_propagation(A, Y, caches)
+
+    #     for i in range(len(self.weights)):
+    #         W = self.weights[i]
+    #         dW_approx = np.zeros_like(W)
+    #         for j in range(W.shape[0]):
+    #             for k in range(W.shape[1]):
+    #                 W_plus = W.copy()
+    #                 W_plus[j, k] += epsilon
+    #                 W_minus = W.copy()
+    #                 W_minus[j, k] -= epsilon
+
+    #                 self.weights[i] = W_plus
+    #                 A_plus, _ = self._forward_propagation(X)
+    #                 cost_plus = self._calculate_cost(A_plus, Y)
+
+    #                 self.weights[i] = W_minus
+    #                 A_minus, _ = self._forward_propagation(X)
+    #                 cost_minus = self._calculate_cost(A_minus, Y)
+
+    #                 dW_approx[j, k] = (cost_plus - cost_minus) / (2 * epsilon)
+
+    #         difference = np.linalg.norm(grads['dW'][i] - dW_approx) / (np.linalg.norm(grads['dW'][i]) + np.linalg.norm(dW_approx))
+    #         if difference > epsilon:
+    #             print(f"Gradient check failed for layer {i} with difference {difference}")
+    #         else:
+    #             print(f"Gradient check passed for layer {i}")
+    #     self.weights = caches
+
+    
+    # def fit(self, X, Y, max_epochs=10, batch_size=32, X_validation=None, y_validation=None, early_stopping=False, patience=1000):
+    #     num_samples = X.shape[0]
+    #     best_loss = float('inf')
+    #     patience_counter = 0
+    #     costs = []
+    #     shift = np.min(Y)
+    #     Y= Y- shift
+    #     y_validation = shift
+    #     y_new = self._one_hot_encode(Y, self.output_size)
+        
+    #     for i in range(max_epochs):
+    #         if self.optimizer == "bgd":
+    #             batch_size = num_samples
+    #             num_batches = 1
+    #         elif self.optimizer == "sgd":
+    #             batch_size = 1
+    #             num_batches = num_samples
+    #         elif self.optimizer == "mbgd":
+    #             num_batches = num_samples // batch_size
+    #         else:
+    #             raise ValueError(f"Optimizer '{self.optimizer}' not supported.")
+
+    #         for j in range(num_batches):
+    #             start = j * batch_size
+    #             end = start + batch_size
+                
+    #             A, caches = self._forward_propagation(X[start:end])
+    #             grads = self._backward_propagation(A, y_new[start:end], caches)
+    #             self.optimizer_func(grads)
+            
+    #         A = self.predict(X)
+    #         cost = self._calculate_cost(A, Y)
+    #         costs.append(cost)
+
+    #         data_to_log = {
+    #             "epoch": i + 1,
+    #             "train_loss": cost
+    #         }
+
+    #         if X_validation is not None and y_validation is not None:
+    #             A = self.predict(X_validation)
+    #             val_loss = self._calculate_cost(A, y_validation)
+    #             data_to_log["val_loss"] = val_loss
+    #             if val_loss < best_loss:
+    #                 best_loss = val_loss
+    #                 patience_counter = 0
+    #             else:
+    #                 patience_counter += 1
+
+    #             if early_stopping and patience_counter > patience:
+    #                 print(f"Early stopping at epoch {i+1}")
+    #                 break
+
+
+    #         if self.wandb_log:
+    #             wandb.log(data_to_log)
+            
+    #         if self.print_every and (i+1) % self.print_every == 0:
+    #             print(f"Cost after {i+1} epochs: {cost}")
 
             
         
-        return costs
+    #     return costs
