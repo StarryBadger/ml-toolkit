@@ -2,7 +2,7 @@ import numpy as np
 import wandb
 class MLP_Classifier:
     def __init__(self, input_size, hidden_layers, num_classes=11, learning_rate=0.01, activation='sigmoid', optimizer='sgd', wandb_log=False, print_every=10):
-        assert activation.lower() in ['sigmoid', 'relu', 'tanh'], "Activation function must be either 'sigmoid', 'relu' or 'tanh'"
+        assert activation.lower() in ['sigmoid', 'relu', 'tanh', 'linear'], "Activation function must be either 'sigmoid', 'relu' or 'tanh' (or 'linear' for testing)"
         assert optimizer.lower() in ['sgd', 'bgd', 'mbgd'], "Optimizer must be either 'sgd', 'bgd' or 'mbgd'"
         assert input_size > 0, "Input size must be greater than 0"
         assert num_classes > 0, "Output size must be greater than 0"
@@ -28,6 +28,8 @@ class MLP_Classifier:
             return self._tanh
         elif activation == 'relu':
             return self._relu
+        elif activation == 'linear':
+            return self._linear
         else:
             raise ValueError(f"Activation function '{activation}' not supported.")
 
@@ -40,6 +42,9 @@ class MLP_Classifier:
     def _relu(self, x):
         return np.maximum(0, x)
     
+    def _linear(self, x):
+        return x
+    
     def _activation_derivative(self, Z):
         if self.activation_func == self._sigmoid:
             return self._sigmoid_derivative(Z)
@@ -47,6 +52,8 @@ class MLP_Classifier:
             return self._tanh_derivative(Z)
         elif self.activation_func == self._relu:
             return self._relu_derivative(Z)
+        elif self.activation_func == self._linear:
+            return self._linear_derivative(Z)
         else:
             raise ValueError(f"Activation function '{self.activation_func}' not supported.")
     
@@ -58,6 +65,9 @@ class MLP_Classifier:
     
     def _relu_derivative(self, Z):
         return np.where(Z > 0, 1, 0)
+    
+    def _linear_derivative(self, Z):
+        return np.ones_like(Z)
     
     def _get_optimizer_func(self, optimizer):
         if optimizer == 'sgd':
@@ -160,8 +170,6 @@ class MLP_Classifier:
 
     def predict(self, X):
         A, _ = self._forward_propagation(X)
-
-        # Apply a softmax to get probabilities & then getting the h9ghest probability
         A = np.exp(A) / np.sum(np.exp(A), axis=1, keepdims=True)
 
         A = np.argmax(A,axis=1)
@@ -172,8 +180,42 @@ class MLP_Classifier:
         one_hot[np.arange(Y.size), Y] = 1
         return one_hot
     
-    def train(self, X, Y, max_epochs=10, batch_size=32, X_validation=None, y_validation=None):
+    def _gradient_check(self, X, Y, epsilon=1e-7):
+        A, caches = self._forward_propagation(X)
+        grads = self._backward_propagation(A, Y, caches)
+
+        for i in range(len(self.weights)):
+            W = self.weights[i]
+            dW_approx = np.zeros_like(W)
+            for j in range(W.shape[0]):
+                for k in range(W.shape[1]):
+                    W_plus = W.copy()
+                    W_plus[j, k] += epsilon
+                    W_minus = W.copy()
+                    W_minus[j, k] -= epsilon
+
+                    self.weights[i] = W_plus
+                    A_plus, _ = self._forward_propagation(X)
+                    cost_plus = self._calculate_cost(A_plus, Y)
+
+                    self.weights[i] = W_minus
+                    A_minus, _ = self._forward_propagation(X)
+                    cost_minus = self._calculate_cost(A_minus, Y)
+
+                    dW_approx[j, k] = (cost_plus - cost_minus) / (2 * epsilon)
+
+            difference = np.linalg.norm(grads['dW'][i] - dW_approx) / (np.linalg.norm(grads['dW'][i]) + np.linalg.norm(dW_approx))
+            if difference > epsilon:
+                print(f"Gradient check failed for layer {i} with difference {difference}")
+            else:
+                print(f"Gradient check passed for layer {i}")
+        self.weights = caches
+
+    
+    def fit(self, X, Y, max_epochs=10, batch_size=32, X_validation=None, y_validation=None, early_stopping=False, patience=1000):
         num_samples = X.shape[0]
+        best_loss = float('inf')
+        patience_counter = 0
         costs = []
 
         y_new = self._one_hot_encode(Y, self.output_size)
@@ -207,16 +249,28 @@ class MLP_Classifier:
                 "train_loss": cost
             }
 
-            # Calculate validation loss
             if X_validation is not None and y_validation is not None:
                 A = self.predict(X_validation)
                 val_loss = self._calculate_cost(A, y_validation)
                 data_to_log["val_loss"] = val_loss
+                if val_loss < best_loss:
+                    best_loss = val_loss
+                    patience_counter = 0
+                else:
+                    print(f"{val_loss} is the val loss")
+                    patience_counter += 1
+
+                if early_stopping and patience_counter > patience:
+                    print(f"Early stopping at epoch {i+1}")
+                    break
+
 
             if self.wandb_log:
                 wandb.log(data_to_log)
             
             if self.print_every and (i+1) % self.print_every == 0:
                 print(f"Cost after {i+1} epochs: {cost}")
+
+            
         
         return costs

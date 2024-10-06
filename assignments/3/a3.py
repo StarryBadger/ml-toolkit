@@ -153,7 +153,7 @@ if __name__ == "__main__":
     X_train, y_train, X_validation, y_validation, X_test, y_test = data_preprocessing()
 
     lr = 0.001
-    max_epochs = 5000
+    max_epochs = 10000
     optimizer = 'bgd'
     activation = 'sigmoid'
     hidden_layers = [8,8,]
@@ -161,13 +161,13 @@ if __name__ == "__main__":
 
     wandb_init(lr, max_epochs, optimizer, activation, hidden_layers, batch_size)
     model = MLP_Classifier(X_train.shape[1], hidden_layers, 11, learning_rate=lr, activation=activation, optimizer=optimizer, print_every=100, wandb_log=True)
-    costs = model.train(X_train, y_train, max_epochs=max_epochs, batch_size=batch_size, X_validation=X_validation, y_validation=y_validation)
+    costs = model.fit(X_train, y_train, max_epochs=max_epochs, batch_size=batch_size, X_validation=X_validation, y_validation=y_validation, early_stopping=True)
     wandb.finish()
-    plt.figure(figsize=(8, 6))
-    plt.plot(costs)
-    plt.title('Training Loss')
-    plt.xlabel('Epoch')
-    plt.ylabel('Loss')
-    plt.grid(True)
-    plt.show()
+    # plt.figure(figsize=(8, 6))
+    # plt.plot(costs)
+    # plt.title('Training Loss')
+    # plt.xlabel('Epoch')
+    # plt.ylabel('Loss')
+    # plt.grid(True)
+    # plt.show()
 
