@@ -1,7 +1,7 @@
 import numpy as np
 import wandb
 class MLP_Classifier:
-    def __init__(self, input_size, hidden_layers, num_classes=11, learning_rate=0.01, activation='sigmoid', optimizer='sgd', wandb_log=False, print_every=10):
+    def __init__(self, input_size, hidden_layers, num_classes=6, learning_rate=0.01, activation='sigmoid', optimizer='sgd', wandb_log=False, print_every=10):
         assert activation.lower() in ['sigmoid', 'relu', 'tanh', 'linear'], "Activation function must be either 'sigmoid', 'relu' or 'tanh' (or 'linear' for testing)"
         assert optimizer.lower() in ['sgd', 'bgd', 'mbgd'], "Optimizer must be either 'sgd', 'bgd' or 'mbgd'"
         assert input_size > 0, "Input size must be greater than 0"
@@ -176,11 +176,14 @@ class MLP_Classifier:
         return A
 
     def _one_hot_encode(self, Y, num_classes):
+        print(Y.size)
         one_hot = np.zeros((Y.size, num_classes))
+        print(one_hot)
         one_hot[np.arange(Y.size), Y] = 1
         return one_hot
+
     
-    def _gradient_check(self, X, Y, epsilon=1e-7):
+    def gradient_check(self, X, Y, epsilon=1e-7):
         A, caches = self._forward_propagation(X)
         grads = self._backward_propagation(A, Y, caches)
 
@@ -217,7 +220,9 @@ class MLP_Classifier:
         best_loss = float('inf')
         patience_counter = 0
         costs = []
-
+        shift = np.min(Y)
+        Y= Y- shift
+        y_validation = shift
         y_new = self._one_hot_encode(Y, self.output_size)
         
         for i in range(max_epochs):
@@ -257,7 +262,6 @@ class MLP_Classifier:
                     best_loss = val_loss
                     patience_counter = 0
                 else:
-                    print(f"{val_loss} is the val loss")
                     patience_counter += 1
 
                 if early_stopping and patience_counter > patience:

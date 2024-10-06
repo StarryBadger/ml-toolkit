@@ -110,20 +110,20 @@ def split_dataset(dataset, output_dir='data/interim/3/WineQT/split/', train_size
     validation_split_df.to_csv(output_dir + 'validation.csv', index=False)
     test_split_df.to_csv(output_dir + 'test.csv', index=False)
 
-    print("Training set shape:", X_train.shape, y_train.shape)
-    print("Validation set shape:", X_validation.shape, y_validation.shape)
-    print("Test set shape:", X_test.shape, y_test.shape)
+    # print("Training set shape:", X_train.shape, y_train.shape)
+    # print("Validation set shape:", X_validation.shape, y_validation.shape)
+    # print("Test set shape:", X_test.shape, y_test.shape)
 
     return X_train, y_train, X_validation, y_validation, X_test, y_test
 
 def data_preprocessing():
-    file_path = 'data/interim/3/WineQT/WineQT.csv'
-    dataset = pd.read_csv(file_path)
-    dataset.drop(['Id'], axis=1, inplace=True)
+    # file_path = 'data/interim/3/WineQT/WineQT.csv'
+    # dataset = pd.read_csv(file_path)
+    # dataset.drop(['Id'], axis=1, inplace=True)
 
-    description = describe_dataset(dataset)
-    plot_quality_distribution(dataset)
-    normalized_data, standardized_data = normalize_and_standardize(dataset)
+    # description = describe_dataset(dataset)
+    # plot_quality_distribution(dataset)
+    # normalized_data, standardized_data = normalize_and_standardize(dataset)
 
     file_path = 'data/interim/3/WineQT/WineQT_normalized.csv'
     dataset = pd.read_csv(file_path)
@@ -159,10 +159,11 @@ if __name__ == "__main__":
     hidden_layers = [8,8,]
     batch_size = 32
 
-    wandb_init(lr, max_epochs, optimizer, activation, hidden_layers, batch_size)
-    model = MLP_Classifier(X_train.shape[1], hidden_layers, 11, learning_rate=lr, activation=activation, optimizer=optimizer, print_every=100, wandb_log=True)
-    costs = model.fit(X_train, y_train, max_epochs=max_epochs, batch_size=batch_size, X_validation=X_validation, y_validation=y_validation, early_stopping=True)
-    wandb.finish()
+    # wandb_init(lr, max_epochs, optimizer, activation, hidden_layers, batch_size)
+    model = MLP_Classifier(X_train.shape[1], hidden_layers, 6, learning_rate=lr, activation=activation, optimizer=optimizer, print_every=100, wandb_log=False)
+    # model.gradient_check(X_train[:5], y_train[:5]) 
+    costs = model.fit(X_train, y_train, max_epochs=max_epochs, batch_size=batch_size, X_validation=X_validation, y_validation=y_validation, early_stopping=False)
+    # wandb.finish()
     # plt.figure(figsize=(8, 6))
     # plt.plot(costs)
     # plt.title('Training Loss')
