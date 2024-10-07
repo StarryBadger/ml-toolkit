@@ -6,6 +6,8 @@ import matplotlib.pyplot as plt
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from performance_measures.classification_metrics import Metrics
 from models.MLP.MLPClassifier import MLPClassifier
+api = wandb.Api()
+
 
 def describe_dataset(df):
     numerical_cols = df.to_numpy()
@@ -113,7 +115,7 @@ def split_dataset(dataset, output_dir='data/interim/3/WineQT/split/', train_size
 
     return X_train, y_train, X_validation, y_validation, X_test, y_test
 
-def data_preprocessing():
+def wine_preprocessing():
     file_path = 'data/interim/3/WineQT/WineQT.csv'
     dataset = pd.read_csv(file_path)
     dataset.drop(['Id'], axis=1, inplace=True)
@@ -126,7 +128,6 @@ def load_wineqt():
     file_path = 'data/interim/3/WineQT/WineQT_normalized.csv'
     dataset = pd.read_csv(file_path)
     return split_dataset(dataset)
-
 
 def train_and_log(project="SMAI_A3", config=None):
     # Initialize the run for sweeps
@@ -176,6 +177,59 @@ def train_and_log(project="SMAI_A3", config=None):
             best_validation_accuracy = validation_accuracy
             best_model_params = dict(config)
 
+def print_hyperparams(file_path="data/interim/3/WineQT/hyperparams.csv"):
+    df = pd.read_csv(file_path)
+
+    metrics_df = df[[
+        'activation', 'batch_size', 'hidden_layers', 'optimizer', 
+        'lr', 'max_epochs', 'accuracy_val_final', 'epoch', 
+        'f1_score_val_final', 'precision_val_final', 'recall_val_final'
+    ]]
+    metrics_df.columns = [
+        'Activation', 'Batch Size', 'Hidden Layers', 'Optimizer', 
+        'Learning Rate', 'Max Epochs', 'Validation Accuracy', 'Epoch', 
+        'F1 Score', 'Precision', 'Recall'
+    ]
+    
+    markdown_table = metrics_df.to_markdown(index=False)
+    print(markdown_table)
+
+def test_on_best():
+    with open('data/interim/3/WineQT/best_model_config_seed_6.json', 'r') as file:
+        config = json.load(file)
+    model = MLPClassifier(X_train.shape[1], config['hidden_layers'], 6, learning_rate=config['lr'], activation=config['activation'], optimizer=config['optimizer'], print_every=10, wandb_log=False)
+    costs = model.fit(
+            X_train, y_train, 
+            max_epochs=config['max_epochs'], 
+            batch_size=config['batch_size'], 
+            X_validation=X_validation, 
+            y_validation=y_validation, 
+            early_stopping=True, 
+            patience=5
+        )
+    model.gradient_checking(X_train[:5], y_train[:5])
+    y_pred_test = model.predict(X_test)
+    test_metrics = Metrics(y_test, y_pred_test, task="classification")
+
+    test_accuracy = test_metrics.accuracy()
+    precision = test_metrics.precision_score()
+    recall = test_metrics.recall_score()
+    f1_score = test_metrics.f1_score()
+
+    print(f'Accuracy: {test_accuracy}\
+          \nPrecision: {precision}\
+          \nRecall: {recall}\
+          \nF1 Score: {f1_score}')
+
+def multi_hot_encode(labels):
+    # Split labels and create a multi-hot encoding
+    unique_labels = set(label for sublist in labels for label in sublist.split())
+    multi_hot = {label: 0 for label in unique_labels}
+    for label in labels:
+        for l in label.split():
+            multi_hot[l] = 1
+    return pd.Series(multi_hot)
+
 sweep_config = {
     'method': 'bayes',
     'metric': {
@@ -190,19 +244,85 @@ sweep_config = {
         'batch_size': {'values': [16, 32]} 
     }
 }
+def advertisement_preprocessing(dataset_path="data/interim/3/advertisement/advertisement.csv"):
+    dataset=pd.read_csv(dataset_path)
+    gender_encoded = pd.get_dummies(dataset['gender'], prefix='gender', dtype=int)
+    education_order = {'High School': 0, 'Bachelor': 1, 'Master': 2, 'PhD': 3}
+    dataset['education'] = dataset['education'].map(education_order)
+    dataset['married'] = dataset['married'].astype(int)
+    occupation_encoded = pd.get_dummies(dataset['occupation'], prefix='occupation', dtype=int)
+    most_bought_encoded = pd.get_dummies(dataset['most bought item'], prefix='most_bought', dtype=int)
+    dataset = dataset.drop(columns=['city', 'gender', 'occupation', 'most bought item'])
+    encoded_dataset = pd.concat([dataset, gender_encoded, occupation_encoded, most_bought_encoded], axis=1)
+    scaler = MinMaxScaler()
+    numerical_features = ['age', 'income', 'education', 'children', 'purchase_amount']
+    encoded_dataset[numerical_features] = scaler.fit_transform(encoded_dataset[numerical_features])
+    encoded_dataset.to_csv('data/interim/3/advertisement/advertisement_encoded.csv', index=False)
+
+def encode_labels(dataset):
+    unique_labels = set()
+    for label_list in dataset['labels']:
+        unique_labels.update(label_list.split())
+    unique_labels = sorted(unique_labels)
+    label_to_index = {label: idx for idx, label in enumerate(unique_labels)}
+    index_to_label = {idx: label for label, idx in label_to_index.items()}
+    def multi_hot_encode(labels):
+        encoded_array = []
+        for label_list in labels:
+            encoded = [0] * len(unique_labels)
+            for label in label_list.split():
+                if label in label_to_index:
+                    encoded[label_to_index[label]] = 1
+            encoded_array.append(encoded)
+        return encoded_array
+    return multi_hot_encode(dataset['labels'])
+def get_advertisement_data():
+    dataset=pd.read_csv('data/interim/3/advertisement/advertisement_encoded.csv')
+    labels=encode_labels(dataset)
+    dataset['labels'] = labels
+
+    shuffled_indices = np.random.permutation(len(dataset))
+    shuffled_dataset = dataset.iloc[shuffled_indices].reset_index(drop=True)
+
+    train_size = int(0.8 * len(shuffled_dataset))
+    val_size = int(0.1 * len(shuffled_dataset))
+
+    train_dataset = shuffled_dataset[:train_size]
+    val_dataset = shuffled_dataset[train_size:train_size + val_size]
+    test_dataset = shuffled_dataset[train_size + val_size:]
+
+    X_train = train_dataset.drop(columns='labels').values
+    y_train = np.array(train_dataset['labels'].tolist())
+
+    X_validation = val_dataset.drop(columns='labels').values
+    y_validation = np.array(val_dataset['labels'].tolist())
+
+    X_test = test_dataset.drop(columns='labels').values
+    y_test = np.array(test_dataset['labels'].tolist())
+
+    return X_train, y_train, X_validation, y_validation, X_test, y_test
 
 if __name__ == "__main__":
-    X_train, y_train, X_validation, y_validation, X_test, y_test = load_wineqt()
+    np.random.seed(6)
+    # wine_preprocessing()
+    # X_train, y_train, X_validation, y_validation, X_test, y_test = load_wineqt()
+    
+    # best_model_params = None
+    # best_validation_accuracy = 0
+    # sweep_id = wandb.sweep(sweep_config, project="SMAI_A3")
+    # wandb.agent(sweep_id, function=train_and_log, count=256)
+    # with open('data/interim/3/WineQT/best_model_config.json', 'w') as f:
+    #     json.dump(best_model_params, f)
+    # wandb.finish()
+    # print_hyperparams()
 
-    best_model_params = None
-    best_validation_accuracy = 0
+    # test_on_best()
+    
+    # advertisement_preprocessing()
+    X_train, y_train, X_validation, y_validation, X_test, y_test = get_advertisement_data()
 
-    sweep_id = wandb.sweep(sweep_config, project="SMAI_A3")
-    wandb.agent(sweep_id, function=train_and_log, count=256)
+    
 
-    with open('best_model_config.json', 'w') as f:
-        json.dump(best_model_params, f)
 
-    wandb.finish()
 
 
