@@ -23,7 +23,8 @@ class Metrics:
         return confusion
     # To handle np.sum(confusion, axis=n) = 0 for n=0 or 1, we add 1e-6 to each element. 
     def accuracy(self):
-        return np.sum(self.y_true == self.y_pred) / len(self.y_true)
+        return np.mean(np.all(self.y_true == self.y_pred, axis=1))
+
 
     def precision_score(self, average="macro"):
         confusion = self.confusion_matrix()

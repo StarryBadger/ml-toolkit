@@ -6,8 +6,7 @@ import matplotlib.pyplot as plt
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from performance_measures.classification_metrics import Metrics
 from models.MLP.MLPClassifier import MLPClassifier
-api = wandb.Api()
-
+from models.MLP.MultiLabelMLP import MultiLabelMLP
 
 def describe_dataset(df):
     numerical_cols = df.to_numpy()
@@ -320,8 +319,33 @@ if __name__ == "__main__":
     
     # advertisement_preprocessing()
     X_train, y_train, X_validation, y_validation, X_test, y_test = get_advertisement_data()
-
     
+    model = MultiLabelMLP(X_train.shape[1], [64], 8, learning_rate=0.05, activation='relu', optimizer='sgd', print_every=10)
+    costs = model.fit(
+            X_train, y_train, 
+            max_epochs=200, 
+            batch_size=32, 
+            X_validation=X_validation, 
+            y_validation=y_validation, 
+            early_stopping=False, 
+            patience=100
+        )
+    y_pred_test = model.predict(X_test)
+    # print(y_pred_test)
+    # print(y_test)
+    test_metrics = Metrics(y_test, y_pred_test, task="classification")
+
+    test_accuracy = test_metrics.accuracy()
+    # precision = test_metrics.precision_score()
+    # recall = test_metrics.recall_score()
+    # f1_score = test_metrics.f1_score()
+
+    print(f'Accuracy: {test_accuracy}')#\
+    #       \nPrecision: {precision}\
+    #       \nRecall: {recall}\
+    #       \nF1 Score: {f1_score}')
+
+
 
 
 
