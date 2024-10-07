@@ -1,14 +1,11 @@
 import numpy as np
 import wandb
+import json
 import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
-from sklearn.model_selection import train_test_split
-
-
-import pandas as pd
-import numpy as np
-from models.MLP.MLP_Classifier import MLP_Classifier
+from performance_measures.classification_metrics import Metrics
+from models.MLP.MLPClassifier import MLPClassifier
 
 def describe_dataset(df):
     numerical_cols = df.to_numpy()
@@ -66,8 +63,8 @@ def normalize_and_standardize(df):
     normalized_df = pd.DataFrame(normalized_data, columns=df.columns[0:-1])
     standardized_df = pd.DataFrame(standardized_data, columns=df.columns[0:-1])
 
-    normalized_df['quality'] = df['quality']
-    standardized_df['quality'] = df['quality']
+    normalized_df['quality'] = df['quality'] -3
+    standardized_df['quality'] = df['quality'] -3
 
     normalized_df.to_csv('data/interim/3/WineQT/WineQT_normalized.csv', index=False)
     standardized_df.to_csv('data/interim/3/WineQT/WineQT_standardized.csv', index=False)
@@ -117,59 +114,95 @@ def split_dataset(dataset, output_dir='data/interim/3/WineQT/split/', train_size
     return X_train, y_train, X_validation, y_validation, X_test, y_test
 
 def data_preprocessing():
-    # file_path = 'data/interim/3/WineQT/WineQT.csv'
-    # dataset = pd.read_csv(file_path)
-    # dataset.drop(['Id'], axis=1, inplace=True)
+    file_path = 'data/interim/3/WineQT/WineQT.csv'
+    dataset = pd.read_csv(file_path)
+    dataset.drop(['Id'], axis=1, inplace=True)
 
-    # description = describe_dataset(dataset)
-    # plot_quality_distribution(dataset)
-    # normalized_data, standardized_data = normalize_and_standardize(dataset)
+    description = describe_dataset(dataset)
+    plot_quality_distribution(dataset)
+    normalized_data, standardized_data = normalize_and_standardize(dataset)
 
+def load_wineqt():
     file_path = 'data/interim/3/WineQT/WineQT_normalized.csv'
     dataset = pd.read_csv(file_path)
     return split_dataset(dataset)
 
-def wandb_init(lr, max_epochs, optimizer, activation, hidden_layers, batch_size):
-    config = {
-        "lr": lr, 
-        "model_type": "MLP_Classifier",
-        "optimizer": optimizer, # SGC/BGD/MBGD
-        "criterion": "mse",
-        "num_epochs": max_epochs,
-        "batch_size": batch_size,
-        "hidden_layers": hidden_layers,
-        "activation": activation,
-        "wandb_run_name": "shaunak1" ,
+
+def train_and_log(project="SMAI_A3", config=None):
+    # Initialize the run for sweeps
+    with wandb.init(config=config):
+        config = wandb.config
+        config_dict = dict(config)
+        wandb.run.name = f"{config_dict['optimizer']}_{config_dict['activation']}_{len(config_dict['hidden_layers'])}_{config_dict['lr']}_{config_dict['batch_size']}_{config_dict['max_epochs']}"
+        
+        # Initialize the MLP classifier with the W&B configuration
+        model = MLPClassifier(
+            input_size=X_train.shape[1],
+            hidden_layers=config.hidden_layers,
+            num_classes=6,
+            learning_rate=config.lr,
+            activation=config.activation,
+            optimizer=config.optimizer,
+            wandb_log=True
+        )
+
+        costs = model.fit(
+            X_train, y_train, 
+            max_epochs=config.max_epochs, 
+            batch_size=config.batch_size, 
+            X_validation=X_validation, 
+            y_validation=y_validation, 
+            early_stopping=True, 
+            patience=5
+        )
+
+        y_pred_validation = model.predict(X_validation)
+        validation_metrics = Metrics(y_validation, y_pred_validation, task="classification")
+
+        validation_accuracy = validation_metrics.accuracy()
+        precision = validation_metrics.precision_score()
+        recall = validation_metrics.recall_score()
+        f1_score = validation_metrics.f1_score()
+
+        wandb.log({
+            'accuracy_val_final': validation_accuracy,
+            'precision_val_final': precision,
+            'recall_val_final': recall,
+            'f1_score_val_final': f1_score
+        })
+
+        global best_model_params, best_validation_accuracy
+        if validation_accuracy > best_validation_accuracy:
+            best_validation_accuracy = validation_accuracy
+            best_model_params = dict(config)
+
+sweep_config = {
+    'method': 'bayes',
+    'metric': {
+      'name': 'accuracy_val_final',
+    },
+    'parameters': {
+        'lr': {'values': [0.002, 0.01, 0.05]}, 
+        'max_epochs': {'values': [200, 800]},
+        'optimizer': {'values': ['sgd', 'bgd', 'mbgd']}, 
+        'activation': {'values': ['sigmoid','tanh','relu','signum']},
+        'hidden_layers': {'values': [[8], [16], [8, 8], [8, 16], [16, 8], [16, 16], [8, 8, 8]]}, 
+        'batch_size': {'values': [16, 32]} 
     }
-
-    wandb.init(project = "SMAI_A3",
-            config = config  
-            )
-    wandb.run.name = f"{config['optimizer']}_{config['activation']}_{len(config['hidden_layers'])}_{config['lr']}_{config['batch_size']}_{config['num_epochs']}"
-    print(wandb.run.name)
-
+}
 
 if __name__ == "__main__":
-    X_train, y_train, X_validation, y_validation, X_test, y_test = data_preprocessing()
+    X_train, y_train, X_validation, y_validation, X_test, y_test = load_wineqt()
 
-    lr = 0.1
-    max_epochs = 10000
-    optimizer = 'bgd'
-    activation = 'sigmoid'
-    hidden_layers = [8,8,]
-    batch_size = 32
+    best_model_params = None
+    best_validation_accuracy = 0
 
-    # wandb_init(lr, max_epochs, optimizer, activation, hidden_layers, batch_size)
-    model = MLP_Classifier(X_train.shape[1], hidden_layers, 6, learning_rate=lr, activation=activation, optimizer=optimizer, print_every=100, wandb_log=False)
-    # model.gradient_check(X_train[:5], y_train[:5]) 
-    costs = model.fit(X_train, y_train-3, max_epochs=max_epochs, batch_size=batch_size, X_validation=X_validation, y_validation=y_validation-3, early_stopping=True)
-    print(model.calculate_accuracy(X_test, y_test-3))
-    # wandb.finish()
-    # plt.figure(figsize=(8, 6))
-    # plt.plot(costs)
-    # plt.title('Training Loss')
-    # plt.xlabel('Epoch')
-    # plt.ylabel('Loss')
-    # plt.grid(True)
-    # plt.show()
+    sweep_id = wandb.sweep(sweep_config, project="SMAI_A3")
+    wandb.agent(sweep_id, function=train_and_log, count=256)
+
+    with open('best_model_config.json', 'w') as f:
+        json.dump(best_model_params, f)
+
+    wandb.finish()
+
 
