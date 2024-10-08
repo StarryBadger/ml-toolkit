@@ -1,13 +1,17 @@
-import numpy as np
-import wandb
+import time
 import json
+import wandb
+import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+
+from models.knn.knn import KNN
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from performance_measures.classification_metrics import Metrics
 from models.MLP.MLPClassifier import MLPClassifier
 from models.MLP.MultiLabelMLP import MultiLabelMLP
 from models.MLP.MLPRegression import MLPRegression
+from models.AutoEncoders.AutoEncoders import AutoEncoder
 
 def describe_dataset(df, file_path='data/interim/3/WineQT/WineQT_description.csv'):
     numerical_cols = df.to_numpy()
@@ -379,7 +383,6 @@ sweep_config_housing = {
     }
 }
 
-
 def advertisement_preprocessing(dataset_path="data/interim/3/advertisement/advertisement.csv"):
     dataset=pd.read_csv(dataset_path)
     gender_encoded = pd.get_dummies(dataset['gender'], prefix='gender', dtype=int)
@@ -438,6 +441,66 @@ def get_advertisement_data():
     y_test = np.array(test_dataset['labels'].tolist())
 
     return X_train, y_train, X_validation, y_validation, X_test, y_test
+
+def split(X, train_ratio=0.8, val_ratio=0.1):
+    np.random.seed(1)
+    indices = np.random.permutation(len(X))
+    X_shuffled = X.iloc[indices]
+
+    train_size = int(train_ratio * len(X_shuffled))
+    val_size = int(val_ratio * len(X_shuffled))
+
+    X_train = X_shuffled[:train_size]
+    X_val = X_shuffled[train_size : train_size + val_size]
+    X_test = X_shuffled[train_size + val_size :]
+    return X_train, X_val, X_test
+
+def autoencoder_knn_task():
+    file_path_spotify = "data/interim/2/spotify_normalized_numerical.csv"
+    df = pd.read_csv(file_path_spotify)
+    genres = df['track_genre'].values
+    features = df.drop(columns=['track_genre']).values
+
+    input_size = features.shape[1]
+    latent_size = 9
+    encoder_layers = [10]
+    decoder_layers = [10] 
+    
+    autoencoder = AutoEncoder(input_size=input_size, latent_size=latent_size, encoder_layers=encoder_layers, decoder_layers=decoder_layers)
+    autoencoder.fit(features, max_epochs=10)
+
+    reduced_features = autoencoder.get_latent(features)
+    
+    features_df = pd.DataFrame(reduced_features)
+    result_df = features_df.copy()
+    result_df['track_genre'] = genres
+
+    train, val, _ = split(df)
+    classifier = KNN(k=64, distance_metric="manhattan")
+    classifier.fit(train.drop(columns=['track_genre']).values, train['track_genre'].values)
+    start_time = time.time()
+    y_pred = classifier.predict(val.drop(columns=['track_genre']).values)
+    time_taken1 = time.time() - start_time
+    Metrics(y_true=val['track_genre'].values, y_pred=y_pred, task="classification").print_metrics()
+    print(f"{time_taken1=}")
+
+    train, val, _ = split(result_df)
+    classifier = KNN(k=64, distance_metric="manhattan")
+    classifier.fit(train.drop(columns=['track_genre']).values, train['track_genre'].values)
+    start_time = time.time()
+    y_pred = classifier.predict(val.drop(columns=['track_genre']).values)
+    time_taken2 = time.time() - start_time
+    Metrics(y_true=val['track_genre'].values, y_pred=y_pred, task="classification").print_metrics()
+    print(f"{time_taken2=}")
+
+    models = [f'Original (12 dim)', f'AutoEncoder ({latent_size} dim)']
+    times = [time_taken1, time_taken2]
+
+    plt.figure(figsize=(8, 5))
+    plt.bar(models, times, color=['skyblue', 'lightgreen'])
+    plt.ylabel('Inference Time (seconds)')
+    plt.title('KNN Inference Time Comparison (Original vs AutoEncoder)')
+    plt.savefig("assignments/3/figures/knn_og_vs_autoencoder_bar_2.png")
 
 if __name__ == "__main__":
     np.random.seed(6)
@@ -499,6 +562,8 @@ if __name__ == "__main__":
     # wandb.finish()
 
     # test_on_best_housing()
+
+    autoencoder_knn_task()
 
 
     

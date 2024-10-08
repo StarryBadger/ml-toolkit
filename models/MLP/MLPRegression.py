@@ -92,7 +92,7 @@ class MLPRegression:
         self.gradients = []
         num_layers = len(self.weights)
         
-        delta = (y_pred.squeeze() - y)[:, np.newaxis]
+        delta = (y_pred.squeeze() - y.squeeze())
         dW = (1 / m) * np.dot(self.layer_outputs[-2].T, delta)
         db = (1 / m) * np.sum(delta, axis=0, keepdims=True)
         self.gradients.append((dW, db))

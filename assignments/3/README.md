@@ -344,3 +344,38 @@ F1 Score: 0.3117707219507481
 | MEDV        |  22.4887   |             9.14391  |   5       |  50      |
 
 ![Histograms](./figures/regression_distributions.png)
+
+Epoch 1/10, Loss: 6.259334192820956
+Epoch 2/10, Loss: 5.548498327557013
+Epoch 3/10, Loss: 4.964977160225369
+Epoch 4/10, Loss: 4.483288198096867
+Epoch 5/10, Loss: 4.082735406606526
+Epoch 6/10, Loss: 3.7468096620742517
+Epoch 7/10, Loss: 3.462558163379566
+Epoch 8/10, Loss: 3.219918084870864
+Epoch 9/10, Loss: 3.011087371211398
+Epoch 10/10, Loss: 2.829989667505953
+
+Classification Task Scores Without Auto Encoders
+
+Accuracy: 0.2561
+  Precision (macro): 0.2340
+  Recall (macro): 0.2472
+  F1-Score (macro): 0.2405
+  Precision (micro): 0.2561
+  Recall (micro): 0.2561
+  F1-Score (micro): 0.2561
+time_taken1=55.996248960494995
+
+Classification Task Scores
+
+Accuracy: 0.1402
+  Precision (macro): 0.1161
+  Recall (macro): 0.1356
+  F1-Score (macro): 0.1251
+  Precision (micro): 0.1402
+  Recall (micro): 0.1402
+  F1-Score (micro): 0.1402
+time_taken2=46.165589809417725
+
+Note, similar accuracy using 10 epochs, 0.01 vs 200 epochs, 0.2 grad descent, which is weird, best with sigmoid
