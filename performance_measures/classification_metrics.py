@@ -60,6 +60,9 @@ class Metrics:
     def mse(self):
         return np.mean((self.y_true - self.y_pred) ** 2)
     
+    def rmse(self):
+        return np.sqrt(np.mean((self.y_true - self.y_pred) ** 2))
+    
     def mae(self):
         return np.mean(np.abs(self.y_true - self.y_pred))
 

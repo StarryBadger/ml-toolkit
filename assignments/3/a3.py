@@ -180,7 +180,7 @@ def load_housing():
     dataset = pd.read_csv(file_path)
     return split_dataset_housing(dataset)
 
-def train_and_log(project="SMAI_A3", config=None):
+def train_and_log_classification (project="SMAI_A3", config=None):
     # Initialize the run for sweeps
     with wandb.init(config=config):
         config = wandb.config
@@ -228,6 +228,51 @@ def train_and_log(project="SMAI_A3", config=None):
             best_validation_accuracy = validation_accuracy
             best_model_params = dict(config)
 
+def train_and_log_regression(project="SMAI_A3", config=None):
+    with wandb.init(config=config):
+        config = wandb.config
+        config_dict = dict(config)
+        wandb.run.name = f"{config_dict['optimizer']}_{config_dict['activation']}_{len(config_dict['hidden_layers'])}_{config_dict['lr']}_{config_dict['batch_size']}_{config_dict['max_epochs']}"
+
+        model = MLPRegression(
+            input_size=X_train.shape[1],
+            hidden_layers=config.hidden_layers,
+            output_size=1,
+            learning_rate=config.lr,
+            activation=config.activation,
+            optimizer=config.optimizer,
+            wandb_log=True
+        )
+
+        costs = model.fit(
+            X_train, y_train,
+            max_epochs=config.max_epochs,
+            batch_size=config.batch_size,
+            X_validation=X_validation,
+            y_validation=y_validation,
+            early_stopping=True
+        )
+
+        y_pred_validation = model.predict(X_validation).squeeze()
+        validation_metrics = Metrics(y_validation, y_pred_validation, task="regression")
+
+        mse = validation_metrics.mse()
+        mae = validation_metrics.mae()
+        r2 = validation_metrics.r2_score()
+        rmse = validation_metrics.rmse()
+
+        wandb.log({
+            'mse_val_final': mse,
+            'mae_val_final': mae,
+            'r2_val_final': r2,
+            'rmse_val_final': rmse
+        })
+
+        global best_model_params_regression, best_validation_mse
+        if mse < best_validation_mse:
+            best_validation_mse = mse
+            best_model_params_regression = dict(config)
+
 def print_hyperparams(file_path="data/interim/3/WineQT/hyperparams.csv"):
     df = pd.read_csv(file_path)
 
@@ -273,36 +318,29 @@ def test_on_best_wineqt():
           \nF1 Score: {f1_score}')
     
 def test_on_best_housing():
-    with open('data/interim/3/WineQT/best_model_config_seed_6.json', 'r') as file:
+
+    with open('data/interim/3/HousingData/best_model_config.json', 'r') as file:
         config = json.load(file)
-    # model = MLPRegression(X_train.shape[1], hidden_layers=[8,8,8], output_size=1,learning_rate=config['lr'], activation=config['activation'], optimizer='sgd', print_every=10, wandb_log=False)
-    # costs = model.fit(
-    #         X_train, y_train, 
-    #         max_epochs=config['max_epochs'], 
-    #         batch_size=config['batch_size'], 
-    #         X_validation=X_validation, 
-    #         y_validation=y_validation, 
-    #         early_stopping=True, 
-    #         patience=5
-    #     )
-    # model.gradient_checking(X_train[:5], y_train[:5])
-
-
-    model = MLPRegression(X_train.shape[1], hidden_layers=[8,8,8], output_size=1, learning_rate=0.5, activation="sigmoid", optimizer="mbgd")
-    costs = model.fit(X_train, y_train, max_epochs=8000, batch_size=32, X_validation=X_validation, y_validation=y_validation)
+    # with wandb.init(config=config):
+    #     config = wandb.config
+    #     config_dict = dict(config)
+        # wandb.run.name = f"{config_dict['optimizer']}_{config_dict['activation']}_{len(config_dict['hidden_layers'])}_{config_dict['lr']}_{config_dict['batch_size']}_{config_dict['max_epochs']}"
+    model = MLPRegression(X_train.shape[1], config['hidden_layers'], output_size=1, learning_rate=config['lr'], activation=config['activation'], optimizer=config['optimizer'], print_every=10, wandb_log=False)
+    costs = model.fit(X_train, y_train, max_epochs=['max_epochs'], batch_size=config['batch_size'], X_validation=X_validation, y_validation=y_validation, early_stopping=True)
     y_pred_test = model.predict(X_test).squeeze()
     test_metrics = Metrics(y_test, y_pred_test, task="regression")
 
     mse = test_metrics.mse()
     mae= test_metrics.mae()
     r2 = test_metrics.r2_score()
+    rmse = test_metrics.rmse()
 
     print(f"MSE: {mse}\
-          \nMAE: {mae}\
-          \nR2 Score: {r2}")
+            \nMAE: {mae}\
+            \nRMSE: {rmse}\
+            \nR2 Score: {r2}")
 
 def multi_hot_encode(labels):
-    # Split labels and create a multi-hot encoding
     unique_labels = set(label for sublist in labels for label in sublist.split())
     multi_hot = {label: 0 for label in unique_labels}
     for label in labels:
@@ -310,7 +348,7 @@ def multi_hot_encode(labels):
             multi_hot[l] = 1
     return pd.Series(multi_hot)
 
-sweep_config = {
+sweep_config_wine = {
     'method': 'bayes',
     'metric': {
       'name': 'accuracy_val_final',
@@ -324,6 +362,24 @@ sweep_config = {
         'batch_size': {'values': [16, 32]} 
     }
 }
+
+sweep_config_housing = {
+    'method': 'bayes',
+    'metric': {
+        'name': 'mse_val_final',
+        'goal': 'minimize',
+    },
+    'parameters': {
+        'lr': {'values': [0.002, 0.005, 0.01, 0.02, 0.05, 0.1, 0.2]},
+        'max_epochs': {'values': [500, 2000, 8000]},
+        'optimizer': {'values': ['sgd', 'bgd', 'mbgd']},
+        'activation': {'values': ['sigmoid', 'tanh', 'relu', 'linear']},
+        'hidden_layers': {'values': [[8], [16], [8, 8], [8, 16], [16, 8], [16, 16], [8, 8, 8], [8, 8, 8, 8]]},
+        'batch_size': {'values': [16, 32]}
+    }
+}
+
+
 def advertisement_preprocessing(dataset_path="data/interim/3/advertisement/advertisement.csv"):
     dataset=pd.read_csv(dataset_path)
     gender_encoded = pd.get_dummies(dataset['gender'], prefix='gender', dtype=int)
@@ -356,6 +412,7 @@ def encode_labels(dataset):
             encoded_array.append(encoded)
         return encoded_array
     return multi_hot_encode(dataset['labels'])
+
 def get_advertisement_data():
     dataset=pd.read_csv('data/interim/3/advertisement/advertisement_encoded.csv')
     labels=encode_labels(dataset)
@@ -389,8 +446,8 @@ if __name__ == "__main__":
     
     # best_model_params = None
     # best_validation_accuracy = 0
-    # sweep_id = wandb.sweep(sweep_config, project="SMAI_A3")
-    # wandb.agent(sweep_id, function=train_and_log, count=256)
+    # sweep_id = wandb.sweep(sweep_config_wine, project="SMAI_A3")
+    # wandb.agent(sweep_id, function=train_and_log_classification, count=256)
     # with open('data/interim/3/WineQT/best_model_config.json', 'w') as f:
     #     json.dump(best_model_params, f)
     # wandb.finish()
@@ -429,8 +486,21 @@ if __name__ == "__main__":
     
     # housing_preprocessing()
     np.random.seed(13)
-    X_train, y_train, X_validation, y_validation, X_test, y_test = load_housing()
-    test_on_best_housing()
+    # X_train, y_train, X_validation, y_validation, X_test, y_test = load_housing()
+
+    # best_model_params_regression = None
+    # best_validation_mse = float('inf')
+    # sweep_id_regression = wandb.sweep(sweep_config_housing, project="SMAI_A3")
+    # wandb.agent(sweep_id_regression, function=train_and_log_regression, count=800)
+
+    # with open('data/interim/3/HousingData/best_model_config.json', 'w') as f:
+    #     json.dump(best_model_params_regression, f)
+
+    # wandb.finish()
+
+    # test_on_best_housing()
+
+
     
 
     
