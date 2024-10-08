@@ -8,33 +8,35 @@ from performance_measures.classification_metrics import Metrics
 from models.MLP.MLPClassifier import MLPClassifier
 from models.MLP.MultiLabelMLP import MultiLabelMLP
 
-def describe_dataset(df):
+def describe_dataset(df, file_path='data/interim/3/WineQT/WineQT_description.csv'):
     numerical_cols = df.to_numpy()
     results = []
-    means = np.mean(numerical_cols, axis=0)
-    stds = np.std(numerical_cols, axis=0)
-    mins = np.min(numerical_cols, axis=0)
-    maxs = np.max(numerical_cols, axis=0)
+    means = np.nanmean(numerical_cols, axis=0)
+    stds = np.nanstd(numerical_cols, axis=0)
+    mins = np.nanmin(numerical_cols, axis=0)
+    maxs = np.nanmax(numerical_cols, axis=0)
     results = np.column_stack((df.columns, means, stds, mins, maxs))
     results_df = pd.DataFrame(results, columns=['Attribute', 'Mean', 'Standard Deviation', 'Min', 'Max'])
     md_table = results_df.to_markdown(index=False)
     print(md_table)
-    results_df.to_csv('data/interim/3/WineQT/WineQT_description.csv', index=False)
+    results_df.to_csv(file_path, index=False)
     return results_df
 
-def plot_quality_distribution(df):
-    plt.figure(figsize=(10, 6))
-    df['quality'].value_counts().sort_index().plot(kind='bar')
-    plt.title('Distribution of Wine Quality')
-    plt.xlabel('Quality')
-    plt.ylabel('Frequency')
-    plt.xticks(rotation=0)
-    plt.grid(axis='y')
-    plt.savefig('assignments/3/figures/quality_distribution.png')
-    plt.close()
+def plot_quality_distribution(df, regression=False, save_path='assignments/3/figures/distributions.png'):
+    if not regression:
+        plt.figure(figsize=(10, 6))
+        df['quality'].value_counts().sort_index().plot(kind='bar')
+        plt.title('Distribution of Wine Quality')
+        plt.xlabel('Quality')
+        plt.ylabel('Frequency')
+        plt.xticks(rotation=0)
+        plt.grid(axis='y')
+        plt.savefig('assignments/3/figures/quality_distribution.png')
+        plt.close()
 
     features = df.columns.tolist()
-    features.remove('quality')
+    if not regression:
+        features.remove('quality')
     num_features = len(features)
     cols = 3
     rows = (num_features // cols) + (num_features % cols > 0)
@@ -48,28 +50,43 @@ def plot_quality_distribution(df):
         plt.grid(axis='y', linestyle='--', alpha=0.7)
 
     plt.tight_layout()
-    plt.savefig('assignments/3/figures/distributions.png')
+    plt.savefig(save_path)
     plt.close()
 
-def normalize_and_standardize(df):
+def normalize_and_standardize(df,regression=False):
+    if not regression:
+        df.fillna(df.mean(), inplace=True)
 
-    df.fillna(df.mean(), inplace=True)
+        min_max_scaler = MinMaxScaler()
+        normalized_data = min_max_scaler.fit_transform(df.drop(columns=['quality']))
 
-    min_max_scaler = MinMaxScaler()
-    normalized_data = min_max_scaler.fit_transform(df.drop(columns=['quality']))
+        standard_scaler = StandardScaler()
+        standardized_data = standard_scaler.fit_transform(df.drop(columns=['quality']))
 
-    standard_scaler = StandardScaler()
-    standardized_data = standard_scaler.fit_transform(df.drop(columns=['quality']))
+        normalized_df = pd.DataFrame(normalized_data, columns=df.columns[0:-1])
+        standardized_df = pd.DataFrame(standardized_data, columns=df.columns[0:-1])
 
-    normalized_df = pd.DataFrame(normalized_data, columns=df.columns[0:-1])
-    standardized_df = pd.DataFrame(standardized_data, columns=df.columns[0:-1])
+        normalized_df['quality'] = df['quality'] -3
+        standardized_df['quality'] = df['quality'] -3
 
-    normalized_df['quality'] = df['quality'] -3
-    standardized_df['quality'] = df['quality'] -3
+        normalized_df.to_csv('data/interim/3/WineQT/WineQT_normalized.csv', index=False)
+        standardized_df.to_csv('data/interim/3/WineQT/WineQT_standardized.csv', index=False)
+        return normalized_df, standardized_df
+    else:
+        df.fillna(df.mean(), inplace=True)
 
-    normalized_df.to_csv('data/interim/3/WineQT/WineQT_normalized.csv', index=False)
-    standardized_df.to_csv('data/interim/3/WineQT/WineQT_standardized.csv', index=False)
-    return normalized_df, standardized_df
+        min_max_scaler = MinMaxScaler()
+        normalized_data = min_max_scaler.fit_transform(df)
+
+        standard_scaler = StandardScaler()
+        standardized_data = standard_scaler.fit_transform(df)
+
+        normalized_df = pd.DataFrame(normalized_data, columns=df.columns)
+        standardized_df = pd.DataFrame(standardized_data, columns=df.columns)
+
+        normalized_df.to_csv('data/interim/3/HousingData/HousingData_normalized.csv', index=False)
+        standardized_df.to_csv('data/interim/3/HousingData/HousingData_standardized.csv', index=False)
+        return normalized_df, standardized_df
 
 def split_dataset(dataset, output_dir='data/interim/3/WineQT/split/', train_size=0.8, val_size=0.1):
     
@@ -122,6 +139,14 @@ def wine_preprocessing():
     description = describe_dataset(dataset)
     plot_quality_distribution(dataset)
     normalized_data, standardized_data = normalize_and_standardize(dataset)
+
+def housing_preprocessing():
+    file_path = 'data/interim/3/HousingData/HousingData.csv'
+    dataset = pd.read_csv(file_path)
+
+    description = describe_dataset(dataset, file_path='data/interim/3/HousingData/HousingData_description.csv')
+    plot_quality_distribution(dataset, regression=True, save_path='assignments/3/figures/regression_distributions.png')
+    normalized_data, standardized_data = normalize_and_standardize(dataset, regression=True)
 
 def load_wineqt():
     file_path = 'data/interim/3/WineQT/WineQT_normalized.csv'
@@ -318,35 +343,36 @@ if __name__ == "__main__":
     # test_on_best()
     
     # advertisement_preprocessing()
-    X_train, y_train, X_validation, y_validation, X_test, y_test = get_advertisement_data()
+    # X_train, y_train, X_validation, y_validation, X_test, y_test = get_advertisement_data()
     
-    model = MultiLabelMLP(X_train.shape[1], [64], 8, learning_rate=0.05, activation='relu', optimizer='sgd', print_every=10)
-    costs = model.fit(
-            X_train, y_train, 
-            max_epochs=200, 
-            batch_size=32, 
-            X_validation=X_validation, 
-            y_validation=y_validation, 
-            early_stopping=False, 
-            patience=100
-        )
-    y_pred_test = model.predict(X_test)
-    # print(y_pred_test)
-    # print(y_test)
-    test_metrics = Metrics(y_test, y_pred_test, task="classification")
+    # model = MultiLabelMLP(X_train.shape[1], [64], 8, learning_rate=0.05, activation='relu', optimizer='sgd', print_every=10)
+    # costs = model.fit(
+    #         X_train, y_train, 
+    #         max_epochs=200, 
+    #         batch_size=32, 
+    #         X_validation=X_validation, 
+    #         y_validation=y_validation, 
+    #         early_stopping=False, 
+    #         patience=100
+    #     )
+    # y_pred_test = model.predict(X_test)
+    # # print(y_pred_test)
+    # # print(y_test)
+    # test_metrics = Metrics(y_test, y_pred_test, task="classification")
 
-    test_accuracy = test_metrics.accuracy()
+    # test_accuracy = test_metrics.accuracy()
     # precision = test_metrics.precision_score()
     # recall = test_metrics.recall_score()
     # f1_score = test_metrics.f1_score()
 
-    print(f'Accuracy: {test_accuracy}')#\
+    # print(f'Accuracy: {test_accuracy}\
     #       \nPrecision: {precision}\
     #       \nRecall: {recall}\
     #       \nF1 Score: {f1_score}')
+    
+    
+    housing_preprocessing()
+    # X_train, y_train, X_validation, y_validation, X_test, y_test = load_wineqt()
+    
 
-
-
-
-
-
+    
