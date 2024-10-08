@@ -288,8 +288,8 @@ def test_on_best_housing():
     # model.gradient_checking(X_train[:5], y_train[:5])
 
 
-    model = MLPRegression(X_train.shape[1], hidden_layers=[8,8,8], output_size=1, learning_rate=0.05, activation="sigmoid", optimizer="sgd")
-    costs = model.fit(X_train, y_train, max_epochs=2000, batch_size=32, X_validation=X_validation, y_validation=y_validation)
+    model = MLPRegression(X_train.shape[1], hidden_layers=[8,8,8], output_size=1, learning_rate=0.5, activation="sigmoid", optimizer="mbgd")
+    costs = model.fit(X_train, y_train, max_epochs=8000, batch_size=32, X_validation=X_validation, y_validation=y_validation)
     y_pred_test = model.predict(X_test).squeeze()
     test_metrics = Metrics(y_test, y_pred_test, task="regression")
 

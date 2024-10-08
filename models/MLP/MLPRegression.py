@@ -37,7 +37,7 @@ class MLPRegression:
             weights.append(w)
             biases.append(b)
             return weights, biases
-        
+
         for i in range(num_layers + 1):
             if i == 0:
                 w = np.random.randn(self.input_size, self.hidden_layers[0])
@@ -46,11 +46,12 @@ class MLPRegression:
             else:
                 w = np.random.randn(self.hidden_layers[i - 1], self.hidden_layers[i])
             
-            b = np.zeros((1, w.shape[1]))
+            b = np.zeros((1, w.shape[1]))  # Bias should match the number of units in the current layer
             weights.append(w)
             biases.append(b)
 
         return weights, biases
+
     
     def _activate(self, X, activation):
         if activation == "sigmoid":
@@ -91,7 +92,7 @@ class MLPRegression:
         self.gradients = []
         num_layers = len(self.weights)
         
-        delta = y_pred - y
+        delta = (y_pred.squeeze() - y)[:, np.newaxis]
         dW = (1 / m) * np.dot(self.layer_outputs[-2].T, delta)
         db = (1 / m) * np.sum(delta, axis=0, keepdims=True)
         self.gradients.append((dW, db))
