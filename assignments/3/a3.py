@@ -88,7 +88,7 @@ def normalize_and_standardize(df,regression=False):
         standardized_df.to_csv('data/interim/3/HousingData/HousingData_standardized.csv', index=False)
         return normalized_df, standardized_df
 
-def split_dataset(dataset, output_dir='data/interim/3/WineQT/split/', train_size=0.8, val_size=0.1):
+def split_dataset_wineqt(dataset, output_dir='data/interim/3/WineQT/split/', train_size=0.8, val_size=0.1):
     
     X = dataset.drop(columns=['quality']).to_numpy()
     y = dataset['quality'].to_numpy()
@@ -131,6 +131,27 @@ def split_dataset(dataset, output_dir='data/interim/3/WineQT/split/', train_size
 
     return X_train, y_train, X_validation, y_validation, X_test, y_test
 
+def split_dataset_housing(dataset, train_size=0.7, val_size=0.15):
+    shuffled_indices = np.random.permutation(len(dataset))
+    dataset_shuffled = dataset.iloc[shuffled_indices]
+    train_end = int(train_size * len(dataset))
+    val_end = train_end + int(val_size * len(dataset))
+
+    train_set = dataset_shuffled.iloc[:train_end]
+    val_set = dataset_shuffled.iloc[train_end:val_end]
+    test_set = dataset_shuffled.iloc[val_end:]
+
+    X_train = train_set.drop(columns=['MEDV']).to_numpy()
+    y_train = train_set['MEDV'].to_numpy()
+    
+    X_val = val_set.drop(columns=['MEDV']).to_numpy()
+    y_val = val_set['MEDV'].to_numpy()
+    
+    X_test = test_set.drop(columns=['MEDV']).to_numpy()
+    y_test = test_set['MEDV'].to_numpy()
+
+    return X_train, y_train, X_val, y_val, X_test, y_test
+
 def wine_preprocessing():
     file_path = 'data/interim/3/WineQT/WineQT.csv'
     dataset = pd.read_csv(file_path)
@@ -151,7 +172,12 @@ def housing_preprocessing():
 def load_wineqt():
     file_path = 'data/interim/3/WineQT/WineQT_normalized.csv'
     dataset = pd.read_csv(file_path)
-    return split_dataset(dataset)
+    return split_dataset_wineqt(dataset)
+
+def load_housing():
+    file_path = 'data/interim/3/HousingData/HousingData_normalized.csv'
+    dataset = pd.read_csv(file_path)
+    return split_dataset_housing(dataset)
 
 def train_and_log(project="SMAI_A3", config=None):
     # Initialize the run for sweeps
@@ -371,8 +397,9 @@ if __name__ == "__main__":
     #       \nF1 Score: {f1_score}')
     
     
-    housing_preprocessing()
-    # X_train, y_train, X_validation, y_validation, X_test, y_test = load_wineqt()
+    # housing_preprocessing()
+    X_train, y_train, X_validation, y_validation, X_test, y_test = load_housing()
+    print(X_test[:2])
     
 
     
