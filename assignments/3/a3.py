@@ -7,6 +7,7 @@ from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from performance_measures.classification_metrics import Metrics
 from models.MLP.MLPClassifier import MLPClassifier
 from models.MLP.MultiLabelMLP import MultiLabelMLP
+from models.MLP.MLPRegression import MLPRegression
 
 def describe_dataset(df, file_path='data/interim/3/WineQT/WineQT_description.csv'):
     numerical_cols = df.to_numpy()
@@ -244,7 +245,7 @@ def print_hyperparams(file_path="data/interim/3/WineQT/hyperparams.csv"):
     markdown_table = metrics_df.to_markdown(index=False)
     print(markdown_table)
 
-def test_on_best():
+def test_on_best_wineqt():
     with open('data/interim/3/WineQT/best_model_config_seed_6.json', 'r') as file:
         config = json.load(file)
     model = MLPClassifier(X_train.shape[1], config['hidden_layers'], 6, learning_rate=config['lr'], activation=config['activation'], optimizer=config['optimizer'], print_every=10, wandb_log=False)
@@ -270,6 +271,35 @@ def test_on_best():
           \nPrecision: {precision}\
           \nRecall: {recall}\
           \nF1 Score: {f1_score}')
+    
+def test_on_best_housing():
+    with open('data/interim/3/WineQT/best_model_config_seed_6.json', 'r') as file:
+        config = json.load(file)
+    # model = MLPRegression(X_train.shape[1], hidden_layers=[8,8,8], output_size=1,learning_rate=config['lr'], activation=config['activation'], optimizer='sgd', print_every=10, wandb_log=False)
+    # costs = model.fit(
+    #         X_train, y_train, 
+    #         max_epochs=config['max_epochs'], 
+    #         batch_size=config['batch_size'], 
+    #         X_validation=X_validation, 
+    #         y_validation=y_validation, 
+    #         early_stopping=True, 
+    #         patience=5
+    #     )
+    # model.gradient_checking(X_train[:5], y_train[:5])
+
+
+    model = MLPRegression(X_train.shape[1], hidden_layers=[8,8,8], output_size=1, learning_rate=0.05, activation="sigmoid", optimizer="sgd")
+    costs = model.fit(X_train, y_train, max_epochs=2000, batch_size=32, X_validation=X_validation, y_validation=y_validation)
+    y_pred_test = model.predict(X_test).squeeze()
+    test_metrics = Metrics(y_test, y_pred_test, task="regression")
+
+    mse = test_metrics.mse()
+    mae= test_metrics.mae()
+    r2 = test_metrics.r2_score()
+
+    print(f"MSE: {mse}\
+          \nMAE: {mae}\
+          \nR2 Score: {r2}")
 
 def multi_hot_encode(labels):
     # Split labels and create a multi-hot encoding
@@ -366,7 +396,7 @@ if __name__ == "__main__":
     # wandb.finish()
     # print_hyperparams()
 
-    # test_on_best()
+    # test_on_best_wineqt()
     
     # advertisement_preprocessing()
     # X_train, y_train, X_validation, y_validation, X_test, y_test = get_advertisement_data()
@@ -398,8 +428,9 @@ if __name__ == "__main__":
     
     
     # housing_preprocessing()
+    np.random.seed(13)
     X_train, y_train, X_validation, y_validation, X_test, y_test = load_housing()
-    print(X_test[:2])
+    test_on_best_housing()
     
 
     
