@@ -1,0 +1,1 @@
+{"activation": "tanh", "batch_size": 32, "hidden_layers": [8, 8], "lr": 0.05, "max_epochs": 2500, "optimizer": "sgd"}

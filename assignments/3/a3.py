@@ -1,6 +1,8 @@
 import time
+import copy
 import json
 import wandb
+import unittest
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -13,7 +15,50 @@ from models.MLP.MultiLabelMLP import MultiLabelMLP
 from models.MLP.MLPRegression import MLPRegression
 from models.AutoEncoders.AutoEncoders import AutoEncoder
 
-def describe_dataset(df, file_path='data/interim/3/WineQT/WineQT_description.csv'):
+class TestMLPGradientChecking(unittest.TestCase):
+
+    def setUp(self):
+        self.X_train_classification = X_train_classification
+        self.y_train_classification = y_train_classification
+
+        self.X_train_regression = X_train_regression
+        self.y_train_regression = y_train_regression
+
+
+    def test_classification_gradient_checking_with_sigmoid(self):
+        model = MLPClassifier(
+            input_size=self.X_train_classification.shape[1],
+            hidden_layers=[10, 5],
+            num_classes=6,
+            learning_rate=0.01,
+            activation='sigmoid',
+            optimizer='sgd',
+        )
+        model.gradient_checking(self.X_train_classification[:20], self.y_train_classification[:20]) 
+
+    def test_classification_gradient_checking_with_relu(self):
+        model = MLPClassifier(
+            input_size=self.X_train_classification.shape[1],
+            hidden_layers=[10],
+            num_classes=6,
+            learning_rate=0.001,
+            activation='relu',
+            optimizer='bgd',
+        )
+        model.gradient_checking(self.X_train_classification[100:110], self.y_train_classification[100:110])  
+
+    def test_classification_gradient_checking_with_tanh(self):
+        model = MLPClassifier(
+            input_size=self.X_train_classification.shape[1],
+            hidden_layers=[15, 5, 3],
+            num_classes=6,
+            learning_rate=0.005,
+            activation='tanh',
+            optimizer='mbgd',
+        )
+        model.gradient_checking(self.X_train[200:300], self.y_train_classification[200:300]) 
+
+def describe_dataset(df, file_path="data/interim/3/WineQT/WineQT_description.csv"):
     numerical_cols = df.to_numpy()
     results = []
     means = np.nanmean(numerical_cols, axis=0)
@@ -21,61 +66,69 @@ def describe_dataset(df, file_path='data/interim/3/WineQT/WineQT_description.csv
     mins = np.nanmin(numerical_cols, axis=0)
     maxs = np.nanmax(numerical_cols, axis=0)
     results = np.column_stack((df.columns, means, stds, mins, maxs))
-    results_df = pd.DataFrame(results, columns=['Attribute', 'Mean', 'Standard Deviation', 'Min', 'Max'])
+    results_df = pd.DataFrame(
+        results, columns=["Attribute", "Mean", "Standard Deviation", "Min", "Max"]
+    )
     md_table = results_df.to_markdown(index=False)
     print(md_table)
     results_df.to_csv(file_path, index=False)
     return results_df
 
-def plot_quality_distribution(df, regression=False, save_path='assignments/3/figures/distributions.png'):
+
+def plot_quality_distribution(
+    df, regression=False, save_path="assignments/3/figures/distributions.png"
+):
     if not regression:
         plt.figure(figsize=(10, 6))
-        df['quality'].value_counts().sort_index().plot(kind='bar')
-        plt.title('Distribution of Wine Quality')
-        plt.xlabel('Quality')
-        plt.ylabel('Frequency')
+        df["quality"].value_counts().sort_index().plot(kind="bar")
+        plt.title("Distribution of Wine Quality")
+        plt.xlabel("Quality")
+        plt.ylabel("Frequency")
         plt.xticks(rotation=0)
-        plt.grid(axis='y')
-        plt.savefig('assignments/3/figures/quality_distribution.png')
+        plt.grid(axis="y")
+        plt.savefig("assignments/3/figures/quality_distribution.png")
         plt.close()
 
     features = df.columns.tolist()
     if not regression:
-        features.remove('quality')
+        features.remove("quality")
     num_features = len(features)
     cols = 3
     rows = (num_features // cols) + (num_features % cols > 0)
     plt.figure(figsize=(15, rows * 4))
     for i, feature in enumerate(features):
         plt.subplot(rows, cols, i + 1)
-        plt.hist(df[feature], bins=30, color='lightblue', edgecolor='black')
+        plt.hist(df[feature], bins=30, color="lightblue", edgecolor="black")
         plt.title(feature)
-        plt.xlabel('Value')
-        plt.ylabel('Frequency')
-        plt.grid(axis='y', linestyle='--', alpha=0.7)
+        plt.xlabel("Value")
+        plt.ylabel("Frequency")
+        plt.grid(axis="y", linestyle="--", alpha=0.7)
 
     plt.tight_layout()
     plt.savefig(save_path)
     plt.close()
 
-def normalize_and_standardize(df,regression=False):
+
+def normalize_and_standardize(df, regression=False):
     if not regression:
         df.fillna(df.mean(), inplace=True)
 
         min_max_scaler = MinMaxScaler()
-        normalized_data = min_max_scaler.fit_transform(df.drop(columns=['quality']))
+        normalized_data = min_max_scaler.fit_transform(df.drop(columns=["quality"]))
 
         standard_scaler = StandardScaler()
-        standardized_data = standard_scaler.fit_transform(df.drop(columns=['quality']))
+        standardized_data = standard_scaler.fit_transform(df.drop(columns=["quality"]))
 
         normalized_df = pd.DataFrame(normalized_data, columns=df.columns[0:-1])
         standardized_df = pd.DataFrame(standardized_data, columns=df.columns[0:-1])
 
-        normalized_df['quality'] = df['quality'] -3
-        standardized_df['quality'] = df['quality'] -3
+        normalized_df["quality"] = df["quality"] - 3
+        standardized_df["quality"] = df["quality"] - 3
 
-        normalized_df.to_csv('data/interim/3/WineQT/WineQT_normalized.csv', index=False)
-        standardized_df.to_csv('data/interim/3/WineQT/WineQT_standardized.csv', index=False)
+        normalized_df.to_csv("data/interim/3/WineQT/WineQT_normalized.csv", index=False)
+        standardized_df.to_csv(
+            "data/interim/3/WineQT/WineQT_standardized.csv", index=False
+        )
         return normalized_df, standardized_df
     else:
         df.fillna(df.mean(), inplace=True)
@@ -89,18 +142,25 @@ def normalize_and_standardize(df,regression=False):
         normalized_df = pd.DataFrame(normalized_data, columns=df.columns)
         standardized_df = pd.DataFrame(standardized_data, columns=df.columns)
 
-        normalized_df.to_csv('data/interim/3/HousingData/HousingData_normalized.csv', index=False)
-        standardized_df.to_csv('data/interim/3/HousingData/HousingData_standardized.csv', index=False)
+        normalized_df.to_csv(
+            "data/interim/3/HousingData/HousingData_normalized.csv", index=False
+        )
+        standardized_df.to_csv(
+            "data/interim/3/HousingData/HousingData_standardized.csv", index=False
+        )
         return normalized_df, standardized_df
 
-def split_dataset_wineqt(dataset, output_dir='data/interim/3/WineQT/split/', train_size=0.8, val_size=0.1):
-    
-    X = dataset.drop(columns=['quality']).to_numpy()
-    y = dataset['quality'].to_numpy()
-    
+
+def split_dataset_wineqt(
+    dataset, output_dir="data/interim/3/WineQT/split/", train_size=0.8, val_size=0.1
+):
+
+    X = dataset.drop(columns=["quality"]).to_numpy()
+    y = dataset["quality"].to_numpy()
+
     indices = np.arange(X.shape[0])
     np.random.shuffle(indices)
-    
+
     X_shuffled = X[indices]
     y_shuffled = y[indices]
 
@@ -110,31 +170,32 @@ def split_dataset_wineqt(dataset, output_dir='data/interim/3/WineQT/split/', tra
     X_train = X_shuffled[:train_split]
     y_train = y_shuffled[:train_split]
 
-    X_validation = X_shuffled[train_split:train_split + val_split]
-    y_validation = y_shuffled[train_split:train_split + val_split]
+    X_validation = X_shuffled[train_split : train_split + val_split]
+    y_validation = y_shuffled[train_split : train_split + val_split]
 
-    X_test = X_shuffled[train_split + val_split:]
-    y_test = y_shuffled[train_split + val_split:]
+    X_test = X_shuffled[train_split + val_split :]
+    y_test = y_shuffled[train_split + val_split :]
 
-    feature_columns = dataset.columns[:-1]  
+    feature_columns = dataset.columns[:-1]
     train_split_df = pd.DataFrame(X_train, columns=feature_columns)
-    train_split_df['quality'] = y_train
+    train_split_df["quality"] = y_train
 
     validation_split_df = pd.DataFrame(X_validation, columns=feature_columns)
-    validation_split_df['quality'] = y_validation
+    validation_split_df["quality"] = y_validation
 
     test_split_df = pd.DataFrame(X_test, columns=feature_columns)
-    test_split_df['quality'] = y_test
+    test_split_df["quality"] = y_test
 
-    train_split_df.to_csv(output_dir + 'train.csv', index=False)
-    validation_split_df.to_csv(output_dir + 'validation.csv', index=False)
-    test_split_df.to_csv(output_dir + 'test.csv', index=False)
+    train_split_df.to_csv(output_dir + "train.csv", index=False)
+    validation_split_df.to_csv(output_dir + "validation.csv", index=False)
+    test_split_df.to_csv(output_dir + "test.csv", index=False)
 
     # print("Training set shape:", X_train.shape, y_train.shape)
     # print("Validation set shape:", X_validation.shape, y_validation.shape)
     # print("Test set shape:", X_test.shape, y_test.shape)
 
     return X_train, y_train, X_validation, y_validation, X_test, y_test
+
 
 def split_dataset_housing(dataset, train_size=0.7, val_size=0.15):
     shuffled_indices = np.random.permutation(len(dataset))
@@ -146,51 +207,64 @@ def split_dataset_housing(dataset, train_size=0.7, val_size=0.15):
     val_set = dataset_shuffled.iloc[train_end:val_end]
     test_set = dataset_shuffled.iloc[val_end:]
 
-    X_train = train_set.drop(columns=['MEDV']).to_numpy()
-    y_train = train_set['MEDV'].to_numpy()
-    
-    X_val = val_set.drop(columns=['MEDV']).to_numpy()
-    y_val = val_set['MEDV'].to_numpy()
-    
-    X_test = test_set.drop(columns=['MEDV']).to_numpy()
-    y_test = test_set['MEDV'].to_numpy()
+    X_train = train_set.drop(columns=["MEDV"]).to_numpy()
+    y_train = train_set["MEDV"].to_numpy()
+
+    X_val = val_set.drop(columns=["MEDV"]).to_numpy()
+    y_val = val_set["MEDV"].to_numpy()
+
+    X_test = test_set.drop(columns=["MEDV"]).to_numpy()
+    y_test = test_set["MEDV"].to_numpy()
 
     return X_train, y_train, X_val, y_val, X_test, y_test
 
+
 def wine_preprocessing():
-    file_path = 'data/interim/3/WineQT/WineQT.csv'
+    file_path = "data/interim/3/WineQT/WineQT.csv"
     dataset = pd.read_csv(file_path)
-    dataset.drop(['Id'], axis=1, inplace=True)
+    dataset.drop(["Id"], axis=1, inplace=True)
 
     description = describe_dataset(dataset)
     plot_quality_distribution(dataset)
     normalized_data, standardized_data = normalize_and_standardize(dataset)
 
+
 def housing_preprocessing():
-    file_path = 'data/interim/3/HousingData/HousingData.csv'
+    file_path = "data/interim/3/HousingData/HousingData.csv"
     dataset = pd.read_csv(file_path)
 
-    description = describe_dataset(dataset, file_path='data/interim/3/HousingData/HousingData_description.csv')
-    plot_quality_distribution(dataset, regression=True, save_path='assignments/3/figures/regression_distributions.png')
-    normalized_data, standardized_data = normalize_and_standardize(dataset, regression=True)
+    description = describe_dataset(
+        dataset, file_path="data/interim/3/HousingData/HousingData_description.csv"
+    )
+    plot_quality_distribution(
+        dataset,
+        regression=True,
+        save_path="assignments/3/figures/regression_distributions.png",
+    )
+    normalized_data, standardized_data = normalize_and_standardize(
+        dataset, regression=True
+    )
+
 
 def load_wineqt():
-    file_path = 'data/interim/3/WineQT/WineQT_normalized.csv'
+    file_path = "data/interim/3/WineQT/WineQT_normalized.csv"
     dataset = pd.read_csv(file_path)
     return split_dataset_wineqt(dataset)
 
+
 def load_housing():
-    file_path = 'data/interim/3/HousingData/HousingData_normalized.csv'
+    file_path = "data/interim/3/HousingData/HousingData_normalized.csv"
     dataset = pd.read_csv(file_path)
     return split_dataset_housing(dataset)
 
-def train_and_log_classification (project="SMAI_A3", config=None):
+
+def train_and_log_classification(project="SMAI_A3", config=None):
     # Initialize the run for sweeps
     with wandb.init(config=config):
         config = wandb.config
         config_dict = dict(config)
         wandb.run.name = f"{config_dict['optimizer']}_{config_dict['activation']}_{len(config_dict['hidden_layers'])}_{config_dict['lr']}_{config_dict['batch_size']}_{config_dict['max_epochs']}"
-        
+
         # Initialize the MLP classifier with the W&B configuration
         model = MLPClassifier(
             input_size=X_train.shape[1],
@@ -199,38 +273,45 @@ def train_and_log_classification (project="SMAI_A3", config=None):
             learning_rate=config.lr,
             activation=config.activation,
             optimizer=config.optimizer,
-            wandb_log=True
+            wandb_log=True,
         )
 
         costs = model.fit(
-            X_train, y_train, 
-            max_epochs=config.max_epochs, 
-            batch_size=config.batch_size, 
-            X_validation=X_validation, 
-            y_validation=y_validation, 
-            early_stopping=True, 
-            patience=5
+            X_train,
+            y_train,
+            max_epochs=config.max_epochs,
+            batch_size=config.batch_size,
+            X_validation=X_validation,
+            y_validation=y_validation,
+            early_stopping=True,
+            patience=config.max_epochs // 20,
         )
 
         y_pred_validation = model.predict(X_validation)
-        validation_metrics = Metrics(y_validation, y_pred_validation, task="classification")
+        validation_metrics = Metrics(
+            y_validation, y_pred_validation, task="classification"
+        )
 
         validation_accuracy = validation_metrics.accuracy()
+
         precision = validation_metrics.precision_score()
         recall = validation_metrics.recall_score()
         f1_score = validation_metrics.f1_score()
 
-        wandb.log({
-            'accuracy_val_final': validation_accuracy,
-            'precision_val_final': precision,
-            'recall_val_final': recall,
-            'f1_score_val_final': f1_score
-        })
+        wandb.log(
+            {
+                "accuracy_val_final": validation_accuracy,
+                "precision_val_final": precision,
+                "recall_val_final": recall,
+                "f1_score_val_final": f1_score,
+            }
+        )
 
         global best_model_params, best_validation_accuracy
         if validation_accuracy > best_validation_accuracy:
             best_validation_accuracy = validation_accuracy
             best_model_params = dict(config)
+
 
 def train_and_log_regression(project="SMAI_A3", config=None):
     with wandb.init(config=config):
@@ -245,16 +326,18 @@ def train_and_log_regression(project="SMAI_A3", config=None):
             learning_rate=config.lr,
             activation=config.activation,
             optimizer=config.optimizer,
-            wandb_log=True
+            wandb_log=True,
         )
 
         costs = model.fit(
-            X_train, y_train,
+            X_train,
+            y_train,
             max_epochs=config.max_epochs,
             batch_size=config.batch_size,
             X_validation=X_validation,
             y_validation=y_validation,
-            early_stopping=True
+            early_stopping=True,
+            patience=config.max_epochs // 50,
         )
 
         y_pred_validation = model.predict(X_validation).squeeze()
@@ -265,48 +348,80 @@ def train_and_log_regression(project="SMAI_A3", config=None):
         r2 = validation_metrics.r2_score()
         rmse = validation_metrics.rmse()
 
-        wandb.log({
-            'mse_val_final': mse,
-            'mae_val_final': mae,
-            'r2_val_final': r2,
-            'rmse_val_final': rmse
-        })
+        wandb.log(
+            {
+                "mse_val_final": mse,
+                "mae_val_final": mae,
+                "r2_val_final": r2,
+                "rmse_val_final": rmse,
+            }
+        )
 
         global best_model_params_regression, best_validation_mse
         if mse < best_validation_mse:
             best_validation_mse = mse
             best_model_params_regression = dict(config)
 
+
 def print_hyperparams(file_path="data/interim/3/WineQT/hyperparams.csv"):
     df = pd.read_csv(file_path)
 
-    metrics_df = df[[
-        'activation', 'batch_size', 'hidden_layers', 'optimizer', 
-        'lr', 'max_epochs', 'accuracy_val_final', 'epoch', 
-        'f1_score_val_final', 'precision_val_final', 'recall_val_final'
-    ]]
-    metrics_df.columns = [
-        'Activation', 'Batch Size', 'Hidden Layers', 'Optimizer', 
-        'Learning Rate', 'Max Epochs', 'Validation Accuracy', 'Epoch', 
-        'F1 Score', 'Precision', 'Recall'
+    metrics_df = df[
+        [
+            "activation",
+            "batch_size",
+            "hidden_layers",
+            "optimizer",
+            "lr",
+            "max_epochs",
+            "accuracy_val_final",
+            "epoch",
+            "f1_score_val_final",
+            "precision_val_final",
+            "recall_val_final",
+        ]
     ]
-    
+    metrics_df.columns = [
+        "Activation",
+        "Batch Size",
+        "Hidden Layers",
+        "Optimizer",
+        "Learning Rate",
+        "Max Epochs",
+        "Validation Accuracy",
+        "Epoch",
+        "F1 Score",
+        "Precision",
+        "Recall",
+    ]
+
     markdown_table = metrics_df.to_markdown(index=False)
     print(markdown_table)
 
+
 def test_on_best_wineqt():
-    with open('data/interim/3/WineQT/best_model_config_seed_6.json', 'r') as file:
+    with open("data/interim/3/WineQT/best_model_config.json", "r") as file:
         config = json.load(file)
-    model = MLPClassifier(X_train.shape[1], config['hidden_layers'], 6, learning_rate=config['lr'], activation=config['activation'], optimizer=config['optimizer'], print_every=10, wandb_log=False)
+    model = MLPClassifier(
+        X_train.shape[1],
+        config["hidden_layers"],
+        6,
+        learning_rate=config["lr"],
+        activation=config["activation"],
+        optimizer=config["optimizer"],
+        print_every=10,
+        wandb_log=False,
+    )
     costs = model.fit(
-            X_train, y_train, 
-            max_epochs=config['max_epochs'], 
-            batch_size=config['batch_size'], 
-            X_validation=X_validation, 
-            y_validation=y_validation, 
-            early_stopping=True, 
-            patience=5
-        )
+        X_train,
+        y_train,
+        max_epochs=config["max_epochs"],
+        batch_size=config["batch_size"],
+        X_validation=X_validation,
+        y_validation=y_validation,
+        early_stopping=True,
+        patience=config["max_epochs"] // 20,
+    )
     model.gradient_checking(X_train[:5], y_train[:5])
     y_pred_test = model.predict(X_test)
     test_metrics = Metrics(y_test, y_pred_test, task="classification")
@@ -316,33 +431,58 @@ def test_on_best_wineqt():
     recall = test_metrics.recall_score()
     f1_score = test_metrics.f1_score()
 
-    print(f'Accuracy: {test_accuracy}\
+    print(
+        f"Accuracy: {test_accuracy}\
           \nPrecision: {precision}\
           \nRecall: {recall}\
-          \nF1 Score: {f1_score}')
-    
+          \nF1 Score: {f1_score}"
+    )
+
+
 def test_on_best_housing():
 
-    with open('data/interim/3/HousingData/best_model_config.json', 'r') as file:
+    with open("data/interim/3/HousingData/best_model_config.json", "r") as file:
         config = json.load(file)
+    # print(config)
     # with wandb.init(config=config):
     #     config = wandb.config
     #     config_dict = dict(config)
-        # wandb.run.name = f"{config_dict['optimizer']}_{config_dict['activation']}_{len(config_dict['hidden_layers'])}_{config_dict['lr']}_{config_dict['batch_size']}_{config_dict['max_epochs']}"
-    model = MLPRegression(X_train.shape[1], config['hidden_layers'], output_size=1, learning_rate=config['lr'], activation=config['activation'], optimizer=config['optimizer'], print_every=10, wandb_log=False)
-    costs = model.fit(X_train, y_train, max_epochs=['max_epochs'], batch_size=config['batch_size'], X_validation=X_validation, y_validation=y_validation, early_stopping=True)
+    #     wandb.run.name = f"{config_dict['optimizer']}_{config_dict['activation']}_{len(config_dict['hidden_layers'])}_{config_dict['lr']}_{config_dict['batch_size']}_{config_dict['max_epochs']}"
+    model = MLPRegression(
+        X_train.shape[1],
+        config["hidden_layers"],
+        output_size=1,
+        learning_rate=config["lr"],
+        activation=config["activation"],
+        optimizer=config["optimizer"],
+        print_every=10,
+        wandb_log=False,
+    )
+    costs = model.fit(
+        X_train,
+        y_train,
+        max_epochs=config["max_epochs"],
+        batch_size=config["batch_size"],
+        X_validation=X_validation,
+        y_validation=y_validation,
+        early_stopping=True,
+        patience=config["max_epochs"] // 50,
+    )
     y_pred_test = model.predict(X_test).squeeze()
     test_metrics = Metrics(y_test, y_pred_test, task="regression")
 
     mse = test_metrics.mse()
-    mae= test_metrics.mae()
+    mae = test_metrics.mae()
     r2 = test_metrics.r2_score()
     rmse = test_metrics.rmse()
 
-    print(f"MSE: {mse}\
+    print(
+        f"MSE: {mse}\
             \nMAE: {mae}\
             \nRMSE: {rmse}\
-            \nR2 Score: {r2}")
+            \nR2 Score: {r2}"
+    )
+
 
 def multi_hot_encode(labels):
     unique_labels = set(label for sublist in labels for label in sublist.split())
@@ -352,59 +492,88 @@ def multi_hot_encode(labels):
             multi_hot[l] = 1
     return pd.Series(multi_hot)
 
+
 sweep_config_wine = {
-    'method': 'bayes',
-    'metric': {
-      'name': 'accuracy_val_final',
+    "method": "bayes",
+    "metric": {
+        "name": "accuracy_val_final",
     },
-    'parameters': {
-        'lr': {'values': [0.002, 0.01, 0.05]}, 
-        'max_epochs': {'values': [200, 800]},
-        'optimizer': {'values': ['sgd', 'bgd', 'mbgd']}, 
-        'activation': {'values': ['sigmoid','tanh','relu','signum']},
-        'hidden_layers': {'values': [[8], [16], [8, 8], [8, 16], [16, 8], [16, 16], [8, 8, 8]]}, 
-        'batch_size': {'values': [16, 32]} 
-    }
+    "parameters": {
+        "lr": {"values": [0.002, 0.01, 0.05]},
+        "max_epochs": {"values": [200, 800]},
+        "optimizer": {"values": ["sgd", "bgd", "mbgd"]},
+        "activation": {"values": ["sigmoid", "tanh", "relu", "signum"]},
+        "hidden_layers": {
+            "values": [[8], [16], [8, 8], [8, 16], [16, 8], [16, 16], [8, 8, 8]]
+        },
+        "batch_size": {"values": [16, 32]},
+    },
 }
 
 sweep_config_housing = {
-    'method': 'bayes',
-    'metric': {
-        'name': 'mse_val_final',
-        'goal': 'minimize',
+    "method": "bayes",
+    "metric": {
+        "name": "mse_val_final",
+        "goal": "minimize",
     },
-    'parameters': {
-        'lr': {'values': [0.002, 0.005, 0.01, 0.02, 0.05, 0.1, 0.2]},
-        'max_epochs': {'values': [500, 2000, 8000]},
-        'optimizer': {'values': ['sgd', 'bgd', 'mbgd']},
-        'activation': {'values': ['sigmoid', 'tanh', 'relu', 'linear']},
-        'hidden_layers': {'values': [[8], [16], [8, 8], [8, 16], [16, 8], [16, 16], [8, 8, 8], [8, 8, 8, 8]]},
-        'batch_size': {'values': [16, 32]}
-    }
+    "parameters": {
+        "lr": {"values": [0.002, 0.005, 0.01, 0.02, 0.05, 0.1, 0.2]},
+        "max_epochs": {"values": [500, 2500, 7500]},
+        "optimizer": {"values": ["sgd", "bgd", "mbgd"]},
+        "activation": {"values": ["sigmoid", "tanh", "relu"]},
+        "hidden_layers": {
+            "values": [
+                [8],
+                [16],
+                [8, 8],
+                [8, 16],
+                [16, 8],
+                [16, 16],
+                [8, 8, 8],
+                [8, 8, 8, 8],
+            ]
+        },
+        "batch_size": {"values": [16, 32]},
+    },
 }
 
-def advertisement_preprocessing(dataset_path="data/interim/3/advertisement/advertisement.csv"):
-    dataset=pd.read_csv(dataset_path)
-    gender_encoded = pd.get_dummies(dataset['gender'], prefix='gender', dtype=int)
-    education_order = {'High School': 0, 'Bachelor': 1, 'Master': 2, 'PhD': 3}
-    dataset['education'] = dataset['education'].map(education_order)
-    dataset['married'] = dataset['married'].astype(int)
-    occupation_encoded = pd.get_dummies(dataset['occupation'], prefix='occupation', dtype=int)
-    most_bought_encoded = pd.get_dummies(dataset['most bought item'], prefix='most_bought', dtype=int)
-    dataset = dataset.drop(columns=['city', 'gender', 'occupation', 'most bought item'])
-    encoded_dataset = pd.concat([dataset, gender_encoded, occupation_encoded, most_bought_encoded], axis=1)
+
+def advertisement_preprocessing(
+    dataset_path="data/interim/3/advertisement/advertisement.csv",
+):
+    dataset = pd.read_csv(dataset_path)
+    gender_encoded = pd.get_dummies(dataset["gender"], prefix="gender", dtype=int)
+    education_order = {"High School": 0, "Bachelor": 1, "Master": 2, "PhD": 3}
+    dataset["education"] = dataset["education"].map(education_order)
+    dataset["married"] = dataset["married"].astype(int)
+    occupation_encoded = pd.get_dummies(
+        dataset["occupation"], prefix="occupation", dtype=int
+    )
+    most_bought_encoded = pd.get_dummies(
+        dataset["most bought item"], prefix="most_bought", dtype=int
+    )
+    dataset = dataset.drop(columns=["city", "gender", "occupation", "most bought item"])
+    encoded_dataset = pd.concat(
+        [dataset, gender_encoded, occupation_encoded, most_bought_encoded], axis=1
+    )
     scaler = MinMaxScaler()
-    numerical_features = ['age', 'income', 'education', 'children', 'purchase_amount']
-    encoded_dataset[numerical_features] = scaler.fit_transform(encoded_dataset[numerical_features])
-    encoded_dataset.to_csv('data/interim/3/advertisement/advertisement_encoded.csv', index=False)
+    numerical_features = ["age", "income", "education", "children", "purchase_amount"]
+    encoded_dataset[numerical_features] = scaler.fit_transform(
+        encoded_dataset[numerical_features]
+    )
+    encoded_dataset.to_csv(
+        "data/interim/3/advertisement/advertisement_encoded.csv", index=False
+    )
+
 
 def encode_labels(dataset):
     unique_labels = set()
-    for label_list in dataset['labels']:
+    for label_list in dataset["labels"]:
         unique_labels.update(label_list.split())
     unique_labels = sorted(unique_labels)
     label_to_index = {label: idx for idx, label in enumerate(unique_labels)}
     index_to_label = {idx: label for label, idx in label_to_index.items()}
+
     def multi_hot_encode(labels):
         encoded_array = []
         for label_list in labels:
@@ -414,12 +583,14 @@ def encode_labels(dataset):
                     encoded[label_to_index[label]] = 1
             encoded_array.append(encoded)
         return encoded_array
-    return multi_hot_encode(dataset['labels'])
+
+    return multi_hot_encode(dataset["labels"])
+
 
 def get_advertisement_data():
-    dataset=pd.read_csv('data/interim/3/advertisement/advertisement_encoded.csv')
-    labels=encode_labels(dataset)
-    dataset['labels'] = labels
+    dataset = pd.read_csv("data/interim/3/advertisement/advertisement_encoded.csv")
+    labels = encode_labels(dataset)
+    dataset["labels"] = labels
 
     shuffled_indices = np.random.permutation(len(dataset))
     shuffled_dataset = dataset.iloc[shuffled_indices].reset_index(drop=True)
@@ -428,19 +599,20 @@ def get_advertisement_data():
     val_size = int(0.1 * len(shuffled_dataset))
 
     train_dataset = shuffled_dataset[:train_size]
-    val_dataset = shuffled_dataset[train_size:train_size + val_size]
-    test_dataset = shuffled_dataset[train_size + val_size:]
+    val_dataset = shuffled_dataset[train_size : train_size + val_size]
+    test_dataset = shuffled_dataset[train_size + val_size :]
 
-    X_train = train_dataset.drop(columns='labels').values
-    y_train = np.array(train_dataset['labels'].tolist())
+    X_train = train_dataset.drop(columns="labels").values
+    y_train = np.array(train_dataset["labels"].tolist())
 
-    X_validation = val_dataset.drop(columns='labels').values
-    y_validation = np.array(val_dataset['labels'].tolist())
+    X_validation = val_dataset.drop(columns="labels").values
+    y_validation = np.array(val_dataset["labels"].tolist())
 
-    X_test = test_dataset.drop(columns='labels').values
-    y_test = np.array(test_dataset['labels'].tolist())
+    X_test = test_dataset.drop(columns="labels").values
+    y_test = np.array(test_dataset["labels"].tolist())
 
     return X_train, y_train, X_validation, y_validation, X_test, y_test
+
 
 def split(X, train_ratio=0.8, val_ratio=0.1):
     np.random.seed(1)
@@ -455,117 +627,134 @@ def split(X, train_ratio=0.8, val_ratio=0.1):
     X_test = X_shuffled[train_size + val_size :]
     return X_train, X_val, X_test
 
+
 def autoencoder_knn_task():
     file_path_spotify = "data/interim/2/spotify_normalized_numerical.csv"
     df = pd.read_csv(file_path_spotify)
-    genres = df['track_genre'].values
-    features = df.drop(columns=['track_genre']).values
+    genres = df["track_genre"].values
+    features = df.drop(columns=["track_genre"]).values
 
     input_size = features.shape[1]
     latent_size = 9
     encoder_layers = [10]
-    decoder_layers = [10] 
-    
-    autoencoder = AutoEncoder(input_size=input_size, latent_size=latent_size, encoder_layers=encoder_layers, decoder_layers=decoder_layers)
+    decoder_layers = [10]
+
+    autoencoder = AutoEncoder(
+        input_size=input_size,
+        latent_size=latent_size,
+        encoder_layers=encoder_layers,
+        decoder_layers=decoder_layers,
+    )
     autoencoder.fit(features, max_epochs=10)
 
     reduced_features = autoencoder.get_latent(features)
-    
+
     features_df = pd.DataFrame(reduced_features)
     result_df = features_df.copy()
-    result_df['track_genre'] = genres
+    result_df["track_genre"] = genres
 
     train, val, _ = split(df)
     classifier = KNN(k=64, distance_metric="manhattan")
-    classifier.fit(train.drop(columns=['track_genre']).values, train['track_genre'].values)
+    classifier.fit(
+        train.drop(columns=["track_genre"]).values, train["track_genre"].values
+    )
     start_time = time.time()
-    y_pred = classifier.predict(val.drop(columns=['track_genre']).values)
+    y_pred = classifier.predict(val.drop(columns=["track_genre"]).values)
     time_taken1 = time.time() - start_time
-    Metrics(y_true=val['track_genre'].values, y_pred=y_pred, task="classification").print_metrics()
+    Metrics(
+        y_true=val["track_genre"].values, y_pred=y_pred, task="classification"
+    ).print_metrics()
     print(f"{time_taken1=}")
 
     train, val, _ = split(result_df)
     classifier = KNN(k=64, distance_metric="manhattan")
-    classifier.fit(train.drop(columns=['track_genre']).values, train['track_genre'].values)
+    classifier.fit(
+        train.drop(columns=["track_genre"]).values, train["track_genre"].values
+    )
     start_time = time.time()
-    y_pred = classifier.predict(val.drop(columns=['track_genre']).values)
+    y_pred = classifier.predict(val.drop(columns=["track_genre"]).values)
     time_taken2 = time.time() - start_time
-    Metrics(y_true=val['track_genre'].values, y_pred=y_pred, task="classification").print_metrics()
+    Metrics(
+        y_true=val["track_genre"].values, y_pred=y_pred, task="classification"
+    ).print_metrics()
     print(f"{time_taken2=}")
 
-    models = [f'Original (12 dim)', f'AutoEncoder ({latent_size} dim)']
+    models = [f"Original (12 dim)", f"AutoEncoder ({latent_size} dim)"]
     times = [time_taken1, time_taken2]
 
     plt.figure(figsize=(8, 5))
-    plt.bar(models, times, color=['skyblue', 'lightgreen'])
-    plt.ylabel('Inference Time (seconds)')
-    plt.title('KNN Inference Time Comparison (Original vs AutoEncoder)')
+    plt.bar(models, times, color=["skyblue", "lightgreen"])
+    plt.ylabel("Inference Time (seconds)")
+    plt.title("KNN Inference Time Comparison (Original vs AutoEncoder)")
     plt.savefig("assignments/3/figures/knn_og_vs_autoencoder_bar_2.png")
+
 
 if __name__ == "__main__":
     np.random.seed(6)
     # wine_preprocessing()
-    # X_train, y_train, X_validation, y_validation, X_test, y_test = load_wineqt()
-    
+    X_train, y_train, X_validation, y_validation, X_test, y_test = load_wineqt()
+    X_train_classification, y_train_classification = copy.deepcopy((X_train, y_train))
+
     # best_model_params = None
     # best_validation_accuracy = 0
     # sweep_id = wandb.sweep(sweep_config_wine, project="SMAI_A3")
-    # wandb.agent(sweep_id, function=train_and_log_classification, count=256)
-    # with open('data/interim/3/WineQT/best_model_config.json', 'w') as f:
+    # wandb.agent(sweep_id, function=train_and_log_classification, count=512)
+    # with open("data/interim/3/WineQT/best_model_config.json", "w") as f:
     #     json.dump(best_model_params, f)
     # wandb.finish()
+
     # print_hyperparams()
 
-    # test_on_best_wineqt()
-    
+    test_on_best_wineqt()
+
     # advertisement_preprocessing()
-    # X_train, y_train, X_validation, y_validation, X_test, y_test = get_advertisement_data()
-    
-    # model = MultiLabelMLP(X_train.shape[1], [64], 8, learning_rate=0.05, activation='relu', optimizer='sgd', print_every=10)
-    # costs = model.fit(
-    #         X_train, y_train, 
-    #         max_epochs=200, 
-    #         batch_size=32, 
-    #         X_validation=X_validation, 
-    #         y_validation=y_validation, 
-    #         early_stopping=False, 
-    #         patience=100
-    #     )
-    # y_pred_test = model.predict(X_test)
-    # # print(y_pred_test)
-    # # print(y_test)
-    # test_metrics = Metrics(y_test, y_pred_test, task="classification")
+    X_train, y_train, X_validation, y_validation, X_test, y_test = get_advertisement_data()
+    model = MultiLabelMLP(X_train.shape[1], [64], 8, learning_rate=0.05, activation='relu', optimizer='sgd', print_every=10)
+    costs = model.fit(
+            X_train, y_train,
+            max_epochs=200,
+            batch_size=32,
+            X_validation=X_validation,
+            y_validation=y_validation,
+            early_stopping=False,
+            patience=100
+        )
+    y_pred_test = model.predict(X_test)
+    # print(y_pred_test)
+    # print(y_test)
+    test_metrics = Metrics(y_test, y_pred_test, task="classification")
 
-    # test_accuracy = test_metrics.accuracy()
-    # precision = test_metrics.precision_score()
-    # recall = test_metrics.recall_score()
-    # f1_score = test_metrics.f1_score()
+    test_accuracy = test_metrics.accuracy()
+    precision = test_metrics.precision_score()
+    recall = test_metrics.recall_score()
+    f1_score = test_metrics.f1_score()
+    hamming_loss = test_metrics.hamming_loss()
+    hamming_accuracy = test_metrics.hamming_accuracy()
 
-    # print(f'Accuracy: {test_accuracy}\
-    #       \nPrecision: {precision}\
-    #       \nRecall: {recall}\
-    #       \nF1 Score: {f1_score}')
+    print(f'Accuracy: {test_accuracy}\
+          \nPrecision: {precision}\
+          \nRecall: {recall}\
+          \nF1 Score: {f1_score}')
     
-    
+    print(f'Hamming Loss: {hamming_loss}\
+        \nHamming Accuracy: {hamming_accuracy}')
+
     # housing_preprocessing()
-    np.random.seed(13)
-    # X_train, y_train, X_validation, y_validation, X_test, y_test = load_housing()
+    # np.random.seed(13)
+    X_train, y_train, X_validation, y_validation, X_test, y_test = load_housing()
+    X_train_regression, y_train_regression = copy.deepcopy((X_train, y_train))
+    best_model_params_regression = None
+    best_validation_mse = float("inf")
+    sweep_id_regression = wandb.sweep(sweep_config_housing, project="SMAI_A3")
+    wandb.agent(sweep_id_regression, function=train_and_log_regression, count=512)
 
-    # best_model_params_regression = None
-    # best_validation_mse = float('inf')
-    # sweep_id_regression = wandb.sweep(sweep_config_housing, project="SMAI_A3")
-    # wandb.agent(sweep_id_regression, function=train_and_log_regression, count=800)
+    with open("data/interim/3/HousingData/best_model_config.json", "w") as f:
+        json.dump(best_model_params_regression, f)
 
-    # with open('data/interim/3/HousingData/best_model_config.json', 'w') as f:
-    #     json.dump(best_model_params_regression, f)
+    wandb.finish()
 
-    # wandb.finish()
+    test_on_best_housing()
 
-    # test_on_best_housing()
+    # autoencoder_knn_task()
 
-    autoencoder_knn_task()
-
-
-    
-
-    
+    unittest.main()

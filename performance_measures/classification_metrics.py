@@ -46,6 +46,13 @@ class Metrics:
         precision = self.precision_score(average)
         recall = self.recall_score(average)
         return 2 * (precision * recall) / (precision + recall)
+    
+
+    def hamming_loss(self):
+        return np.mean(self.y_true != self.y_pred)
+
+    def hamming_accuracy(self):
+        return 1 - self.hamming_loss()
 
     def print_classification_metrics(self):
         print("Classification Task Scores")

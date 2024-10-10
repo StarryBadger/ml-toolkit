@@ -27,6 +27,7 @@ class MLPRegression:
         self.wandb_log = wandb_log
 
     def _initialize_weights_and_biases(self):
+        np.random.seed(13)
         num_layers = len(self.hidden_layers)
         weights = []
         biases = []
@@ -92,7 +93,8 @@ class MLPRegression:
         self.gradients = []
         num_layers = len(self.weights)
         
-        delta = (y_pred.squeeze() - y.squeeze())
+        # delta = (y_pred.squeeze() - y.squeeze())
+        delta = (y_pred.squeeze() - y)[:, np.newaxis]
         dW = (1 / m) * np.dot(self.layer_outputs[-2].T, delta)
         db = (1 / m) * np.sum(delta, axis=0, keepdims=True)
         self.gradients.append((dW, db))
@@ -151,14 +153,14 @@ class MLPRegression:
                 validation_loss = self._compute_loss(X_validation, y_validation)
                 self.validation_losses.append(validation_loss)
 
-            if current_loss < best_loss:
-                best_loss = current_loss
-                patience_counter = 0
-            else:
-                patience_counter += 1
-                if early_stopping and patience_counter > patience:
-                    print(f"Early stopping at epoch {epoch+1}")
-                    break
+                if validation_loss < best_loss:
+                    best_loss = validation_loss
+                    patience_counter = 0
+                else:
+                    patience_counter += 1
+                    if early_stopping and patience_counter > patience:
+                        print(f"Early stopping at epoch {epoch+1}")
+                        break
             
             y_pred_train = self.predict(X_train).squeeze()
             y_pred_validation = self.predict(X_validation).squeeze()
