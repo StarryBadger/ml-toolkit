@@ -13,6 +13,7 @@ from performance_measures.classification_metrics import Metrics
 from models.MLP.MLPClassifier import MLPClassifier
 from models.MLP.MultiLabelMLP import MultiLabelMLP
 from models.MLP.MLPRegression import MLPRegression
+from models.MLP.MLPLogistic import MLPLogisticRegression
 from models.AutoEncoders.AutoEncoders import AutoEncoder
 
 class TestMLPGradientChecking(unittest.TestCase):
@@ -621,31 +622,17 @@ def process_diabetes_data():
     output_dir = 'data/interim/3/diabetes/'
     split_dir = f"{output_dir}split"
     os.makedirs(split_dir, exist_ok=True)
-
-    # Read the data
     data = pd.read_csv(input_file)
-
-    # Standardize the data (excluding the last column)
     features = data.iloc[:, :-1]
     target = data.iloc[:, -1]
-
-    # Calculate means and standard deviations
     means = features.mean()
     stds = features.std()
-
-    # Standardize
     standardized_features = (features - means) / stds
-
-    # Combine standardized features with the target
     standardized_data = pd.concat([standardized_features, target], axis=1)
-
-    # Save standardized data to a new CSV file
     standardized_data.to_csv(f"{output_dir}_standardized_diabetes.csv")
 
-    # Shuffle the data
     shuffled_data = standardized_data.sample(frac=1, random_state=42).reset_index(drop=True)
 
-    # Split into train, validation, and test sets
     train_size = int(0.7 * len(shuffled_data))
     validation_size = int(0.15 * len(shuffled_data))
     
@@ -658,7 +645,6 @@ def process_diabetes_data():
     X_test = shuffled_data.iloc[train_size + validation_size:, :-1]
     y_test = shuffled_data.iloc[train_size + validation_size:, -1]
 
-    # Save split data to separate files
     X_train.to_csv(os.path.join(split_dir, 'X_train.csv'), index=False)
     y_train.to_csv(os.path.join(split_dir, 'y_train.csv'), index=False)
     X_validation.to_csv(os.path.join(split_dir, 'X_validation.csv'), index=False)
@@ -763,37 +749,37 @@ if __name__ == "__main__":
 
     # test_on_best_wineqt()
 
-    # advertisement_preprocessing()
-    # X_train, y_train, X_validation, y_validation, X_test, y_test = get_advertisement_data()
-    # model = MultiLabelMLP(X_train.shape[1], [64], 8, learning_rate=0.05, activation='relu', optimizer='sgd', print_every=10)
-    # costs = model.fit(
-    #         X_train, y_train,
-    #         max_epochs=200,
-    #         batch_size=32,
-    #         X_validation=X_validation,
-    #         y_validation=y_validation,
-    #         early_stopping=False,
-    #         patience=100
-    #     )
-    # y_pred_test = model.predict(X_test)
-    # # print(y_pred_test)
-    # # print(y_test)
-    # test_metrics = Metrics(y_test, y_pred_test, task="classification")
+    advertisement_preprocessing()
+    X_train, y_train, X_validation, y_validation, X_test, y_test = get_advertisement_data()
+    model = MultiLabelMLP(X_train.shape[1], [64,64], 8, learning_rate=0.1, activation='sigmoid', optimizer='sgd', print_every=10)
+    costs = model.fit(
+            X_train, y_train,
+            max_epochs=1500,
+            batch_size=32,
+            X_validation=X_validation,
+            y_validation=y_validation,
+            early_stopping=False,
+            patience=100
+        )
+    y_pred_test = model.predict(X_test)
+    # print(y_pred_test)
+    # print(y_test)
+    test_metrics = Metrics(y_test, y_pred_test, task="classification")
 
-    # test_accuracy = test_metrics.accuracy()
-    # precision = test_metrics.precision_score()
-    # recall = test_metrics.recall_score()
-    # f1_score = test_metrics.f1_score()
-    # hamming_loss = test_metrics.hamming_loss()
-    # hamming_accuracy = test_metrics.hamming_accuracy()
+    test_accuracy = test_metrics.accuracy()
+    precision = test_metrics.precision_score()
+    recall = test_metrics.recall_score()
+    f1_score = test_metrics.f1_score()
+    hamming_loss = test_metrics.hamming_loss()
+    hamming_accuracy = test_metrics.hamming_accuracy()
 
-    # print(f'Accuracy: {test_accuracy}\
-    #       \nPrecision: {precision}\
-    #       \nRecall: {recall}\
-    #       \nF1 Score: {f1_score}')
+    print(f'Accuracy: {test_accuracy}\
+          \nPrecision: {precision}\
+          \nRecall: {recall}\
+          \nF1 Score: {f1_score}')
     
-    # print(f'Hamming Loss: {hamming_loss}\
-    #     \nHamming Accuracy: {hamming_accuracy}')
+    print(f'Hamming Loss: {hamming_loss}\
+        \nHamming Accuracy: {hamming_accuracy}')
 
     # housing_preprocessing()
     # np.random.seed(13)
@@ -811,7 +797,25 @@ if __name__ == "__main__":
 
     # test_on_best_housing()
 
-    X_train, y_train, X_validation, y_validation, X_test, y_test = process_diabetes_data()
+    # X_train, y_train, X_validation, y_validation, X_test, y_test = process_diabetes_data()
+
+    # model_bce = MLPLogisticRegression(input_size=X_train.shape[1], learning_rate=0.1, loss='bce')
+    # model_bce.fit(X_train, y_train, max_epochs=100)
+
+    # model_mse = MLPLogisticRegression(input_size=X_train.shape[1], learning_rate=0.1, loss='mse')
+    # model_mse.fit(X_train, y_train, max_epochs=100)
+
+    # predictions_bce = model_bce.predict(X_train)
+    # predictions_mse = model_mse.predict(X_train)
+
+    # # print("BCE Predictions:", predictions_bce.flatten())
+    # print("BCE Accuracy",np.mean(predictions_bce.flatten() == y_train))
+    # # print("MSE Predictions:", predictions_mse.flatten())
+    # print("MSE Accuracy", np.mean(predictions_mse.flatten() == y_train))
+
+
+
+
 
     # autoencoder_knn_task()
 

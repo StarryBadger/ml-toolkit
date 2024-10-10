@@ -49,6 +49,7 @@ class MLPLogisticRegression:
         self.bias -= self.learning_rate * db
 
     def fit(self, X_train, y_train, max_epochs=10):
+        y_train = np.expand_dims(y_train, axis=1)
         for epoch in range(max_epochs):
             y_pred = self._forward(X_train)
             loss = self._compute_loss(y_pred, y_train)
@@ -56,10 +57,11 @@ class MLPLogisticRegression:
 
             dW, db = self._backward(X_train, y_train, y_pred)
             self.update_parameters(dW, db)
-
             if epoch % self.print_every == 0 or epoch == max_epochs - 1:
                 print(f"Epoch {epoch+1}, Loss: {loss:.4f}")
 
     def predict(self, X):
         y_pred = self._forward(X)
         return (y_pred > 0.5).astype(int) 
+
+
