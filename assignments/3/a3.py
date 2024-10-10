@@ -24,7 +24,6 @@ class TestMLPGradientChecking(unittest.TestCase):
         self.X_train_regression = X_train_regression
         self.y_train_regression = y_train_regression
 
-
     def test_classification_gradient_checking_with_sigmoid(self):
         model = MLPClassifier(
             input_size=self.X_train_classification.shape[1],
@@ -56,7 +55,7 @@ class TestMLPGradientChecking(unittest.TestCase):
             activation='tanh',
             optimizer='mbgd',
         )
-        model.gradient_checking(self.X_train[200:300], self.y_train_classification[200:300]) 
+        model.gradient_checking(self.X_train_classification[200:300], self.y_train_classification[200:300])
 
 def describe_dataset(df, file_path="data/interim/3/WineQT/WineQT_description.csv"):
     numerical_cols = df.to_numpy()
@@ -613,6 +612,63 @@ def get_advertisement_data():
 
     return X_train, y_train, X_validation, y_validation, X_test, y_test
 
+import pandas as pd
+import numpy as np
+import os
+
+def process_diabetes_data():
+    input_file = 'data/interim/3/diabetes/diabetes.csv'
+    output_dir = 'data/interim/3/diabetes/'
+    split_dir = f"{output_dir}split"
+    os.makedirs(split_dir, exist_ok=True)
+
+    # Read the data
+    data = pd.read_csv(input_file)
+
+    # Standardize the data (excluding the last column)
+    features = data.iloc[:, :-1]
+    target = data.iloc[:, -1]
+
+    # Calculate means and standard deviations
+    means = features.mean()
+    stds = features.std()
+
+    # Standardize
+    standardized_features = (features - means) / stds
+
+    # Combine standardized features with the target
+    standardized_data = pd.concat([standardized_features, target], axis=1)
+
+    # Save standardized data to a new CSV file
+    standardized_data.to_csv(f"{output_dir}_standardized_diabetes.csv")
+
+    # Shuffle the data
+    shuffled_data = standardized_data.sample(frac=1, random_state=42).reset_index(drop=True)
+
+    # Split into train, validation, and test sets
+    train_size = int(0.7 * len(shuffled_data))
+    validation_size = int(0.15 * len(shuffled_data))
+    
+    X_train = shuffled_data.iloc[:train_size, :-1]
+    y_train = shuffled_data.iloc[:train_size, -1]
+    
+    X_validation = shuffled_data.iloc[train_size:train_size + validation_size, :-1]
+    y_validation = shuffled_data.iloc[train_size:train_size + validation_size, -1]
+    
+    X_test = shuffled_data.iloc[train_size + validation_size:, :-1]
+    y_test = shuffled_data.iloc[train_size + validation_size:, -1]
+
+    # Save split data to separate files
+    X_train.to_csv(os.path.join(split_dir, 'X_train.csv'), index=False)
+    y_train.to_csv(os.path.join(split_dir, 'y_train.csv'), index=False)
+    X_validation.to_csv(os.path.join(split_dir, 'X_validation.csv'), index=False)
+    y_validation.to_csv(os.path.join(split_dir, 'y_validation.csv'), index=False)
+    X_test.to_csv(os.path.join(split_dir, 'X_test.csv'), index=False)
+    y_test.to_csv(os.path.join(split_dir, 'y_test.csv'), index=False)
+
+    return X_train, y_train, X_validation, y_validation, X_test, y_test
+
+
 
 def split(X, train_ratio=0.8, val_ratio=0.1):
     np.random.seed(1)
@@ -705,56 +761,58 @@ if __name__ == "__main__":
 
     # print_hyperparams()
 
-    test_on_best_wineqt()
+    # test_on_best_wineqt()
 
     # advertisement_preprocessing()
-    X_train, y_train, X_validation, y_validation, X_test, y_test = get_advertisement_data()
-    model = MultiLabelMLP(X_train.shape[1], [64], 8, learning_rate=0.05, activation='relu', optimizer='sgd', print_every=10)
-    costs = model.fit(
-            X_train, y_train,
-            max_epochs=200,
-            batch_size=32,
-            X_validation=X_validation,
-            y_validation=y_validation,
-            early_stopping=False,
-            patience=100
-        )
-    y_pred_test = model.predict(X_test)
-    # print(y_pred_test)
-    # print(y_test)
-    test_metrics = Metrics(y_test, y_pred_test, task="classification")
+    # X_train, y_train, X_validation, y_validation, X_test, y_test = get_advertisement_data()
+    # model = MultiLabelMLP(X_train.shape[1], [64], 8, learning_rate=0.05, activation='relu', optimizer='sgd', print_every=10)
+    # costs = model.fit(
+    #         X_train, y_train,
+    #         max_epochs=200,
+    #         batch_size=32,
+    #         X_validation=X_validation,
+    #         y_validation=y_validation,
+    #         early_stopping=False,
+    #         patience=100
+    #     )
+    # y_pred_test = model.predict(X_test)
+    # # print(y_pred_test)
+    # # print(y_test)
+    # test_metrics = Metrics(y_test, y_pred_test, task="classification")
 
-    test_accuracy = test_metrics.accuracy()
-    precision = test_metrics.precision_score()
-    recall = test_metrics.recall_score()
-    f1_score = test_metrics.f1_score()
-    hamming_loss = test_metrics.hamming_loss()
-    hamming_accuracy = test_metrics.hamming_accuracy()
+    # test_accuracy = test_metrics.accuracy()
+    # precision = test_metrics.precision_score()
+    # recall = test_metrics.recall_score()
+    # f1_score = test_metrics.f1_score()
+    # hamming_loss = test_metrics.hamming_loss()
+    # hamming_accuracy = test_metrics.hamming_accuracy()
 
-    print(f'Accuracy: {test_accuracy}\
-          \nPrecision: {precision}\
-          \nRecall: {recall}\
-          \nF1 Score: {f1_score}')
+    # print(f'Accuracy: {test_accuracy}\
+    #       \nPrecision: {precision}\
+    #       \nRecall: {recall}\
+    #       \nF1 Score: {f1_score}')
     
-    print(f'Hamming Loss: {hamming_loss}\
-        \nHamming Accuracy: {hamming_accuracy}')
+    # print(f'Hamming Loss: {hamming_loss}\
+    #     \nHamming Accuracy: {hamming_accuracy}')
 
     # housing_preprocessing()
     # np.random.seed(13)
     X_train, y_train, X_validation, y_validation, X_test, y_test = load_housing()
     X_train_regression, y_train_regression = copy.deepcopy((X_train, y_train))
-    best_model_params_regression = None
-    best_validation_mse = float("inf")
-    sweep_id_regression = wandb.sweep(sweep_config_housing, project="SMAI_A3")
-    wandb.agent(sweep_id_regression, function=train_and_log_regression, count=512)
+    # best_model_params_regression = None
+    # best_validation_mse = float("inf")
+    # sweep_id_regression = wandb.sweep(sweep_config_housing, project="SMAI_A3")
+    # wandb.agent(sweep_id_regression, function=train_and_log_regression, count=512)
 
-    with open("data/interim/3/HousingData/best_model_config.json", "w") as f:
-        json.dump(best_model_params_regression, f)
+    # with open("data/interim/3/HousingData/best_model_config.json", "w") as f:
+    #     json.dump(best_model_params_regression, f)
 
-    wandb.finish()
+    # wandb.finish()
 
-    test_on_best_housing()
+    # test_on_best_housing()
+
+    X_train, y_train, X_validation, y_validation, X_test, y_test = process_diabetes_data()
 
     # autoencoder_knn_task()
 
-    unittest.main()
+    # unittest.main()
