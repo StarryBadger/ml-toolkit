@@ -465,7 +465,6 @@ def print_hyperparams_wineqt(file_path="data/interim/3/WineQT/hyperparams_2fd1o2
     print(markdown_table)
     metrics_df.to_markdown("temp.md", index=False)
 
-
 def test_on_best_wineqt():
     with open("data/interim/3/WineQT/best_model_config.json", "r") as file:
         config = json.load(file)
@@ -505,6 +504,107 @@ def test_on_best_wineqt():
           \nF1 Score: {f1_score}"
     )
 
+def analyze_model_impact():
+    with open("data/interim/3/WineQT/best_model_config.json", "r") as file:
+        best_config = json.load(file)
+    def plot_loss_vs_epochs(experiments, title, save_path):
+        plt.figure(figsize=(10, 6))
+        for label, losses in experiments.items():
+            plt.plot(losses, label=label)
+        plt.xlabel('Epochs')
+        plt.ylabel('Loss')
+        plt.title(title)
+        plt.legend()
+        plt.savefig(save_path)
+        plt.show()
+
+    # Effect of Non-linearity (Activation Function)
+    def analyze_activation_impact():
+        activations = ['sigmoid', 'relu', 'tanh', 'linear']
+        experiments = {}
+        for activation in activations:
+            model = MLPClassifier(
+                X_train.shape[1],
+                best_config["hidden_layers"],
+                6,
+                learning_rate=best_config["lr"],
+                activation=activation,
+                optimizer=best_config["optimizer"],
+                print_every=10,
+                wandb_log=False
+            )
+            costs = model.fit(
+                X_train,
+                y_train,
+                max_epochs=best_config["max_epochs"],
+                batch_size=best_config["batch_size"],
+                X_validation=X_validation,
+                y_validation=y_validation,
+                early_stopping=True,
+                patience=best_config["max_epochs"] // 20,
+            )
+            experiments[activation] = costs
+        plot_loss_vs_epochs(experiments, 'Effect of Activation Function on Loss', 'assignments/3/figures/2.5.1.png')
+
+    # Effect of Learning Rate
+    def analyze_learning_rate_impact():
+        learning_rates = [0.001, 0.005, 0.01, 0.05]
+        experiments = {}
+        for lr in learning_rates:
+            model = MLPClassifier(
+                X_train.shape[1],
+                best_config["hidden_layers"],
+                6,
+                learning_rate=lr,
+                activation=best_config["activation"],
+                optimizer=best_config["optimizer"],
+                print_every=10,
+                wandb_log=False
+            )
+            costs = model.fit(
+                X_train,
+                y_train,
+                max_epochs=best_config["max_epochs"],
+                batch_size=best_config["batch_size"],
+                X_validation=X_validation,
+                y_validation=y_validation,
+                early_stopping=True,
+                patience=best_config["max_epochs"] // 20,
+            )
+            experiments[f'LR={lr}'] = costs
+        plot_loss_vs_epochs(experiments, 'Effect of Learning Rate on Loss', 'assignments/3/figures/2.5.2.png')
+
+    # Effect of Batch Size
+    def analyze_batch_size_impact():
+        batch_sizes = [16, 32, 64, 128]
+        experiments = {}
+        for batch_size in batch_sizes:
+            model = MLPClassifier(
+                X_train.shape[1],
+                best_config["hidden_layers"],
+                6,
+                learning_rate=best_config["lr"],
+                activation=best_config["activation"],
+                optimizer=best_config["optimizer"],
+                print_every=10,
+                wandb_log=False
+            )
+            costs = model.fit(
+                X_train,
+                y_train,
+                max_epochs=best_config["max_epochs"],
+                batch_size=batch_size,
+                X_validation=X_validation,
+                y_validation=y_validation,
+                early_stopping=True,
+                patience=best_config["max_epochs"] // 20,
+            )
+            experiments[f'Batch={batch_size}'] = costs
+        plot_loss_vs_epochs(experiments, 'Effect of Batch Size on Loss', 'assignments/3/figures/2.5.3.png')
+
+    analyze_activation_impact()
+    analyze_learning_rate_impact()
+    analyze_batch_size_impact()
 
 def test_on_best_housing():
 
@@ -891,6 +991,8 @@ if __name__ == "__main__":
     # print_hyperparams_wineqt()
 
     test_on_best_wineqt()
+
+    analyze_model_impact()
 
     # advertisement_preprocessing()
     # X_train, y_train, X_validation, y_validation, X_test, y_test = (get_advertisement_data())

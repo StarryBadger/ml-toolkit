@@ -728,6 +728,44 @@ sponding metrics mentioned above
 | Recall        | 0.29970319420530983            |
 | F1 Score      | 0.3086482628066152             |
 
+## 2.5 Analyzing Hyperparameters Effects
+
+![Plot](./figures/2.5.1.png)
+![Plot](./figures/2.5.2.png)
+![Plot](./figures/2.5.3.png)
+
+### 1. Effect of Non-linearity (Activation Functions):
+   **(Activation functions tested: Sigmoid, ReLU, Tanh, Linear)**
+   
+   - **Sigmoid and Tanh**: These two functions show very similar patterns. Both achieve faster convergence in the initial epochs but plateau around a loss of 1.0 after around 100 epochs. The "S-shaped" curve characteristic of sigmoid and tanh helps in non-linearity, allowing the model to adjust weights efficiently in the beginning, but both suffer from diminishing gradients as training progresses, leading to slower updates later.
+   - **ReLU**: This function shows slower initial convergence compared to Tanh and Sigmoid, as seen in the higher loss at the start. However, ReLU tends to achieve a lower overall loss after about 200 epochs. This indicates that ReLU avoids the vanishing gradient problem more effectively, especially over longer training sessions.
+   - **Linear**: Although usually not ideal for deep networks because they lack the ability to capture non-linear patterns, essential for most complex tasks. for this dataset, the linear activation performs comparably to other non-linear functions
+
+   **Observation**: Non-linear activations (Sigmoid, Tanh, ReLU) lead to faster and more effective learning. ReLU appears to perform better over extended training.
+
+### 2. Effect of Learning Rate:
+   **(Learning rates tested: 0.001, 0.005, 0.01, 0.05)**
+   
+   - **LR = 0.001**: Shows the slowest convergence, with a gradual decrease in loss. The model does not fully converge even after 800 epochs, indicating that a lower learning rate results in more stable but slower learning.
+   - **LR = 0.005 and 0.01**: Both of these learning rates show similar behavior. They converge more quickly compared to 0.001 and reach a minimum loss earlier (around 200-300 epochs). However, LR = 0.01 converges slightly faster and to a lower loss than LR = 0.005.
+   - **LR = 0.05**: This learning rate converges very quickly, but there is more volatility in the loss curve, which suggests that the model is overshooting the optimal solution. After around 100 epochs, the loss instability leads to early stopping. 
+   **Observation**: Higher learning rates (like 0.05) converge faster but may lead to instability and overshooting. Moderate learning rates (0.01) seem to offer the best balance of convergence speed and stability. A very low learning rate (0.001) results in slow convergence, requiring significantly more epochs to reach optimal performance.
+
+### 3. Effect of Batch Size:
+   **(Batch sizes tested: 16, 32, 64, 128)**
+   
+   - **Batch size 16**: The smallest batch size converges the fastest, as smaller batches allow more frequent updates to the weights. However, the smaller batch size also results in noisier convergence, with fluctuations in the loss curve during the early stages of training.
+   - **Batch size 32**: Offers a balanced performance, converging quickly with more stability than batch size 16. The model reaches a low loss with less noise compared to batch size 16, making it a good compromise between frequency of updates and stability.
+   - **Batch size 64**: Slightly slower convergence than batch size 32, but the curve is more stable with fewer fluctuations. The larger batch size reduces the variance in weight updates, contributing to more stable but slower learning.
+   - **Batch size 128**: This results in the slowest convergence. While the loss curve is the smoothest, it takes much longer to reach a similar loss compared to smaller batch sizes. The reduced number of updates per epoch with this larger batch size contributes to this slower convergence.
+
+   **Observation**: Smaller batch sizes (16, 32) lead to faster convergence but with more noise, whereas larger batch sizes (64, 128) smooth out the learning but slow down the convergence. Batch size 32 appears to be the best compromise between convergence speed and stability.
+
+   ## 2.6 Multi-Label Classification
+
+   
+
+
 
 | Attribute   |       Mean |   Standard Deviation |       Min |      Max |
 |:------------|-----------:|---------------------:|----------:|---------:|
