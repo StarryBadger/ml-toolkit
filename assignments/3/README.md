@@ -108,6 +108,14 @@ using W&B.
 ![alt text](figures/2.3.4.png)
 ![alt text](figures/2.3.5.png)
 ![alt text](figures/2.3.6.png)
+![alt text](figures/2.3.11.png)
+
+![alt text](figures/2.3.12.png)
+![alt text](figures/2.3.9.png)
+![alt text](figures/2.3.10.png)
+![alt text](figures/2.3.8.png)
+![alt text](figures/2.3.7.png)
+
 
 2. Generate a table listing all the hyperparameters tested and their corre-
 sponding metrics mentioned above
