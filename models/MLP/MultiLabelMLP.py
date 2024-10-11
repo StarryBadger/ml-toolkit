@@ -1,8 +1,10 @@
 import numpy as np
+import wandb
+from performance_measures.classification_metrics import Metrics
 
 class MultiLabelMLP:
 
-    def __init__(self, input_size, hidden_layers, output_size, learning_rate=0.01, activation='sigmoid', optimizer='sgd', print_every=10):
+    def __init__(self, input_size, hidden_layers, output_size, learning_rate=0.01, activation='sigmoid', optimizer='sgd', print_every=10, wandb_log=False):
         assert activation.lower() in ['sigmoid', 'relu', 'tanh'], "Activation must be 'sigmoid', 'relu', or 'tanh'"
         assert optimizer.lower() in ['sgd', 'bgd', 'mbgd'], "Optimizer must be 'sgd', 'bgd', or 'mbgd'"
         
@@ -13,9 +15,11 @@ class MultiLabelMLP:
         self.activation = activation
         self.optimizer = optimizer
 
-        # Initialize weights and biases
         self.weights, self.biases = self._initialize_weights_and_biases()
         self.print_every = print_every
+        self.wandb_log = wandb_log
+        self.train_losses = []
+        self.validation_losses = []
 
     def _initialize_weights_and_biases(self):
         weights = []
@@ -55,7 +59,7 @@ class MultiLabelMLP:
         for i in range(len(self.weights)):
             Z = np.dot(self.layer_outputs[-1], self.weights[i]) + self.biases[i]
             if i == len(self.weights) - 1:
-                A = self._activate(Z, 'sigmoid')  # Use sigmoid in the output layer for multi-label
+                A = self._activate(Z, 'sigmoid') 
             else:
                 A = self._activate(Z, self.activation)
             self.layer_outputs.append(A)
@@ -66,13 +70,11 @@ class MultiLabelMLP:
         self.gradients = []
         num_layers = len(self.weights)
 
-        # Compute delta for the output layer (Binary cross-entropy gradient)
         delta = A - y  
         dW = (1 / m) * np.dot(self.layer_outputs[-2].T, delta)
         db = (1 / m) * np.sum(delta, axis=0, keepdims=True)
         self.gradients.append((dW, db))
 
-        # Backpropagate through the hidden layers
         for i in reversed(range(num_layers - 1)):
             dA = np.dot(delta, self.weights[i + 1].T)
             delta = dA * self._activation_derivative(self.layer_outputs[i + 1], self.activation)
@@ -80,7 +82,7 @@ class MultiLabelMLP:
             db = (1 / m) * np.sum(delta, axis=0, keepdims=True)
             self.gradients.append((dW, db))
 
-        self.gradients = self.gradients[::-1]  # Reverse gradients to match the layers
+        self.gradients = self.gradients[::-1] 
 
     def update_parameters(self):
         for i in range(len(self.weights)):
@@ -89,22 +91,17 @@ class MultiLabelMLP:
 
     def compute_loss(self, A, y):
         m = y.shape[0]
-        # Binary cross-entropy loss
         loss = -np.mean(np.sum(y * np.log(A + 1e-8) + (1 - y) * np.log(1 - A + 1e-8), axis=1))
         return loss
 
     def fit(self, X_train, y_train, X_validation=None, y_validation=None, max_epochs=10, batch_size=32, early_stopping=False, patience=100):
         best_loss = float('inf')
         patience_counter = 0
-        self.train_losses = []
-        self.validation_losses = []
 
         for epoch in range(max_epochs):
-            # Forward propagation
             A_train = self.forward_propagation(X_train)
             train_loss = self.compute_loss(A_train, y_train)
 
-            # Backpropagation and update parameters
             self.backpropagation(X_train, y_train, A_train)
             self.update_parameters()
 
@@ -121,8 +118,47 @@ class MultiLabelMLP:
                 else:
                     patience_counter += 1
                     if early_stopping and patience_counter > patience:
-                        print(f"Early stopping at epoch {epoch+1}")
+                        print(f"Early stopping at epoch {epoch + 1}")
                         break
+            
+            # Metrics calculation
+            train_metrics = Metrics(y_train, (A_train >= 0.5).astype(int), task="classification")
+            train_accuracy = train_metrics.accuracy(one_hot=True)
+            train_precision = train_metrics.precision_score()
+            train_recall = train_metrics.recall_score()
+            train_f1 = train_metrics.f1_score()
+            train_hamming_loss = train_metrics.hamming_loss()
+            train_hamming_accuracy = train_metrics.hamming_accuracy()
+
+            if X_validation is not None and y_validation is not None:
+                validation_metrics = Metrics(y_validation, (A_val >= 0.5).astype(int), task="classification")
+                validation_accuracy = validation_metrics.accuracy(one_hot=True)
+                validation_precision = validation_metrics.precision_score()
+                validation_recall = validation_metrics.recall_score()
+                validation_f1 = validation_metrics.f1_score()
+                val_hamming_loss = validation_metrics.hamming_loss()
+                val_hamming_accuracy = validation_metrics.hamming_accuracy()
+            else:
+                val_hamming_loss = val_hamming_accuracy = None
+
+            if self.wandb_log:
+                wandb.log({
+                    "epoch": epoch + 1,
+                    "train_loss": train_loss,
+                    "validation_loss": val_loss if X_validation is not None else None,
+                    "train_accuracy": train_accuracy,
+                    "train_precision": train_precision,
+                    "train_recall": train_recall,
+                    "train_f1": train_f1,
+                    "validation_accuracy": validation_accuracy,
+                    "validation_precision": validation_precision,
+                    "validation_recall": validation_recall,
+                    "validation_f1": validation_f1,
+                    "train_hamming_loss": train_hamming_loss,
+                    "train_hamming_accuracy": train_hamming_accuracy,
+                    "validation_hamming_loss": val_hamming_loss,
+                    "validation_hamming_accuracy": val_hamming_accuracy,
+                })
 
             if epoch % self.print_every == 0 or epoch == max_epochs - 1:
                 print(f"Epoch {epoch}, Train Loss: {train_loss:.4f}, Validation Loss: {val_loss if X_validation is not None else 'N/A'}")
@@ -130,4 +166,3 @@ class MultiLabelMLP:
     def predict(self, X, threshold=0.5):
         probabilities = self.forward_propagation(X)
         return (probabilities >= threshold).astype(int)
-

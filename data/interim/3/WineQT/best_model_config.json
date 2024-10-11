@@ -1,1 +1,1 @@
-{"activation": "sigmoid", "batch_size": 16, "hidden_layers": [16], "lr": 0.01, "max_epochs": 200, "optimizer": "mbgd"}
+{"activation": "tanh", "batch_size": 32, "hidden_layers": [16], "lr": 0.002, "max_epochs": 800, "optimizer": "mbgd"}

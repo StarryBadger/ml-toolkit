@@ -370,8 +370,66 @@ def train_and_log_regression(project="SMAI_A3", config=None):
             best_validation_mse = mse
             best_model_params_regression = dict(config)
 
+def train_and_log_multi_label_classification(project="SMAI_A3", config=None):
+    # Initialize the run for sweeps
+    with wandb.init(config=config):
+        config = wandb.config
+        config_dict = dict(config)
+        wandb.run.name = f"{config_dict['optimizer']}_{config_dict['activation']}_{len(config_dict['hidden_layers'])}_{config_dict['lr']}_{config_dict['batch_size']}_{config_dict['max_epochs']}"
 
-def print_hyperparams(file_path="data/interim/3/WineQT/hyperparams.csv"):
+        # Initialize the MLP classifier with the W&B configuration
+        model = MultiLabelMLP(
+            input_size=X_train.shape[1],
+            hidden_layers=config.hidden_layers,
+            output_size=8,
+            learning_rate=config.lr,
+            activation=config.activation,
+            optimizer=config.optimizer,
+            wandb_log=True,
+        )
+
+        costs = model.fit(
+            X_train,
+            y_train,
+            max_epochs=config.max_epochs,
+            batch_size=config.batch_size,
+            X_validation=X_validation,
+            y_validation=y_validation,
+            early_stopping=True,
+            patience=config.max_epochs // 20,
+        )
+
+        y_pred_validation = model.predict(X_validation)
+        validation_metrics = Metrics(
+            y_validation, y_pred_validation, task="classification"
+        )
+
+        validation_accuracy = validation_metrics.accuracy(one_hot=True)
+        precision = validation_metrics.precision_score()
+        recall = validation_metrics.recall_score()
+        f1_score = validation_metrics.f1_score()
+        hamming_loss = validation_metrics.hamming_loss()
+        hamming_accuracy = validation_metrics.hamming_accuracy()
+
+        wandb.log(
+            {
+                "accuracy_val_final": validation_accuracy,
+                "precision_val_final": precision,
+                "recall_val_final": recall,
+                "f1_score_val_final": f1_score,
+                "hamming_loss": hamming_loss,
+                "hamming_accuracy": hamming_accuracy,
+            }
+        )
+
+        global best_model_params, best_validation_accuracy
+        if validation_accuracy > best_validation_accuracy:
+            best_validation_accuracy = validation_accuracy
+            best_model_params = dict(config)
+
+
+
+def print_hyperparams_wineqt(file_path="data/interim/3/WineQT/hyperparams_2fd1o2fl.csv"):
     df = pd.read_csv(file_path)
 
     metrics_df = df[
@@ -405,6 +463,7 @@ def print_hyperparams(file_path="data/interim/3/WineQT/hyperparams.csv"):
 
     markdown_table = metrics_df.to_markdown(index=False)
     print(markdown_table)
+    metrics_df.to_markdown("temp.md", index=False)
 
 
 def test_on_best_wineqt():
@@ -546,6 +605,29 @@ sweep_config_housing = {
     },
 }
 
+sweep_config_diabetes = {
+    "method": "bayes",
+    "metric": {
+        "name": "accuracy_val_final",
+    },
+    "parameters": {
+        "lr": {"values": [0.01, 0.05, 0.1, 0.2]},
+        "max_epochs": {"values": [800, 1500]},
+        "optimizer": {"values": ["sgd", "bgd", "mbgd"]}, 
+        "activation": {"values": ["sigmoid", "tanh", "relu"]}, 
+        "hidden_layers": {
+            "values": [
+                [64, 64],
+                [128],
+                [64, 32],
+                [128, 64],
+                [64, 64, 32]
+            ] 
+        },
+        "batch_size": {"values": [16, 32, 64]}, 
+    },
+}
+
 
 def advertisement_preprocessing(
     dataset_path="data/interim/3/advertisement/advertisement.csv",
@@ -622,11 +704,7 @@ def get_advertisement_data():
 
     return X_train, y_train, X_validation, y_validation, X_test, y_test
 
-
-import pandas as pd
-import numpy as np
 import os
-
 
 def process_diabetes_data():
     input_file = "data/interim/3/diabetes/diabetes.csv"
@@ -810,12 +888,24 @@ if __name__ == "__main__":
     #     json.dump(best_model_params, f)
     # wandb.finish()
 
-    # print_hyperparams()
+    # print_hyperparams_wineqt()
 
-    # test_on_best_wineqt()
+    test_on_best_wineqt()
 
     # advertisement_preprocessing()
-    X_train, y_train, X_validation, y_validation, X_test, y_test = (get_advertisement_data())
+    # X_train, y_train, X_validation, y_validation, X_test, y_test = (get_advertisement_data())
+    # best_model_params = None
+    # best_validation_accuracy = 0
+
+    # sweep_id = wandb.sweep(sweep_config_diabetes, project="SMAI_A3")
+    # wandb.agent(sweep_id, function=train_and_log_multi_label_classification, count=64)
+
+    # # Save the best model parameters to a JSON file
+    # with open("data/interim/3/diabetes/best_model_config.json", "w") as f:
+    #     json.dump(best_model_params, f)
+
+    # wandb.finish()
+
     # model = MultiLabelMLP(X_train.shape[1], [64,64], 8, learning_rate=0.1, activation='sigmoid', optimizer='sgd', print_every=10)
     # costs = model.fit(
     #         X_train, y_train,
@@ -880,14 +970,14 @@ if __name__ == "__main__":
 
     # autoencoder_knn_task()
 
-    config = {
-        "hidden_layers": [32, 64],
-        "lr": 0.01,
-        "activation": "relu",
-        "optimizer": "mbgd",
-        "max_epochs": 100,
-        "batch_size": 16,
-    }
-    prepare_and_train_mlp("data/interim/2/spotify_normalized_numerical.csv", config)
+    # config = {
+    #     "hidden_layers": [32, 64],
+    #     "lr": 0.01,
+    #     "activation": "relu",
+    #     "optimizer": "mbgd",
+    #     "max_epochs": 100,
+    #     "batch_size": 16,12
+    # }
+    # prepare_and_train_mlp("data/interim/2/spotify_normalized_numerical.csv", config)
 
     # unittest.main()
