@@ -465,6 +465,46 @@ def print_hyperparams_wineqt(file_path="data/interim/3/WineQT/hyperparams_2fd1o2
     print(markdown_table)
     metrics_df.to_markdown("temp.md", index=False)
 
+import pandas as pd
+
+def print_hyperparams_housing(file_path="data/interim/3/HousingData/hyperparams_jdqz1le1.csv"):
+    df = pd.read_csv(file_path)
+    metrics_df = df[
+        [
+            "activation",
+            "batch_size",
+            "hidden_layers",
+            "optimizer",
+            "lr",
+            "max_epochs",
+            "epoch",
+            "mae_val_final",
+            "r2_val_final",
+            "rmse_val_final",
+            "mse_val_final",
+        ]
+    ]
+
+    metrics_df.columns = [
+        "Activation",
+        "Batch Size",
+        "Hidden Layers",
+        "Optimizer",
+        "Learning Rate",
+        "Max Epochs",
+        "Epoch",
+        "Validation MAE",
+        "Validation R2",
+        "Validation RMSE",
+        "Validation MSE",
+    ]
+
+    markdown_table = metrics_df.to_markdown(index=False)
+    print(markdown_table)
+    metrics_df.to_markdown("temp.md", index=False)
+
+
+
 def print_hyperparams_advertisement(file_path="data/interim/3/advertisement/hyperparams_2hry5c8h.csv"):
     df = pd.read_csv(file_path)
 
@@ -866,7 +906,6 @@ def encode_labels(dataset):
         unique_labels.update(label_list.split())
     unique_labels = sorted(unique_labels)
     label_to_index = {label: idx for idx, label in enumerate(unique_labels)}
-    print(label_to_index)
     index_to_label = {idx: label for label, idx in label_to_index.items()}
 
     def multi_hot_encode(labels):
@@ -1113,7 +1152,7 @@ if __name__ == "__main__":
 
     # wandb.finish()
 
-    test_on_best_advertisement(index_to_label)
+    # test_on_best_advertisement(index_to_label)
 
     # print_hyperparams_advertisement()
 
@@ -1130,8 +1169,8 @@ if __name__ == "__main__":
     #     json.dump(best_model_params_regression, f)
 
     # wandb.finish()
-
-    # test_on_best_housing()
+    # print_hyperparams_housing()
+    test_on_best_housing()
 
     # X_train, y_train, X_validation, y_validation, X_test, y_test = process_diabetes_data()
 

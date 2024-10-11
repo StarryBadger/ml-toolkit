@@ -68,8 +68,12 @@ class Metrics:
 
     def mse(self):
         return np.mean((self.y_true - self.y_pred) ** 2)
+
     
     def rmse(self):
+        print(self.mse())
+        print(np.sqrt(self.mse()))
+
         return np.sqrt(np.mean((self.y_true - self.y_pred) ** 2))
     
     def mae(self):
