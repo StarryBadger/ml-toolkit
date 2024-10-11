@@ -1601,7 +1601,9 @@ values you trained the model on).
 | Max Epochs      | 2500         |
 | Optimizer       | sgd          |
 
-## 3.4 Evaluating Model (5 marks)
+## 3.4 Evaluating Model
+
+Note: Change in seed
 
 | Epoch | Train Loss | Train MSE | Validation MSE |
 |-------|------------|-----------|-----------------|
@@ -1620,192 +1622,417 @@ Early stopping at epoch 52
 | RMSE         | 0.09934581865386534            |
 | R2 Score     | 0.7500409203523087             |
 
+## 3.5 Binary Cross Entropy (left) vs Mean Squared Error (right)
+
+![Plot](./figures/3.5.1_500.png)
+![Plot](./figures/3.5.2_500.png)
+![Plot](./figures/3.5.1_1000.png)
+![Plot](./figures/3.5.2_1000.png)
+![Plot](./figures/3.5.1_2500.png)
+![Plot](./figures/3.5.2_2500.png)
+
+
+Observations for Model 1 (BCE):
+
+1. Rapid initial decrease: The loss drops sharply in the first ~100 epochs for both train and validation sets.
+2. Early convergence: The model appears to converge around 200-300 epochs.
+3. Stability: After convergence, both train and validation losses remain very stable.
+4. Close alignment: Train and validation losses are very close throughout training, indicating good generalization.
+5. Final loss value: Converges to around 0.5 for both train and validation sets.
+
+Observations for Model 2 (MSE):
+
+1. Gradual decrease: The loss decreases more slowly and steadily compared to Model 1.
+2. No clear convergence: The loss continues to decrease even at 1000 epochs, suggesting the model might benefit from more training.
+3. Gap between train and validation: The validation loss is consistently higher than the train loss, indicating some overfitting.
+4. Continued improvement: Both losses are still decreasing at the end of training, suggesting potential for further optimization.
+5. Final loss values: Around 0.17 for train loss and 0.19 for validation loss at 1000 epochs.
+
+Key differences:
+
+1. Convergence speed: BCE converges much faster than MSE in this case.
+2. Stability: BCE shows more stability post-convergence, while MSE continues to improve.
+3. Generalization: BCE shows better generalization with closer train and validation losses.
+4. Range of loss values: BCE converges to around 0.5, while MSE reaches much lower values (around 0.18).
+
+BCE is used for binary classification problems and tends to converge faster for such tasks. MSE is used for regression problems, thus the continuous improvement for further epochs but slower convergence. The faster convergence of BCE suggests it might be more suitable for the given binary classification task.
+
+## 3.6 Analysis
+
+Datapoint 1 - X: [0.000579, 0.000000, 0.005121, 0.000000, 0.000260, 0.365317, 0.571576, 0.154534, 0.086957, 0.011450, 0.553191, 1.000000, 0.091336] - True: 0.715556, Predicted: 0.629283, MSE: 0.007443     
+Datapoint 2 - X: [0.105477, 0.000000, 0.045168, 0.000000, 0.000895, 0.220750, 0.937178, 0.062527, 1.000000, 0.914122, 0.808511, 1.000000, 0.583609] - True: 0.173333, Predicted: 0.201988, MSE: 0.000821     
+Datapoint 3 - X: [0.008617, 0.000000, 0.019665, 0.000000, 0.000386, 0.313495, 0.942327, 0.302367, 0.130435, 0.229008, 0.893617, 0.977407, 0.305464] - True: 0.297778, Predicted: 0.324393, MSE: 0.000708     
+Datapoint 4 - X: [0.088041, 0.000000, 0.045168, 0.000000, 0.000681, 0.282936, 0.643666, 0.166756, 1.000000, 0.914122, 0.808511, 1.000000, 0.317053] - True: 0.364444, Predicted: 0.319871, MSE: 0.001987     
+Datapoint 5 - X: [0.000733, 0.000000, 0.010319, 0.000000, 0.000161, 0.273533, 0.555098, 0.238067, 0.086957, 0.114504, 0.627660, 0.995587, 0.302133] - True: 0.382222, Predicted: 0.373493, MSE: 0.000076     
+Datapoint 6 - X: [0.001462, 0.110425, 0.025938, 0.000000, 0.000262, 0.248958, 0.199794, 0.256054, 0.130435, 0.171756, 0.638298, 1.000000, 0.252208] - True: 0.391111, Predicted: 0.402022, MSE: 0.000119     
+Datapoint 7 - X: [0.039939, 0.000000, 0.045168, 0.000000, 0.000535, 0.351640, 1.000000, 0.030545, 1.000000, 0.914122, 0.808511, 0.451460, 0.498068] - True: 0.500000, Predicted: 0.240919, MSE: 0.067123     
+Datapoint 8 - X: [0.001403, 0.000000, 0.020741, 0.000000, 0.000340, 0.274175, 0.847580, 0.090280, 0.173913, 0.375954, 0.882979, 0.976776, 0.341060] - True: 0.342222, Predicted: 0.318628, MSE: 0.000557     
+Datapoint 9 - X: [0.200746, 0.000000, 0.045168, 0.000000, 0.000721, 0.284432, 1.000000, 0.023325, 1.000000, 0.914122, 0.808511, 0.992032, 0.553256] - True: 0.115556, Predicted: 0.223165, MSE: 0.011580     
+Datapoint 10 - X: [0.001117, 0.000000, 0.069852, 0.000000, 0.000565, 0.258788, 0.987642, 0.067155, 0.130435, 1.000000, 0.797872, 0.982879, 0.450883] - True: 0.191111, Predicted: 0.194457, MSE: 0.000011     
+Datapoint 11 - X: [0.000612, 0.000000, 0.029370, 0.000000, 0.000474, 0.364889, 0.907312, 0.094381, 0.000000, 0.164122, 0.893617, 1.000000, 0.107892] - True: 0.420000, Predicted: 0.485819, MSE: 0.004332     
+Datapoint 12 - X: [0.111389, 0.000000, 0.045168, 0.000000, 0.000777, 0.244791, 0.771370, 0.033719, 1.000000, 0.914122, 0.808511, 0.851884, 0.779249] - True: 0.028889, Predicted: 0.160800, MSE: 0.017400     
+Datapoint 13 - X: [0.225678, 0.000000, 0.045168, 0.000000, 0.000794, 0.086227, 0.909372, 0.028181, 1.000000, 0.914122, 0.808511, 0.719930, 0.797461] - True: 0.084444, Predicted: 0.097126, MSE: 0.000161     
+Datapoint 14 - X: [0.041271, 0.000000, 0.045168, 0.000000, 0.000971, 0.192435, 0.960865, 0.088570, 1.000000, 0.914122, 0.808511, 0.959378, 0.233444] - True: 0.351111, Predicted: 0.315544, MSE: 0.001265     
+Datapoint 15 - X: [0.039939, 0.800000, 0.002714, 0.000000, 0.000048, 0.398119, 0.321318, 0.561922, 0.043478, 0.270992, 0.000000, 1.000000, 0.064845] - True: 0.628889, Predicted: 0.718708, MSE: 0.008067     
+Datapoint 16 - X: [0.002046, 0.000000, 0.016516, 0.000000, 0.000159, 0.237739, 0.313079, 0.361084, 0.086957, 0.087786, 0.563830, 1.000000, 0.342715] - True: 0.333333, Predicted: 0.332831, MSE: 0.000000     
+Datapoint 17 - X: [0.001287, 0.000000, 0.006222, 0.000000, 0.000151, 0.481675, 0.752832, 0.215115, 0.043478, 0.169847, 0.574468, 1.000000, 0.068433] - True: 0.748889, Predicted: 0.657582, MSE: 0.008337     
+Datapoint 18 - X: [0.104786, 0.000000, 0.045168, 0.000000, 0.000827, 0.280372, 0.986612, 0.102938, 1.000000, 0.914122, 0.808511, 1.000000, 0.452539] - True: 0.202222, Predicted: 0.254837, MSE: 0.002768     
+Datapoint 19 - X: [0.073423, 0.000000, 0.045168, 0.052083, 0.000620, 0.369163, 0.974253, 0.006620, 1.000000, 0.914122, 0.808511, 0.987770, 0.033940] - True: 1.000000, Predicted: 0.543457, MSE: 0.208431     
+Datapoint 20 - X: [0.000849, 0.000000, 0.006222, 0.000000, 0.000151, 0.455070, 0.350154, 0.215115, 0.043478, 0.169847, 0.574468, 0.991502, 0.050773] - True: 0.862222, Predicted: 0.658777, MSE: 0.041390     
+Datapoint 21 - X: [0.049634, 0.000000, 0.045168, 0.000000, 0.000502, 0.260925, 0.943357, 0.128282, 1.000000, 0.914122, 0.808511, 0.834560, 0.540563] - True: 0.313333, Predicted: 0.210614, MSE: 0.010551     
+Datapoint 22 - X: [0.000155, 0.950000, 0.005684, 0.000000, 0.000078, 0.477936, 0.298661, 0.362684, 0.130435, 0.070611, 0.223404, 0.983988, 0.031733] - True: 1.000000, Predicted: 0.912090, MSE: 0.007728     
+Datapoint 23 - X: [0.000075, 0.350000, 0.002714, 0.000000, 0.000144, 0.393204, 0.477858, 0.537270, 0.000000, 0.185115, 0.308511, 0.994553, 0.103753] - True: 0.615556, Predicted: 0.571966, MSE: 0.001900     
+Datapoint 24 - X: [0.002638, 0.000000, 0.017719, 0.000000, 0.000272, 0.269473, 0.420185, 0.389773, 0.173913, 0.190840, 0.744681, 1.000000, 0.305188] - True: 0.382222, Predicted: 0.336679, MSE: 0.002074     
+Datapoint 25 - X: [0.039939, 0.000000, 0.045168, 0.000000, 0.000827, 0.335506, 0.897013, 0.133483, 1.000000, 0.914122, 0.808511, 0.642771, 0.405353] - True: 0.253333, Predicted: 0.276744, MSE: 0.000548     
+Datapoint 26 - X: [0.024151, 0.110425, 0.048958, 0.000000, 0.001226, 0.220857, 1.000000, 0.035192, 0.173913, 0.412214, 0.223404, 0.426017, 0.411700] - True: 0.235556, Predicted: 0.245963, MSE: 0.000108     
+Datapoint 27 - X: [0.000332, 0.800000, 0.007451, 0.000000, 0.000033, 0.291591, 0.153450, 0.498495, 0.130435, 0.286260, 0.372340, 1.000000, 0.081126] - True: 0.411111, Predicted: 0.564405, MSE: 0.023499     
+Datapoint 28 - X: [0.001053, 0.110425, 0.014416, 0.000000, 0.000121, 0.365531, 0.152420, 0.396666, 0.260870, 0.270992, 0.372340, 0.983686, 0.086369] - True: 0.624444, Predicted: 0.604034, MSE: 0.000417     
+Datapoint 29 - X: [0.000438, 0.000000, 0.029370, 0.000000, 0.000474, 0.273427, 0.760041, 0.105293, 0.000000, 0.164122, 0.893617, 1.000000, 0.202815] - True: 0.346667, Predicted: 0.391406, MSE: 0.002002     
+Datapoint 30 - X: [0.005965, 0.000000, 0.014698, 0.000000, 0.000300, 0.258575, 0.671473, 0.231147, 0.304348, 0.229008, 0.510638, 0.953225, 0.273731] - True: 0.428889, Predicted: 0.394359, MSE: 0.001192     
+Datapoint 31 - X: [0.086161, 0.000000, 0.045168, 0.000000, 0.000777, 0.233572, 0.988671, 0.045813, 1.000000, 0.914122, 0.808511, 0.990418, 0.501932] - True: 0.077778, Predicted: 0.231602, MSE: 0.023662     
+Datapoint 32 - X: [0.000772, 0.330000, 0.004404, 0.000000, 0.000219, 0.412330, 0.710608, 0.179105, 0.260870, 0.066794, 0.617021, 1.000000, 0.130795] - True: 0.631111, Predicted: 0.650114, MSE: 0.000361     
+Datapoint 33 - X: [0.052159, 0.000000, 0.045168, 0.000000, 0.000578, 0.365317, 0.666323, 0.127609, 1.000000, 0.914122, 0.808511, 0.943971, 0.302133] - True: 0.551111, Predicted: 0.372763, MSE: 0.031808     
+Datapoint 34 - X: [0.162015, 0.000000, 0.045168, 0.000000, 0.000895, 0.309862, 0.930999, 0.079386, 1.000000, 0.914122, 0.808511, 0.068511, 0.450331] - True: 0.102222, Predicted: 0.189492, MSE: 0.007616     
+Datapoint 35 - X: [0.001397, 0.110425, 0.024453, 0.000000, 0.000409, 0.246928, 0.722966, 0.122571, 0.217391, 0.467557, 0.553191, 0.853069, 0.376380] - True: 0.342222, Predicted: 0.295096, MSE: 0.002221     
+Datapoint 36 - X: [0.188890, 0.000000, 0.045168, 0.000000, 0.000794, 0.183353, 0.980433, 0.026962, 1.000000, 0.914122, 0.808511, 1.000000, 0.802428] - True: 0.048889, Predicted: 0.138556, MSE: 0.008040     
+Datapoint 37 - X: [0.000283, 0.950000, 0.002586, 0.000000, 0.000045, 0.364783, 0.127703, 0.593240, 0.086957, 0.410305, 0.468085, 1.000000, 0.078091] - True: 0.664444, Predicted: 0.546152, MSE: 0.013993     
+Datapoint 38 - X: [0.135348, 0.000000, 0.045168, 0.000000, 0.000578, 0.222994, 0.872297, 0.074712, 1.000000, 0.914122, 0.808511, 0.734354, 0.341336] - True: 0.351111, Predicted: 0.259549, MSE: 0.008384     
+Datapoint 39 - X: [0.004079, 0.000000, 0.024172, 0.000000, 0.000401, 0.321188, 0.869207, 0.224854, 0.130435, 0.223282, 0.617021, 0.996949, 0.208333] - True: 0.417778, Predicted: 0.432083, MSE: 0.000205     
+Datapoint 40 - X: [0.076372, 0.000000, 0.045168, 0.000000, 0.000827, 0.269260, 0.839341, 0.144395, 1.000000, 0.914122, 0.808511, 1.000000, 0.357892] - True: 0.333333, Predicted: 0.290838, MSE: 0.001806     
+Datapoint 41 - X: [0.110343, 0.000000, 0.045168, 0.000000, 0.000721, 0.345443, 0.987642, 0.020769, 1.000000, 0.914122, 0.808511, 1.000000, 0.538355] - True: 0.184444, Predicted: 0.260200, MSE: 0.005739     
+Datapoint 42 - X: [0.008362, 0.000000, 0.019665, 0.000000, 0.000386, 0.252484, 0.939238, 0.297357, 0.130435, 0.229008, 0.893617, 0.993520, 0.402042] - True: 0.235556, Predicted: 0.270133, MSE: 0.001196     
+Datapoint 43 - X: [0.037257, 0.000000, 0.048958, 0.052083, 0.001226, 0.196816, 1.000000, 0.017459, 0.173913, 0.412214, 0.223404, 1.000000, 0.692329] - True: 0.186667, Predicted: 0.190552, MSE: 0.000015     
+Datapoint 44 - X: [0.000052, 0.550000, 0.004583, 0.000000, 0.000010, 0.309007, 0.298661, 0.561767, 0.000000, 0.215649, 0.287234, 0.994503, 0.179360] - True: 0.377778, Predicted: 0.466885, MSE: 0.007940     
+Datapoint 45 - X: [0.075435, 0.000000, 0.045168, 0.005609, 0.000827, 0.340635, 0.923790, 0.108576, 1.000000, 0.914122, 0.808511, 0.000000, 0.433499] - True: 0.186667, Predicted: 0.211098, MSE: 0.000597     
+Datapoint 46 - X: [0.003889, 0.000000, 0.054873, 0.000000, 0.000603, 0.309114, 0.983522, 0.065491, 0.130435, 0.477099, 0.914894, 0.992889, 0.354857] - True: 0.268889, Predicted: 0.308427, MSE: 0.001563     
+Datapoint 47 - X: [0.039939, 0.525000, 0.012444, 0.000000, 0.000050, 0.294262, 0.439753, 0.562668, 0.217391, 0.202290, 0.425532, 1.000000, 0.161976] - True: 0.384444, Predicted: 0.464919, MSE: 0.006476     
+Datapoint 48 - X: [0.001713, 0.000000, 0.026502, 0.000000, 0.000071, 0.256438, 0.150360, 0.378079, 0.130435, 0.225191, 0.702128, 0.949670, 0.224890] - True: 0.371111, Predicted: 0.373095, MSE: 0.000004     
+Datapoint 49 - X: [0.001528, 0.000000, 0.024453, 0.000000, 0.000409, 0.287744, 0.837281, 0.102474, 0.217391, 0.467557, 0.553191, 0.979424, 0.240618] - True: 0.300000, Predicted: 0.396367, MSE: 0.009287     
+Datapoint 50 - X: [0.004512, 0.000000, 0.014698, 0.052083, 0.000308, 0.278128, 0.910402, 0.174449, 0.304348, 0.229008, 0.510638, 0.995814, 0.544426] - True: 0.371111, Predicted: 0.274993, MSE: 0.009239     
+Datapoint 51 - X: [0.041220, 0.000000, 0.045168, 0.000000, 0.000499, 0.293942, 0.504634, 0.260264, 1.000000, 0.914122, 0.808511, 0.979121, 0.244205] - True: 0.360000, Predicted: 0.359450, MSE: 0.000000     
+Datapoint 52 - X: [0.001008, 0.400000, 0.015235, 0.000000, 0.000156, 0.351854, 0.410917, 0.285326, 0.130435, 0.127863, 0.531915, 1.000000, 0.034492] - True: 0.600000, Predicted: 0.655568, MSE: 0.003088     
+Datapoint 53 - X: [0.001607, 0.250000, 0.011958, 0.000000, 0.000171, 0.232931, 0.651905, 0.554320, 0.304348, 0.185115, 0.755319, 0.995486, 0.315121] - True: 0.304444, Predicted: 0.305247, MSE: 0.000001     
+Datapoint 54 - X: [0.000279, 0.000000, 0.010063, 0.000000, 0.000144, 0.262101, 0.469619, 0.625995, 0.086957, 0.314885, 0.659574, 0.971607, 0.242826] - True: 0.277778, Predicted: 0.288887, MSE: 0.000123     
+Datapoint 55 - X: [0.005470, 0.000000, 0.024172, 0.000000, 0.000401, 0.328454, 0.819773, 0.198956, 0.130435, 0.223282, 0.617021, 1.000000, 0.077539] - True: 0.395556, Predicted: 0.532926, MSE: 0.018871     
+Datapoint 56 - X: [0.000870, 0.450000, 0.007630, 0.000000, 0.000131, 0.387221, 0.370752, 0.312552, 0.173913, 0.402672, 0.276596, 1.000000, 0.100993] - True: 0.664444, Predicted: 0.642316, MSE: 0.000490     
+Datapoint 57 - X: [0.003954, 0.000000, 0.014698, 0.052083, 0.000308, 0.362218, 0.881565, 0.157508, 0.304348, 0.229008, 0.510638, 0.986888, 0.220199] - True: 0.482222, Predicted: 0.512537, MSE: 0.000919     
+Datapoint 58 - X: [0.000609, 0.000000, 0.005121, 0.000000, 0.000260, 0.276953, 0.678682, 0.195519, 0.086957, 0.011450, 0.553191, 0.975314, 0.315121] - True: 0.546667, Predicted: 0.401970, MSE: 0.020937     
+Datapoint 59 - X: [0.025133, 0.000000, 0.048958, 0.000000, 0.000555, 0.245005, 0.915551, 0.117524, 0.173913, 0.412214, 0.223404, 0.995486, 0.273455] - True: 0.393333, Predicted: 0.413279, MSE: 0.000398     
+Datapoint 60 - X: [0.000416, 0.210000, 0.029180, 0.000000, 0.000136, 0.272892, 0.618950, 0.516973, 0.130435, 0.106870, 0.446809, 0.992612, 0.212472] - True: 0.344444, Predicted: 0.404201, MSE: 0.003571     
+Datapoint 61 - X: [0.151915, 0.000000, 0.045168, 0.005609, 0.000620, 0.032268, 1.000000, 0.034646, 1.000000, 0.914122, 0.808511, 0.330576, 0.320088] - True: 0.402222, Predicted: 0.153578, MSE: 0.061824     
+Datapoint 62 - X: [0.092102, 0.000000, 0.045168, 0.000000, 0.000827, 0.253766, 0.797116, 0.150006, 1.000000, 0.914122, 0.808511, 0.008019, 0.419702] - True: 0.188889, Predicted: 0.178421, MSE: 0.000110     
+Datapoint 63 - X: [0.000814, 0.450000, 0.007630, 0.000000, 0.000131, 0.344161, 0.393409, 0.241795, 0.173913, 0.402672, 0.276596, 0.992360, 0.136589] - True: 0.600000, Predicted: 0.600386, MSE: 0.000000     
+Datapoint 64 - X: [0.003749, 0.220000, 0.013827, 0.000000, 0.000116, 0.272144, 0.329557, 0.629805, 0.260870, 0.272901, 0.691489, 0.983055, 0.205022] - True: 0.428889, Predicted: 0.361528, MSE: 0.004537     
+Datapoint 65 - X: [0.001315, 0.000000, 0.024453, 0.000000, 0.000409, 0.251309, 0.926880, 0.111286, 0.217391, 0.467557, 0.553191, 0.995083, 0.399558] - True: 0.306667, Predicted: 0.291748, MSE: 0.000223     
+Datapoint 66 - X: [0.041482, 0.000000, 0.045168, 0.000000, 0.000840, 0.149802, 0.911432, 0.056625, 1.000000, 0.914122, 0.808511, 0.796081, 0.338576] - True: 0.375556, Predicted: 0.248252, MSE: 0.016206     
+Datapoint 67 - X: [0.000656, 0.700000, 0.004558, 0.000000, 0.000038, 0.297468, 0.177137, 0.609099, 0.173913, 0.326336, 0.234043, 0.927732, 0.089404] - True: 0.388889, Predicted: 0.535124, MSE: 0.021385     
+Datapoint 68 - X: [0.220331, 0.110425, 0.045168, 0.000000, 0.000721, 0.400898, 0.978373, 0.016978, 1.000000, 0.914122, 0.808511, 1.000000, 0.323124] - True: 0.222222, Predicted: 0.367871, MSE: 0.021214     
+Datapoint 69 - X: [0.121703, 0.000000, 0.045168, 0.000000, 0.000741, 0.344161, 0.905252, 0.062736, 1.000000, 0.914122, 0.808511, 0.053583, 0.663907] - True: 0.055556, Predicted: 0.137579, MSE: 0.006728     
+Datapoint 70 - X: [0.000483, 0.330000, 0.004404, 0.000000, 0.000219, 0.351320, 0.694130, 0.186698, 0.260870, 0.066794, 0.617021, 1.000000, 0.160044] - True: 0.515556, Predicted: 0.583117, MSE: 0.004565     
+Datapoint 71 - X: [0.000082, 0.750000, 0.009064, 0.000000, 0.000063, 0.248638, 0.460350, 0.562895, 0.086957, 0.538168, 0.904255, 1.000000, 0.360651] - True: 0.308889, Predicted: 0.271490, MSE: 0.001399     
+Datapoint 72 - X: [0.001214, 0.000000, 0.020741, 0.000000, 0.000340, 0.344054, 0.704428, 0.156999, 0.173913, 0.375954, 0.882979, 0.996672, 0.163907] - True: 0.477778, Predicted: 0.419913, MSE: 0.003348     
+Datapoint 73 - X: [0.000412, 0.800000, 0.003713, 0.000000, 0.000071, 0.224597, 0.195675, 0.859888, 0.130435, 0.280534, 1.000000, 0.964446, 0.174393] - True: 0.293333, Predicted: 0.344993, MSE: 0.002669     
+Datapoint 74 - X: [0.024085, 0.000000, 0.048958, 0.000000, 0.001226, 0.229512, 0.984552, 0.044885, 0.173913, 0.412214, 0.223404, 0.659716, 0.387969] - True: 0.320000, Predicted: 0.295499, MSE: 0.000600     
+Datapoint 75 - X: [0.119877, 0.000000, 0.045168, 0.000000, 0.000895, 0.309648, 0.946447, 0.078049, 1.000000, 0.914122, 0.808511, 0.107771, 0.613962] - True: 0.151111, Predicted: 0.140332, MSE: 0.000116     
+Datapoint 76 - X: [0.063903, 0.000000, 0.045168, 0.000000, 0.000499, 0.272786, 0.791967, 0.219726, 1.000000, 0.914122, 0.808511, 0.989359, 0.365618] - True: 0.313333, Predicted: 0.281413, MSE: 0.001019     
+Datapoint 77 - X: [0.000678, 0.000000, 0.009192, 0.000000, 0.000315, 0.318944, 0.311020, 0.182115, 0.173913, 0.208015, 0.425532, 0.985022, 0.099338] - True: 0.542222, Predicted: 0.591629, MSE: 0.002441     
+Datapoint 78 - X: [0.039939, 0.000000, 0.014698, 0.000000, 0.000300, 0.319585, 0.190525, 0.204194, 0.304348, 0.229008, 0.510638, 0.958243, 0.056015] - True: 0.588889, Predicted: 0.606216, MSE: 0.000300     
+
+**Datapoints which have features lying closer to extremes of the range [0,1] have higher MSE**
+
+1. **High MSE for Outliers or Extreme Predictions**: Datapoints where the true value is significantly high or low often result in higher MSE values. For instance:
+   - Datapoint 19: True: 1.000, Predicted: 0.543, MSE: 0.208 — the true value is at the upper limit (1.0), but the prediction is considerably lower.
+   - Datapoint 20: True: 0.862, Predicted: 0.659, MSE: 0.041 — here too, the true value is on the higher side, but the prediction is much lower.
+
+2. **Lower MSE for Predictions Near True Values**: Datapoints where the predicted value is close to the true value have lower MSE, as expected. Examples include:
+   - Datapoint 5: True: 0.382, Predicted: 0.373, MSE: 0.000076 — very small error, leading to a low MSE.
+   - Datapoint 16: True: 0.333, Predicted: 0.333, MSE: 0.000000 — perfect prediction, hence no error.
+
+3. **Erratic or Dispersed Features Leading to High MSE**: Some datapoints with a wide spread in feature values tend to have higher MSE, possibly because the model struggles with predicting based on dispersed inputs:
+   - Datapoint 7: X features vary significantly, and it results in an MSE of 0.067.
+   - Datapoint 27: X values are somewhat scattered (e.g., [0.000332, 0.800, 0.007, ...]), leading to an MSE of 0.023.
+
+In general, high MSE seems to occur when the true value is extreme (either close to 0 or 1) or when there is a significant variation in the feature values. This is because MSE is sensitive to outliers due to the squaring of errors. This causes extreme values to have a significant impact on the model. (Datapoints which have features lying closer to extremes (0 or 1) have higher MSE)
+
+
+## 4 AutoEncoders
+
+![Plot](./figures/knn_og_vs_autoencoder_bar_2.png)
+
+
+##### Table 1: Performance Metrics without Dimensionality Reduction (KNN on the Original Dataset)
+
+| Metric                  | Value    |
+|-------------------------|----------|
+| **Accuracy**             | 0.2561   |
+| **Precision (macro)**    | 0.2340   |
+| **Recall (macro)**       | 0.2472   |
+| **F1-Score (macro)**     | 0.2405   |
+| **Precision (micro)**    | 0.2561   |
+| **Recall (micro)**       | 0.2561   |
+| **F1-Score (micro)**     | 0.2561   |
+| **Time Taken**           | 74.9516 s|
+
+##### Table 2: Performance Metrics with Autoencoder-based Dimensionality Reduction (KNN on Reduced Dataset)
+
+| Metric                  | Value    |
+|-------------------------|----------|
+| **Accuracy**             | 0.1601   |
+| **Precision (macro)**    | 0.1359   |
+| **Recall (macro)**       | 0.1552   |
+| **F1-Score (macro)**     | 0.1449   |
+| **Precision (micro)**    | 0.1601   |
+| **Recall (micro)**       | 0.1601   |
+| **F1-Score (micro)**     | 0.1601   |
+| **Time Taken**           | 59.6965 s|
+
+#### 3. Comparison and Analysis
+
+The results from Tables 1 and 2 show a clear decrease in the performance of the KNN classifier when using the reduced dataset generated by the autoencoder. The accuracy, precision, recall, and F1-score all drop when the dimensionality is reduced using the autoencoder.
+
+- **Accuracy**: The accuracy dropped from 0.2561 to 0.1601, indicating that the autoencoder did not preserve the discriminative properties of the original dataset for KNN classification.
+- **Precision (macro and micro)**: The precision values in both the macro and micro cases also dropped significantly, from 0.2340 (macro) to 0.1359 and from 0.2561 (micro) to 0.1601.
+- **Recall (macro and micro)**: The recall also experienced a decrease, reflecting a decline in the model's ability to correctly identify relevant instances after dimensionality reduction.
+- **F1-Score (macro and micro)**: The F1-score similarly decreased for both macro and micro metrics.
+
+One positive aspect, however, is that the **time taken** for the task decreased from 74.9516 seconds to 59.6965 seconds, reflecting that the KNN model processes the reduced dataset faster due to lower dimensionality.
+
+#### 4. Epoch-wise Training Progress (Autoencoder)
+
+The autoencoder's training over 10 epochs shows a steady decrease in the loss, demonstrating successful convergence:
+
+| Epoch   | Loss                  |
+|---------|------------------------|
+| 1       | 1.6871                 |
+| 2       | 1.6243                 |
+| 3       | 1.5684                 |
+| 4       | 1.5186                 |
+| 5       | 1.4740                 |
+| 6       | 1.4340                 |
+| 7       | 1.3981                 |
+| 8       | 1.3657                 |
+| 9       | 1.3364                 |
+| 10      | 1.3100                 |
+
+In a future run, we get,
+
+Epoch 1/50, Loss: 1.6870602079312826     
+Epoch 2/50, Loss: 1.624275567896819     
+Epoch 3/50, Loss: 1.5684161168270923     
+Epoch 4/50, Loss: 1.518576253585605     
+Epoch 5/50, Loss: 1.4739886735345877     
+Epoch 6/50, Loss: 1.4340003172059514     
+Epoch 7/50, Loss: 1.3980529659556877     
+Epoch 8/50, Loss: 1.3656675064051367     
+Epoch 9/50, Loss: 1.3364311064962158     
+Epoch 10/50, Loss: 1.3099867140542985     
+Epoch 11/50, Loss: 1.28602441716772     
+Epoch 12/50, Loss: 1.264274304297438     
+Epoch 13/50, Loss: 1.2445005381214702     
+Epoch 14/50, Loss: 1.2264964161281167     
+Epoch 15/50, Loss: 1.2100802369579517     
+Epoch 16/50, Loss: 1.195091827503879     
+Epoch 17/50, Loss: 1.1813896141079798     
+Epoch 18/50, Loss: 1.1688481435835585     
+Epoch 19/50, Loss: 1.1573559775650142     
+Epoch 20/50, Loss: 1.146813897859682     
+Epoch 21/50, Loss: 1.1371333718222916     
+Epoch 22/50, Loss: 1.1282352358947567     
+Epoch 23/50, Loss: 1.1200485628166992     
+Epoch 24/50, Loss: 1.1125096839777806     
+Epoch 25/50, Loss: 1.1055613432347324     
+Epoch 26/50, Loss: 1.0991519624762673     
+Epoch 27/50, Loss: 1.0932350024630924     
+Epoch 28/50, Loss: 1.0877684051366125     
+Epoch 29/50, Loss: 1.0827141057889027     
+Epoch 30/50, Loss: 1.0780376053058558     
+Epoch 31/50, Loss: 1.073707594205433     
+Epoch 32/50, Loss: 1.0696956214500262     
+Epoch 33/50, Loss: 1.0659758020616812     
+Epoch 34/50, Loss: 1.0625245584479275     
+Epoch 35/50, Loss: 1.0593203910842381     
+Epoch 36/50, Loss: 1.0563436748207888     
+Epoch 37/50, Loss: 1.053576477606102     
+Epoch 38/50, Loss: 1.0510023988646127     
+Epoch 39/50, Loss: 1.0486064251423082     
+Epoch 40/50, Loss: 1.0463748009556026     
+Epoch 41/50, Loss: 1.0442949130522783     
+Epoch 42/50, Loss: 1.0423551865274108     
+Epoch 43/50, Loss: 1.0405449914377307     
+Epoch 44/50, Loss: 1.038854558730118     
+Epoch 45/50, Loss: 1.0372749044482332     
+Epoch 46/50, Loss: 1.0357977613091607     
+Epoch 47/50, Loss: 1.0344155168525275     
+Epoch 48/50, Loss: 1.0331211574603818     
+Epoch 49/50, Loss: 1.0319082176291918     
+Epoch 50/50, Loss: 1.0307707339476924    
+
+The autoencoder’s performance improved consistently over the epochs, but its effect on classification performance was suboptimal.
+
+- **Similar Accuracy with Different Hyperparameters**: An unusual observation is that similar accuracy results were achieved by using a learning rate of 0.01 and 10 epochs compared to 200 epochs and a learning rate of 0.2. This suggests that increasing the number of epochs and the learning rate did not result in improved accuracy, which could indicate that the model was overfitting or that the dataset is not sensitive to higher learning rates and longer training periods.
+  
+- **Best Activation Function: Sigmoid**: During the training process, the **sigmoid** activation function yielded the best results. This might be due to its ability to map outputs to a restricted range (0, 1), which works well in the context of an autoencoder where we aim to compress information and reconstruct the input accurately.
+
+The KNN model performed better without dimensionality reduction, suggesting that the autoencoder did not manage to retain enough useful information for the classification task. However, the reduced dataset resulted in faster inference times. 
 
 
 
+Epoch 0, Train Loss: 4.6611, Train Accuracy: 0.0284, Validation Accuracy: 0.0284    
+Epoch 1, Train Loss: 4.6142, Train Accuracy: 0.0422, Validation Accuracy: 0.0424    
+Epoch 2, Train Loss: 4.5588, Train Accuracy: 0.0494, Validation Accuracy: 0.0504    
+Epoch 3, Train Loss: 4.5001, Train Accuracy: 0.0590, Validation Accuracy: 0.0590    
+Epoch 4, Train Loss: 4.4364, Train Accuracy: 0.0711, Validation Accuracy: 0.0732    
+Epoch 5, Train Loss: 4.3591, Train Accuracy: 0.0795, Validation Accuracy: 0.0814    
+Epoch 6, Train Loss: 4.2994, Train Accuracy: 0.0875, Validation Accuracy: 0.0856    
+Epoch 7, Train Loss: 4.2509, Train Accuracy: 0.0937, Validation Accuracy: 0.0937    
+Epoch 8, Train Loss: 4.2035, Train Accuracy: 0.1015, Validation Accuracy: 0.1011    
+Epoch 9, Train Loss: 4.1601, Train Accuracy: 0.1106, Validation Accuracy: 0.1135    
+Epoch 10, Train Loss: 4.1255, Train Accuracy: 0.1159, Validation Accuracy: 0.1152    
+Epoch 11, Train Loss: 4.0851, Train Accuracy: 0.1165, Validation Accuracy: 0.1183    
+Epoch 12, Train Loss: 4.0427, Train Accuracy: 0.1218, Validation Accuracy: 0.1204    
+Epoch 13, Train Loss: 4.0031, Train Accuracy: 0.1270, Validation Accuracy: 0.1296    
+Epoch 14, Train Loss: 3.9584, Train Accuracy: 0.1293, Validation Accuracy: 0.1297    
+Epoch 15, Train Loss: 3.9193, Train Accuracy: 0.1324, Validation Accuracy: 0.1341   
+Epoch 16, Train Loss: 3.8784, Train Accuracy: 0.1407, Validation Accuracy: 0.1422   
+Epoch 17, Train Loss: 3.8436, Train Accuracy: 0.1413, Validation Accuracy: 0.1422    
+Epoch 18, Train Loss: 3.7834, Train Accuracy: 0.1454, Validation Accuracy: 0.1503    
+Epoch 19, Train Loss: 3.7368, Train Accuracy: 0.1538, Validation Accuracy: 0.1551    
+Epoch 20, Train Loss: 3.6829, Train Accuracy: 0.1619, Validation Accuracy: 0.1636    
+Epoch 21, Train Loss: 3.6554, Train Accuracy: 0.1612, Validation Accuracy: 0.1643   
+Epoch 22, Train Loss: 3.5942, Train Accuracy: 0.1720, Validation Accuracy: 0.1739   
+Epoch 23, Train Loss: 3.5529, Train Accuracy: 0.1781, Validation Accuracy: 0.1795    
+Epoch 24, Train Loss: 3.5299, Train Accuracy: 0.1766, Validation Accuracy: 0.1801    
+Epoch 25, Train Loss: 3.4887, Train Accuracy: 0.1852, Validation Accuracy: 0.1907    
+Epoch 26, Train Loss: 3.4565, Train Accuracy: 0.1883, Validation Accuracy: 0.1885    
+Epoch 27, Train Loss: 3.4267, Train Accuracy: 0.1900, Validation Accuracy: 0.1916    
+Epoch 28, Train Loss: 3.4136, Train Accuracy: 0.1893, Validation Accuracy: 0.1918    
+Epoch 29, Train Loss: 3.3789, Train Accuracy: 0.1957, Validation Accuracy: 0.1959    
+Epoch 30, Train Loss: 3.3574, Train Accuracy: 0.1994, Validation Accuracy: 0.1977    
+Epoch 31, Train Loss: 3.3391, Train Accuracy: 0.2003, Validation Accuracy: 0.2032    
+Epoch 32, Train Loss: 3.3114, Train Accuracy: 0.2068, Validation Accuracy: 0.2082   
+Epoch 33, Train Loss: 3.2833, Train Accuracy: 0.2103, Validation Accuracy: 0.2118     
+Epoch 34, Train Loss: 3.2731, Train Accuracy: 0.2130, Validation Accuracy: 0.2091     
+Epoch 35, Train Loss: 3.2768, Train Accuracy: 0.2079, Validation Accuracy: 0.2075   
+Epoch 36, Train Loss: 3.2289, Train Accuracy: 0.2147, Validation Accuracy: 0.2162    
+Epoch 37, Train Loss: 3.2190, Train Accuracy: 0.2188, Validation Accuracy: 0.2162    
+Epoch 38, Train Loss: 3.1923, Train Accuracy: 0.2239, Validation Accuracy: 0.2249    
+Epoch 39, Train Loss: 3.1920, Train Accuracy: 0.2224, Validation Accuracy: 0.2205    
+Epoch 40, Train Loss: 3.1569, Train Accuracy: 0.2281, Validation Accuracy: 0.2300    
+Epoch 41, Train Loss: 3.1542, Train Accuracy: 0.2275, Validation Accuracy: 0.2268    
+Epoch 42, Train Loss: 3.1404, Train Accuracy: 0.2287, Validation Accuracy: 0.2292    
+Epoch 43, Train Loss: 3.1424, Train Accuracy: 0.2283, Validation Accuracy: 0.2278   
+Epoch 44, Train Loss: 3.1213, Train Accuracy: 0.2327, Validation Accuracy: 0.2331    
+Epoch 45, Train Loss: 3.0988, Train Accuracy: 0.2366, Validation Accuracy: 0.2358    
+Epoch 46, Train Loss: 3.1008, Train Accuracy: 0.2354, Validation Accuracy: 0.2324   
+Epoch 47, Train Loss: 3.0877, Train Accuracy: 0.2372, Validation Accuracy: 0.2344   
+Epoch 48, Train Loss: 3.0772, Train Accuracy: 0.2391, Validation Accuracy: 0.2381   
+Epoch 49, Train Loss: 3.0718, Train Accuracy: 0.2387, Validation Accuracy: 0.2397   
+Epoch 50, Train Loss: 3.0766, Train Accuracy: 0.2376, Validation Accuracy: 0.2383   
+Epoch 51, Train Loss: 3.0447, Train Accuracy: 0.2444, Validation Accuracy: 0.2442   
+Epoch 52, Train Loss: 3.0656, Train Accuracy: 0.2389, Validation Accuracy: 0.2370   
+Epoch 53, Train Loss: 3.0437, Train Accuracy: 0.2433, Validation Accuracy: 0.2442   
+Epoch 54, Train Loss: 3.0401, Train Accuracy: 0.2426, Validation Accuracy: 0.2438   
+Epoch 55, Train Loss: 3.0299, Train Accuracy: 0.2462, Validation Accuracy: 0.2486   
+Epoch 56, Train Loss: 3.0315, Train Accuracy: 0.2419, Validation Accuracy: 0.2410   
+Epoch 57, Train Loss: 3.0197, Train Accuracy: 0.2477, Validation Accuracy: 0.2449   
+Epoch 58, Train Loss: 3.0271, Train Accuracy: 0.2428, Validation Accuracy: 0.2462   
+Epoch 59, Train Loss: 3.0135, Train Accuracy: 0.2458, Validation Accuracy: 0.2467   
+Epoch 60, Train Loss: 3.0056, Train Accuracy: 0.2504, Validation Accuracy: 0.2515   
+Epoch 61, Train Loss: 2.9940, Train Accuracy: 0.2514, Validation Accuracy: 0.2528   
+Epoch 62, Train Loss: 3.0000, Train Accuracy: 0.2477, Validation Accuracy: 0.2476  
+Epoch 63, Train Loss: 2.9880, Train Accuracy: 0.2523, Validation Accuracy: 0.2499    
+Epoch 64, Train Loss: 2.9934, Train Accuracy: 0.2534, Validation Accuracy: 0.2488  
+Epoch 65, Train Loss: 2.9800, Train Accuracy: 0.2535, Validation Accuracy: 0.2529  
+Epoch 66, Train Loss: 2.9910, Train Accuracy: 0.2494, Validation Accuracy: 0.2508  
+Epoch 67, Train Loss: 2.9746, Train Accuracy: 0.2524, Validation Accuracy: 0.2528  
+Epoch 68, Train Loss: 2.9702, Train Accuracy: 0.2553, Validation Accuracy: 0.2549    
+Epoch 69, Train Loss: 2.9774, Train Accuracy: 0.2542, Validation Accuracy: 0.2489    
+Epoch 70, Train Loss: 2.9597, Train Accuracy: 0.2562, Validation Accuracy: 0.2548   
+Epoch 71, Train Loss: 2.9568, Train Accuracy: 0.2571, Validation Accuracy: 0.2556   
+Epoch 72, Train Loss: 2.9551, Train Accuracy: 0.2582, Validation Accuracy: 0.2593   
+Epoch 73, Train Loss: 2.9694, Train Accuracy: 0.2548, Validation Accuracy: 0.2548   
+Epoch 74, Train Loss: 2.9428, Train Accuracy: 0.2591, Validation Accuracy: 0.2562   
+Epoch 75, Train Loss: 2.9452, Train Accuracy: 0.2593, Validation Accuracy: 0.2611    
+Epoch 76, Train Loss: 2.9519, Train Accuracy: 0.2562, Validation Accuracy: 0.2544    
+Epoch 77, Train Loss: 2.9298, Train Accuracy: 0.2610, Validation Accuracy: 0.2609   
+Epoch 78, Train Loss: 2.9383, Train Accuracy: 0.2593, Validation Accuracy: 0.2581    
+Epoch 79, Train Loss: 2.9269, Train Accuracy: 0.2607, Validation Accuracy: 0.2604  
+Epoch 80, Train Loss: 2.9399, Train Accuracy: 0.2549, Validation Accuracy: 0.2561   
+Epoch 81, Train Loss: 2.9338, Train Accuracy: 0.2607, Validation Accuracy: 0.2584      
+Epoch 82, Train Loss: 2.9193, Train Accuracy: 0.2607, Validation Accuracy: 0.2618   
+Epoch 83, Train Loss: 2.9185, Train Accuracy: 0.2629, Validation Accuracy: 0.2616    
+Epoch 84, Train Loss: 2.9199, Train Accuracy: 0.2625, Validation Accuracy: 0.2594       
+Epoch 85, Train Loss: 2.9077, Train Accuracy: 0.2631, Validation Accuracy: 0.2582     
+Epoch 86, Train Loss: 2.9404, Train Accuracy: 0.2554, Validation Accuracy: 0.2519     
+Epoch 87, Train Loss: 2.9135, Train Accuracy: 0.2609, Validation Accuracy: 0.2574    
+Epoch 88, Train Loss: 2.9087, Train Accuracy: 0.2638, Validation Accuracy: 0.2616    
+Epoch 89, Train Loss: 2.8975, Train Accuracy: 0.2647, Validation Accuracy: 0.2615    
+Epoch 90, Train Loss: 2.9002, Train Accuracy: 0.2631, Validation Accuracy: 0.2628    
+Epoch 91, Train Loss: 2.9031, Train Accuracy: 0.2643, Validation Accuracy: 0.2607    
+Epoch 92, Train Loss: 2.9288, Train Accuracy: 0.2599, Validation Accuracy: 0.2591    
+Epoch 93, Train Loss: 2.8896, Train Accuracy: 0.2672, Validation Accuracy: 0.2592        
+Epoch 94, Train Loss: 2.8895, Train Accuracy: 0.2656, Validation Accuracy: 0.2624    
+Epoch 95, Train Loss: 2.8793, Train Accuracy: 0.2688, Validation Accuracy: 0.2674    
+Epoch 96, Train Loss: 2.8795, Train Accuracy: 0.2668, Validation Accuracy: 0.2664    
+Epoch 97, Train Loss: 2.9060, Train Accuracy: 0.2641, Validation Accuracy: 0.2594    
+Epoch 98, Train Loss: 2.8859, Train Accuracy: 0.2651, Validation Accuracy: 0.2637        
+Epoch 99, Train Loss: 2.8848, Train Accuracy: 0.2667, Validation Accuracy: 0.2664    
 
 
-Epoch 1/10, Loss: 6.259334192820956
-Epoch 2/10, Loss: 5.548498327557013
-Epoch 3/10, Loss: 4.964977160225369
-Epoch 4/10, Loss: 4.483288198096867
-Epoch 5/10, Loss: 4.082735406606526
-Epoch 6/10, Loss: 3.7468096620742517
-Epoch 7/10, Loss: 3.462558163379566
-Epoch 8/10, Loss: 3.219918084870864
-Epoch 9/10, Loss: 3.011087371211398
-Epoch 10/10, Loss: 2.829989667505953
+### Comparison of KNN and MLP Classification Metrics
 
-Classification Task Scores Without Auto Encoders
+| Metric          | Value                    |
+|------------------|--------------------------|
+| Test Accuracy     | 0.2578                   |
+| Precision         | 0.2379                   |
+| Recall            | 0.2503                   |
+| F1 Score          | 0.2439                   |
+#### Configuration for MLP Model:
+```python
+config = {
+    "hidden_layers": [32, 64],
+    "lr": 0.01,
+    "activation": "relu",
+    "optimizer": "mbgd",
+    "max_epochs": 100,
+    "batch_size": 16,
+}
+```
 
-Accuracy: 0.2561
-  Precision (macro): 0.2340
-  Recall (macro): 0.2472
-  F1-Score (macro): 0.2405
-  Precision (micro): 0.2561
-  Recall (micro): 0.2561
-  F1-Score (micro): 0.2561
-time_taken1=55.996248960494995
+#### Performance Metrics for KNN and MLP Classifier:
 
-Classification Task Scores
+| Metric                  | KNN (without reduction) | KNN (with Autoencoder) | MLP Classification     |
+|-------------------------|-------------------------|------------------------|------------------------|
+| **Accuracy**             | 0.2561                  | 0.1601                 | 0.2578                 |
+| **Precision (macro)**    | 0.2340                  | 0.1359                 | 0.2379                 |
+| **Precision (micro)**    | 0.2561                  | 0.1601                 | 0.2578                 |
+| **Recall (macro)**       | 0.2472                  | 0.1552                 | 0.2503                 |
+| **Recall (micro)**       | 0.2561                  | 0.1601                 | 0.2578                 |
+| **F1-Score (macro)**     | 0.2405                  | 0.1449                 | 0.2439                 |
+| **F1-Score (micro)**     | 0.2561                  | 0.1601                 | 0.2578                 |
+| **Time Taken (s)**       | 71.1714                 | 63.4309                | Not reported           |
 
-Accuracy: 0.1402
-  Precision (macro): 0.1161
-  Recall (macro): 0.1356
-  F1-Score (macro): 0.1251
-  Precision (micro): 0.1402
-  Recall (micro): 0.1402
-  F1-Score (micro): 0.1402
-time_taken2=46.165589809417725
+### Analysis:
 
-Note, similar accuracy using 10 epochs, 0.01 vs 200 epochs, 0.2 grad descent, which is weird, best with sigmoid
+1. **Accuracy**: 
+   - The MLP classifier achieved a slightly higher accuracy (0.2578) than both the KNN (without reduction) at 0.2561 and KNN with autoencoder at 0.1601. The difference in accuracy between MLP and KNN without reduction is minor, but the performance of KNN drastically drops when dimensionality reduction is applied.
 
-Epoch 0, Train Loss: 0.0576, Train MSE: 0.0576, Validation MSE: 0.0649
-Epoch 10, Train Loss: 0.0688, Train MSE: 0.0688, Validation MSE: 0.0768
-Epoch 20, Train Loss: 0.0687, Train MSE: 0.0687, Validation MSE: 0.0774
-Epoch 30, Train Loss: 0.0686, Train MSE: 0.0686, Validation MSE: 0.0777
-Epoch 40, Train Loss: 0.0686, Train MSE: 0.0686, Validation MSE: 0.0781
-Epoch 50, Train Loss: 0.0687, Train MSE: 0.0687, Validation MSE: 0.0786
-Early stopping at epoch 52
-MSE: 0.01242521717995083            
-MAE: 0.07777702730961404            
-RMSE: 0.1114684582290023            
-R2 Score: 0.7153900598629171
-Epoch 1/10, Loss: 3.4216108860291494
-Epoch 2/10, Loss: 2.612487385441516
-Epoch 3/10, Loss: 2.177920321281458
-Epoch 4/10, Loss: 1.9097271345974087
-Epoch 5/10, Loss: 1.729737250342207
-Epoch 6/10, Loss: 1.601862523298113
-Epoch 7/10, Loss: 1.506940171627335
-Epoch 8/10, Loss: 1.4344477427370441
-Epoch 9/10, Loss: 1.3781229710056127
-Epoch 10/10, Loss: 1.3338152897677653
-Classification Task Scores
----------------------------
-Accuracy: 0.2561
-  Precision (macro): 0.2340
-  Recall (macro): 0.2472
-  F1-Score (macro): 0.2405
-  Precision (micro): 0.2561
-  Recall (micro): 0.2561
-  F1-Score (micro): 0.2561
----------------------------
-time_taken1=71.2023024559021
-Classification Task Scores
----------------------------
-Accuracy: 0.1168
-  Precision (macro): 0.0929
-  Recall (macro): 0.1132
-  F1-Score (macro): 0.1021
-  Precision (micro): 0.1168
-  Recall (micro): 0.1168
-  F1-Score (micro): 0.1168
----------------------------
-time_taken2=60.10706067085266
+2. **Precision (macro and micro)**:
+   - MLP achieved a macro precision of 0.2379, which is slightly better than KNN without reduction (0.2340) and much better than KNN with autoencoder (0.1359). The micro precision follows a similar trend, with MLP showing marginal improvements over KNN without reduction and outperforming the autoencoder version.
 
+3. **Recall (macro and micro)**:
+   - In terms of recall, MLP performs slightly better than KNN without reduction in both macro and micro settings (MLP macro recall 0.2503 vs. KNN without reduction macro recall 0.2472). KNN with autoencoder once again shows much lower performance (0.1552 for macro recall).
 
-Epoch 0, Train Loss: 4.6611, Train Accuracy: 0.0284, Validation Accuracy: 0.0284
-Epoch 1, Train Loss: 4.6142, Train Accuracy: 0.0422, Validation Accuracy: 0.0424
-Epoch 2, Train Loss: 4.5588, Train Accuracy: 0.0494, Validation Accuracy: 0.0504
-Epoch 3, Train Loss: 4.5001, Train Accuracy: 0.0590, Validation Accuracy: 0.0590
-Epoch 4, Train Loss: 4.4364, Train Accuracy: 0.0711, Validation Accuracy: 0.0732
-Epoch 5, Train Loss: 4.3591, Train Accuracy: 0.0795, Validation Accuracy: 0.0814
-Epoch 6, Train Loss: 4.2994, Train Accuracy: 0.0875, Validation Accuracy: 0.0856
-Epoch 7, Train Loss: 4.2509, Train Accuracy: 0.0937, Validation Accuracy: 0.0937
-Epoch 8, Train Loss: 4.2035, Train Accuracy: 0.1015, Validation Accuracy: 0.1011
-Epoch 9, Train Loss: 4.1601, Train Accuracy: 0.1106, Validation Accuracy: 0.1135
-Epoch 10, Train Loss: 4.1255, Train Accuracy: 0.1159, Validation Accuracy: 0.1152
-Epoch 11, Train Loss: 4.0851, Train Accuracy: 0.1165, Validation Accuracy: 0.1183
-Epoch 12, Train Loss: 4.0427, Train Accuracy: 0.1218, Validation Accuracy: 0.1204
-Epoch 13, Train Loss: 4.0031, Train Accuracy: 0.1270, Validation Accuracy: 0.1296
-Epoch 14, Train Loss: 3.9584, Train Accuracy: 0.1293, Validation Accuracy: 0.1297
-Epoch 15, Train Loss: 3.9193, Train Accuracy: 0.1324, Validation Accuracy: 0.1341
-Epoch 16, Train Loss: 3.8784, Train Accuracy: 0.1407, Validation Accuracy: 0.1422
-Epoch 17, Train Loss: 3.8436, Train Accuracy: 0.1413, Validation Accuracy: 0.1422
-Epoch 18, Train Loss: 3.7834, Train Accuracy: 0.1454, Validation Accuracy: 0.1503
-Epoch 19, Train Loss: 3.7368, Train Accuracy: 0.1538, Validation Accuracy: 0.1551
-Epoch 20, Train Loss: 3.6829, Train Accuracy: 0.1619, Validation Accuracy: 0.1636
-Epoch 21, Train Loss: 3.6554, Train Accuracy: 0.1612, Validation Accuracy: 0.1643
-Epoch 22, Train Loss: 3.5942, Train Accuracy: 0.1720, Validation Accuracy: 0.1739
-Epoch 23, Train Loss: 3.5529, Train Accuracy: 0.1781, Validation Accuracy: 0.1795
-Epoch 24, Train Loss: 3.5299, Train Accuracy: 0.1766, Validation Accuracy: 0.1801
-Epoch 25, Train Loss: 3.4887, Train Accuracy: 0.1852, Validation Accuracy: 0.1907
-Epoch 26, Train Loss: 3.4565, Train Accuracy: 0.1883, Validation Accuracy: 0.1885
-Epoch 27, Train Loss: 3.4267, Train Accuracy: 0.1900, Validation Accuracy: 0.1916
-Epoch 28, Train Loss: 3.4136, Train Accuracy: 0.1893, Validation Accuracy: 0.1918
-Epoch 29, Train Loss: 3.3789, Train Accuracy: 0.1957, Validation Accuracy: 0.1959
-Epoch 30, Train Loss: 3.3574, Train Accuracy: 0.1994, Validation Accuracy: 0.1977
-Epoch 31, Train Loss: 3.3391, Train Accuracy: 0.2003, Validation Accuracy: 0.2032
-Epoch 32, Train Loss: 3.3114, Train Accuracy: 0.2068, Validation Accuracy: 0.2082
-Epoch 33, Train Loss: 3.2833, Train Accuracy: 0.2103, Validation Accuracy: 0.2118
-Epoch 34, Train Loss: 3.2731, Train Accuracy: 0.2130, Validation Accuracy: 0.2091
-Epoch 35, Train Loss: 3.2768, Train Accuracy: 0.2079, Validation Accuracy: 0.2075
-Epoch 36, Train Loss: 3.2289, Train Accuracy: 0.2147, Validation Accuracy: 0.2162
-Epoch 37, Train Loss: 3.2190, Train Accuracy: 0.2188, Validation Accuracy: 0.2162
-Epoch 38, Train Loss: 3.1923, Train Accuracy: 0.2239, Validation Accuracy: 0.2249
-Epoch 39, Train Loss: 3.1920, Train Accuracy: 0.2224, Validation Accuracy: 0.2205
-Epoch 40, Train Loss: 3.1569, Train Accuracy: 0.2281, Validation Accuracy: 0.2300
-Epoch 41, Train Loss: 3.1542, Train Accuracy: 0.2275, Validation Accuracy: 0.2268
-Epoch 42, Train Loss: 3.1404, Train Accuracy: 0.2287, Validation Accuracy: 0.2292
-Epoch 43, Train Loss: 3.1424, Train Accuracy: 0.2283, Validation Accuracy: 0.2278
-Epoch 44, Train Loss: 3.1213, Train Accuracy: 0.2327, Validation Accuracy: 0.2331
-Epoch 45, Train Loss: 3.0988, Train Accuracy: 0.2366, Validation Accuracy: 0.2358
-Epoch 46, Train Loss: 3.1008, Train Accuracy: 0.2354, Validation Accuracy: 0.2324
-Epoch 47, Train Loss: 3.0877, Train Accuracy: 0.2372, Validation Accuracy: 0.2344
-Epoch 48, Train Loss: 3.0772, Train Accuracy: 0.2391, Validation Accuracy: 0.2381
-Epoch 49, Train Loss: 3.0718, Train Accuracy: 0.2387, Validation Accuracy: 0.2397
-Epoch 50, Train Loss: 3.0766, Train Accuracy: 0.2376, Validation Accuracy: 0.2383
-Epoch 51, Train Loss: 3.0447, Train Accuracy: 0.2444, Validation Accuracy: 0.2442
-Epoch 52, Train Loss: 3.0656, Train Accuracy: 0.2389, Validation Accuracy: 0.2370
-Epoch 53, Train Loss: 3.0437, Train Accuracy: 0.2433, Validation Accuracy: 0.2442
-Epoch 54, Train Loss: 3.0401, Train Accuracy: 0.2426, Validation Accuracy: 0.2438
-Epoch 55, Train Loss: 3.0299, Train Accuracy: 0.2462, Validation Accuracy: 0.2486
-Epoch 56, Train Loss: 3.0315, Train Accuracy: 0.2419, Validation Accuracy: 0.2410
-Epoch 57, Train Loss: 3.0197, Train Accuracy: 0.2477, Validation Accuracy: 0.2449
-Epoch 58, Train Loss: 3.0271, Train Accuracy: 0.2428, Validation Accuracy: 0.2462
-Epoch 59, Train Loss: 3.0135, Train Accuracy: 0.2458, Validation Accuracy: 0.2467
-Epoch 60, Train Loss: 3.0056, Train Accuracy: 0.2504, Validation Accuracy: 0.2515
-Epoch 61, Train Loss: 2.9940, Train Accuracy: 0.2514, Validation Accuracy: 0.2528
-Epoch 62, Train Loss: 3.0000, Train Accuracy: 0.2477, Validation Accuracy: 0.2476
-Epoch 63, Train Loss: 2.9880, Train Accuracy: 0.2523, Validation Accuracy: 0.2499
-Epoch 64, Train Loss: 2.9934, Train Accuracy: 0.2534, Validation Accuracy: 0.2488
-Epoch 65, Train Loss: 2.9800, Train Accuracy: 0.2535, Validation Accuracy: 0.2529
-Epoch 66, Train Loss: 2.9910, Train Accuracy: 0.2494, Validation Accuracy: 0.2508
-Epoch 67, Train Loss: 2.9746, Train Accuracy: 0.2524, Validation Accuracy: 0.2528
-Epoch 68, Train Loss: 2.9702, Train Accuracy: 0.2553, Validation Accuracy: 0.2549
-Epoch 69, Train Loss: 2.9774, Train Accuracy: 0.2542, Validation Accuracy: 0.2489
-Epoch 70, Train Loss: 2.9597, Train Accuracy: 0.2562, Validation Accuracy: 0.2548
-Epoch 71, Train Loss: 2.9568, Train Accuracy: 0.2571, Validation Accuracy: 0.2556
-Epoch 72, Train Loss: 2.9551, Train Accuracy: 0.2582, Validation Accuracy: 0.2593
-Epoch 73, Train Loss: 2.9694, Train Accuracy: 0.2548, Validation Accuracy: 0.2548
-Epoch 74, Train Loss: 2.9428, Train Accuracy: 0.2591, Validation Accuracy: 0.2562
-Epoch 75, Train Loss: 2.9452, Train Accuracy: 0.2593, Validation Accuracy: 0.2611
-Epoch 76, Train Loss: 2.9519, Train Accuracy: 0.2562, Validation Accuracy: 0.2544
-Epoch 77, Train Loss: 2.9298, Train Accuracy: 0.2610, Validation Accuracy: 0.2609
-Epoch 78, Train Loss: 2.9383, Train Accuracy: 0.2593, Validation Accuracy: 0.2581
-Epoch 79, Train Loss: 2.9269, Train Accuracy: 0.2607, Validation Accuracy: 0.2604
-Epoch 80, Train Loss: 2.9399, Train Accuracy: 0.2549, Validation Accuracy: 0.2561
-Epoch 81, Train Loss: 2.9338, Train Accuracy: 0.2607, Validation Accuracy: 0.2584
-Epoch 82, Train Loss: 2.9193, Train Accuracy: 0.2607, Validation Accuracy: 0.2618
-Epoch 83, Train Loss: 2.9185, Train Accuracy: 0.2629, Validation Accuracy: 0.2616
-Epoch 84, Train Loss: 2.9199, Train Accuracy: 0.2625, Validation Accuracy: 0.2594
-Epoch 85, Train Loss: 2.9077, Train Accuracy: 0.2631, Validation Accuracy: 0.2582
-Epoch 86, Train Loss: 2.9404, Train Accuracy: 0.2554, Validation Accuracy: 0.2519
-Epoch 87, Train Loss: 2.9135, Train Accuracy: 0.2609, Validation Accuracy: 0.2574
-Epoch 88, Train Loss: 2.9087, Train Accuracy: 0.2638, Validation Accuracy: 0.2616
-Epoch 89, Train Loss: 2.8975, Train Accuracy: 0.2647, Validation Accuracy: 0.2615
-Epoch 90, Train Loss: 2.9002, Train Accuracy: 0.2631, Validation Accuracy: 0.2628
-Epoch 91, Train Loss: 2.9031, Train Accuracy: 0.2643, Validation Accuracy: 0.2607
-Epoch 92, Train Loss: 2.9288, Train Accuracy: 0.2599, Validation Accuracy: 0.2591
-Epoch 93, Train Loss: 2.8896, Train Accuracy: 0.2672, Validation Accuracy: 0.2592
-Epoch 94, Train Loss: 2.8895, Train Accuracy: 0.2656, Validation Accuracy: 0.2624
-Epoch 95, Train Loss: 2.8793, Train Accuracy: 0.2688, Validation Accuracy: 0.2674
-Epoch 96, Train Loss: 2.8795, Train Accuracy: 0.2668, Validation Accuracy: 0.2664
-Epoch 97, Train Loss: 2.9060, Train Accuracy: 0.2641, Validation Accuracy: 0.2594
-Epoch 98, Train Loss: 2.8859, Train Accuracy: 0.2651, Validation Accuracy: 0.2637
-Epoch 99, Train Loss: 2.8848, Train Accuracy: 0.2667, Validation Accuracy: 0.2664
-Test Accuracy: 0.25776281331836887
-Precision: 0.237878828969582
-Recall: 0.25033297455881737
-F1 Score: 0.24394705089124158
+4. **F1-Score (macro and micro)**:
+   - MLP's macro and micro F1-scores are again slightly better than KNN without reduction. However, the KNN with autoencoder reduction significantly drops in performance.
+
+The MLP classifier slightly outperforms KNN without dimensionality reduction in terms of accuracy, precision, recall, and F1-score.
+
+1. **MLP Inference vs. Training**: 
+   - **MLP inference** is much faster once the model is trained because it only involves a forward pass through the network, which is computationally light compared to KNN's distance calculations. However, **MLP training** is much slower due to the need for multiple forward and backward passes, weight updates, and gradient descent optimization. This makes MLP more time-consuming during training but highly efficient during inference.
+
+2. **KNN Training vs. Inference**: 
+   - **KNN trains almost instantly** because it essentially memorizes the entire training dataset without performing any learning or parameter updates. However, **KNN inference** is much slower since it requires computing distances between the test point and all training points for every query, making it computationally expensive for large datasets. In other words, KNN's inference time scales poorly with dataset size.
+
+### Hyperparameter Tuning:
+- **Better hyperparameter tuning** can further improve the MLP's performance. Tuning factors such as learning rate, batch size, number of hidden layers, and activation functions can significantly enhance the model's ability to generalize and perform well on unseen data.

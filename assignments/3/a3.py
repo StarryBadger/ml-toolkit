@@ -1,3 +1,4 @@
+import os
 import time
 import copy
 import json
@@ -370,14 +371,13 @@ def train_and_log_regression(project="SMAI_A3", config=None):
             best_validation_mse = mse
             best_model_params_regression = dict(config)
 
+
 def train_and_log_multi_label_classification(project="SMAI_A3", config=None):
-    # Initialize the run for sweeps
     with wandb.init(config=config):
         config = wandb.config
         config_dict = dict(config)
         wandb.run.name = f"{config_dict['optimizer']}_{config_dict['activation']}_{len(config_dict['hidden_layers'])}_{config_dict['lr']}_{config_dict['batch_size']}_{config_dict['max_epochs']}"
 
-        # Initialize the MLP classifier with the W&B configuration
         model = MultiLabelMLP(
             input_size=X_train.shape[1],
             hidden_layers=config.hidden_layers,
@@ -428,8 +428,9 @@ def train_and_log_multi_label_classification(project="SMAI_A3", config=None):
             best_model_params = dict(config)
 
 
-
-def print_hyperparams_wineqt(file_path="data/interim/3/WineQT/hyperparams_2fd1o2fl.csv"):
+def print_hyperparams_wineqt(
+    file_path="data/interim/3/WineQT/hyperparams_2fd1o2fl.csv",
+):
     df = pd.read_csv(file_path)
 
     metrics_df = df[
@@ -465,9 +466,10 @@ def print_hyperparams_wineqt(file_path="data/interim/3/WineQT/hyperparams_2fd1o2
     print(markdown_table)
     metrics_df.to_markdown("temp.md", index=False)
 
-import pandas as pd
 
-def print_hyperparams_housing(file_path="data/interim/3/HousingData/hyperparams_jdqz1le1.csv"):
+def print_hyperparams_housing(
+    file_path="data/interim/3/HousingData/hyperparams_jdqz1le1.csv",
+):
     df = pd.read_csv(file_path)
     metrics_df = df[
         [
@@ -504,8 +506,9 @@ def print_hyperparams_housing(file_path="data/interim/3/HousingData/hyperparams_
     metrics_df.to_markdown("temp.md", index=False)
 
 
-
-def print_hyperparams_advertisement(file_path="data/interim/3/advertisement/hyperparams_2hry5c8h.csv"):
+def print_hyperparams_advertisement(
+    file_path="data/interim/3/advertisement/hyperparams_2hry5c8h.csv",
+):
     df = pd.read_csv(file_path)
 
     metrics_df = df[
@@ -522,8 +525,7 @@ def print_hyperparams_advertisement(file_path="data/interim/3/advertisement/hype
             "precision_val_final",
             "recall_val_final",
             "hamming_accuracy",
-            "hamming_loss"
-
+            "hamming_loss",
         ]
     ]
     metrics_df.columns = [
@@ -539,12 +541,13 @@ def print_hyperparams_advertisement(file_path="data/interim/3/advertisement/hype
         "Precision",
         "Recall",
         "Hamming Accuracy",
-        "Hamming Loss"
+        "Hamming Loss",
     ]
 
     markdown_table = metrics_df.to_markdown(index=False)
     print(markdown_table)
     metrics_df.to_markdown("temp.md", index=False)
+
 
 def test_on_best_wineqt():
     with open("data/interim/3/WineQT/best_model_config.json", "r") as file:
@@ -586,15 +589,17 @@ def test_on_best_wineqt():
           \nF1 Score: {f1_score}"
     )
 
+
 def analyze_model_impact():
     with open("data/interim/3/WineQT/best_model_config.json", "r") as file:
         best_config = json.load(file)
+
     def plot_loss_vs_epochs(experiments, title, save_path):
         plt.figure(figsize=(10, 6))
         for label, losses in experiments.items():
             plt.plot(losses, label=label)
-        plt.xlabel('Epochs')
-        plt.ylabel('Loss')
+        plt.xlabel("Epochs")
+        plt.ylabel("Loss")
         plt.title(title)
         plt.legend()
         plt.savefig(save_path)
@@ -602,7 +607,7 @@ def analyze_model_impact():
 
     # Effect of Non-linearity (Activation Function)
     def analyze_activation_impact():
-        activations = ['sigmoid', 'relu', 'tanh', 'linear']
+        activations = ["sigmoid", "relu", "tanh", "linear"]
         experiments = {}
         for activation in activations:
             model = MLPClassifier(
@@ -613,7 +618,7 @@ def analyze_model_impact():
                 activation=activation,
                 optimizer=best_config["optimizer"],
                 print_every=10,
-                wandb_log=False
+                wandb_log=False,
             )
             costs = model.fit(
                 X_train,
@@ -626,7 +631,11 @@ def analyze_model_impact():
                 patience=best_config["max_epochs"] // 20,
             )
             experiments[activation] = costs
-        plot_loss_vs_epochs(experiments, 'Effect of Activation Function on Loss', 'assignments/3/figures/2.5.1.png')
+        plot_loss_vs_epochs(
+            experiments,
+            "Effect of Activation Function on Loss",
+            "assignments/3/figures/2.5.1.png",
+        )
 
     # Effect of Learning Rate
     def analyze_learning_rate_impact():
@@ -641,7 +650,7 @@ def analyze_model_impact():
                 activation=best_config["activation"],
                 optimizer=best_config["optimizer"],
                 print_every=10,
-                wandb_log=False
+                wandb_log=False,
             )
             costs = model.fit(
                 X_train,
@@ -653,8 +662,12 @@ def analyze_model_impact():
                 early_stopping=True,
                 patience=best_config["max_epochs"] // 20,
             )
-            experiments[f'LR={lr}'] = costs
-        plot_loss_vs_epochs(experiments, 'Effect of Learning Rate on Loss', 'assignments/3/figures/2.5.2.png')
+            experiments[f"LR={lr}"] = costs
+        plot_loss_vs_epochs(
+            experiments,
+            "Effect of Learning Rate on Loss",
+            "assignments/3/figures/2.5.2.png",
+        )
 
     # Effect of Batch Size
     def analyze_batch_size_impact():
@@ -669,7 +682,7 @@ def analyze_model_impact():
                 activation=best_config["activation"],
                 optimizer=best_config["optimizer"],
                 print_every=10,
-                wandb_log=False
+                wandb_log=False,
             )
             costs = model.fit(
                 X_train,
@@ -681,12 +694,17 @@ def analyze_model_impact():
                 early_stopping=True,
                 patience=best_config["max_epochs"] // 20,
             )
-            experiments[f'Batch={batch_size}'] = costs
-        plot_loss_vs_epochs(experiments, 'Effect of Batch Size on Loss', 'assignments/3/figures/2.5.3.png')
+            experiments[f"Batch={batch_size}"] = costs
+        plot_loss_vs_epochs(
+            experiments,
+            "Effect of Batch Size on Loss",
+            "assignments/3/figures/2.5.3.png",
+        )
 
     analyze_activation_impact()
     analyze_learning_rate_impact()
     analyze_batch_size_impact()
+
 
 def test_on_best_housing():
 
@@ -733,6 +751,13 @@ def test_on_best_housing():
             \nR2 Score: {r2}"
     )
 
+    individual_mse = np.square(y_pred_test - y_test)  # Squared errors for each datapoint
+    for i, (x_vals, true, pred, mse) in enumerate(zip(X_test, y_test, y_pred_test, individual_mse)):
+        x_vals_str = ", ".join([f"{x:.6f}" for x in x_vals])  # Convert X_test row to a string
+        print(f"Datapoint {i+1} - X: [{x_vals_str}] - True: {true:.6f}, Predicted: {pred:.6f}, MSE: {mse:.6f}     ")
+
+
+
 def test_on_best_advertisement(index_to_label):
     with open("data/interim/3/advertisement/best_model_config.json", "r") as file:
         config = json.load(file)
@@ -744,7 +769,7 @@ def test_on_best_advertisement(index_to_label):
         activation=config["activation"],
         optimizer=config["optimizer"],
         wandb_log=False,
-        print_every=100
+        print_every=100,
     )
     costs = model.fit(
         X_train,
@@ -754,29 +779,37 @@ def test_on_best_advertisement(index_to_label):
         X_validation=X_validation,
         y_validation=y_validation,
         early_stopping=True,
-        patience=config["max_epochs"]// 20,
+        patience=config["max_epochs"] // 20,
     )
-    
+
     y_pred_test = model.predict(X_test)
 
     all_labels = []
 
     for multi_hot_vector in y_pred_test:
-        labels = [index_to_label[idx] for idx, value in enumerate(multi_hot_vector) if value == 1]
+        labels = [
+            index_to_label[idx]
+            for idx, value in enumerate(multi_hot_vector)
+            if value == 1
+        ]
         all_labels.append(labels)
 
-    print('Predictions',all_labels)
+    print("Predictions", all_labels)
 
-    print('Multi Hot Encoding of predictions', y_pred_test)
+    print("Multi Hot Encoding of predictions", y_pred_test)
 
     for multi_hot_vector in y_test:
-        labels = [index_to_label[idx] for idx, value in enumerate(multi_hot_vector) if value == 1]
+        labels = [
+            index_to_label[idx]
+            for idx, value in enumerate(multi_hot_vector)
+            if value == 1
+        ]
         all_labels.append(labels)
 
-    print('Actual', all_labels)
+    print("Actual", all_labels)
 
-    print('Multi Hot Encoding of actual', y_test)
- 
+    print("Multi Hot Encoding of actual", y_test)
+
     test_metrics = Metrics(y_test, y_pred_test, task="classification")
 
     test_accuracy = test_metrics.accuracy(one_hot=True)
@@ -786,13 +819,17 @@ def test_on_best_advertisement(index_to_label):
     hamming_loss = test_metrics.hamming_loss()
     hamming_accuracy = test_metrics.hamming_accuracy()
 
-    print(f'Accuracy: {test_accuracy}\
+    print(
+        f"Accuracy: {test_accuracy}\
           \nPrecision: {precision}\
           \nRecall: {recall}\
-          \nF1 Score: {f1_score}')
+          \nF1 Score: {f1_score}"
+    )
 
-    print(f'Hamming Loss: {hamming_loss}\
-        \nHamming Accuracy: {hamming_accuracy}')
+    print(
+        f"Hamming Loss: {hamming_loss}\
+        \nHamming Accuracy: {hamming_accuracy}"
+    )
 
 
 def multi_hot_encode(labels):
@@ -856,18 +893,12 @@ sweep_config_diabetes = {
     "parameters": {
         "lr": {"values": [0.01, 0.05, 0.1, 0.2]},
         "max_epochs": {"values": [800, 1500]},
-        "optimizer": {"values": ["sgd", "bgd", "mbgd"]}, 
-        "activation": {"values": ["sigmoid", "tanh", "relu"]}, 
+        "optimizer": {"values": ["sgd", "bgd", "mbgd"]},
+        "activation": {"values": ["sigmoid", "tanh", "relu"]},
         "hidden_layers": {
-            "values": [
-                [64, 64],
-                [128],
-                [64, 32],
-                [128, 64],
-                [64, 64, 32]
-            ] 
+            "values": [[64, 64], [128], [64, 32], [128, 64], [64, 64, 32]]
         },
-        "batch_size": {"values": [16, 32, 64]}, 
+        "batch_size": {"values": [16, 32, 64]},
     },
 }
 
@@ -947,7 +978,6 @@ def get_advertisement_data():
 
     return X_train, y_train, X_validation, y_validation, X_test, y_test, index_to_label
 
-import os
 
 def process_diabetes_data():
     input_file = "data/interim/3/diabetes/diabetes.csv"
@@ -989,6 +1019,39 @@ def process_diabetes_data():
     return X_train, y_train, X_validation, y_validation, X_test, y_test
 
 
+def plot_train_val_loss(
+    train_loss_1,
+    val_loss_1,
+    train_loss_2,
+    val_loss_2,
+    max_epochs,
+    save_path_1="assignments/3/figures/3.5.1.png",
+    save_path_2="assignments/3/figures/3.5.2.png",
+):
+    epochs = np.arange(1, len(train_loss_1) + 1)
+    plt.figure()
+    plt.plot(epochs, train_loss_1, label="Model 1 Train Loss", color="blue")
+    plt.plot(epochs, val_loss_1, label="Model 1 Validation Loss", color="orange")
+    plt.xlabel("Epochs")
+    plt.ylabel("Loss")
+    plt.title("Train vs Validation Loss for Model 1")
+    plt.legend()
+    plt.grid(True)
+    plt.savefig(save_path_1)
+    plt.close()
+
+    plt.figure()
+    plt.plot(epochs, train_loss_2, label="Model 2 Train Loss", color="green")
+    plt.plot(epochs, val_loss_2, label="Model 2 Validation Loss", color="red")
+    plt.xlabel("Epochs")
+    plt.ylabel("Loss")
+    plt.title("Train vs Validation Loss for Model 2")
+    plt.legend()
+    plt.grid(True)
+    plt.savefig(save_path_2)
+    plt.close()
+
+
 def split(X, train_ratio=0.8, val_ratio=0.1):
     np.random.seed(1)
     indices = np.random.permutation(len(X))
@@ -1004,6 +1067,7 @@ def split(X, train_ratio=0.8, val_ratio=0.1):
 
 
 def autoencoder_knn_task():
+    np.random.seed(13)
     file_path_spotify = "data/interim/2/spotify_normalized_numerical.csv"
     df = pd.read_csv(file_path_spotify)
     genres = df["track_genre"].values
@@ -1019,7 +1083,7 @@ def autoencoder_knn_task():
         encoder_layers=encoder_layers,
         decoder_layers=decoder_layers,
     )
-    autoencoder.fit(features, max_epochs=10)
+    autoencoder.fit(features, max_epochs=50)
     reduced_features = autoencoder.get_latent(features)
 
     features_df = pd.DataFrame(reduced_features)
@@ -1059,22 +1123,17 @@ def autoencoder_knn_task():
 
 
 def prepare_and_train_mlp(file_path, config):
-    # Load the dataset
     df = pd.read_csv(file_path)
-    
-    # Sort unique genres and create a mapping
-    unique_genres = sorted(df['track_genre'].unique())
+
+    unique_genres = sorted(df["track_genre"].unique())
     genre_to_number = {genre: idx for idx, genre in enumerate(unique_genres)}
-    df['track_genre'] = df['track_genre'].map(genre_to_number)
+    df["track_genre"] = df["track_genre"].map(genre_to_number)
 
-    # Split the data into features and target variable
     X = df.drop(columns=["track_genre"]).values
-    y = df['track_genre'].values
+    y = df["track_genre"].values
 
-    # Use your custom split function
     train, val, test = split(df)
 
-    # Prepare training and validation sets
     X_train = train.drop(columns=["track_genre"]).values
     y_train = train["track_genre"].values
     X_validation = val.drop(columns=["track_genre"]).values
@@ -1082,18 +1141,17 @@ def prepare_and_train_mlp(file_path, config):
     X_test = test.drop(columns=["track_genre"]).values
     y_test = test["track_genre"].values
 
-    # Initialize and fit the MLP Classifier
     model = MLPClassifier(
         input_size=X_train.shape[1],
         hidden_layers=config["hidden_layers"],
-        num_classes=len(unique_genres),  # Number of unique classes
+        num_classes=len(unique_genres),  
         learning_rate=config["lr"],
         activation=config["activation"],
         optimizer=config["optimizer"],
         print_every=1,
         wandb_log=False,
     )
-    
+
     costs = model.fit(
         X_train,
         y_train,
@@ -1104,18 +1162,20 @@ def prepare_and_train_mlp(file_path, config):
         early_stopping=True,
         patience=config["max_epochs"] // 20,
     )
-    
-    # Predict on the test set
+
     y_pred_test = model.predict(X_test)
 
-    # Calculate metrics
     test_metrics = Metrics(y_test, y_pred_test, task="classification")
 
-    # Print the metrics
     print(f"Test Accuracy: {test_metrics.accuracy()}")
-    print(f"Precision: {test_metrics.precision_score()}")
-    print(f"Recall: {test_metrics.recall_score()}")
-    print(f"F1 Score: {test_metrics.f1_score()}")
+    print(f"Macro Precision: {test_metrics.precision_score(average='macro')}")
+    print(f"Micro Precision: {test_metrics.precision_score(average='micro')}")
+    print(f"Macro Recall: {test_metrics.recall_score(average='macro')}")
+    print(f"Micro Recall: {test_metrics.recall_score(average='micro')}")
+    print(f"Macro F1 Score: {test_metrics.f1_score(average='macro')}")
+    print(f"Micro F1 Score: {test_metrics.f1_score(average='micro')}")
+
+
 
 if __name__ == "__main__":
     np.random.seed(6)
@@ -1137,9 +1197,10 @@ if __name__ == "__main__":
 
     # analyze_model_impact()
 
-
     # advertisement_preprocessing()
-    X_train, y_train, X_validation, y_validation, X_test, y_test, index_to_label = (get_advertisement_data())
+    X_train, y_train, X_validation, y_validation, X_test, y_test, index_to_label = (
+        get_advertisement_data()
+    )
     # best_model_params = None
     # best_validation_accuracy = 0
 
@@ -1170,34 +1231,36 @@ if __name__ == "__main__":
 
     # wandb.finish()
     # print_hyperparams_housing()
-    test_on_best_housing()
+    # test_on_best_housing()
 
     # X_train, y_train, X_validation, y_validation, X_test, y_test = process_diabetes_data()
 
     # model_bce = MLPLogisticRegression(input_size=X_train.shape[1], learning_rate=0.1, loss='bce')
-    # model_bce.fit(X_train, y_train, max_epochs=100)
+    # train_loss_1, val_loss_1 = model_bce.fit(X_train, y_train, X_validation, y_validation, max_epochs=500)
 
     # model_mse = MLPLogisticRegression(input_size=X_train.shape[1], learning_rate=0.1, loss='mse')
-    # model_mse.fit(X_train, y_train, max_epochs=100)
+    # train_loss_2, val_loss_2 = model_mse.fit(X_train, y_train, X_validation, y_validation, max_epochs=500)
 
-    # predictions_bce = model_bce.predict(X_train)
-    # predictions_mse = model_mse.predict(X_train)
+    # plot_train_val_loss(train_loss_1, val_loss_1, train_loss_2, val_loss_2, max_epochs=500)
+
+    # predictions_bce = model_bce.predict(X_test)
+    # predictions_mse = model_mse.predict(X_test)
 
     # # print("BCE Predictions:", predictions_bce.flatten())
-    # print("BCE Accuracy",np.mean(predictions_bce.flatten() == y_train))
+    # print("BCE Accuracy",np.mean(predictions_bce.flatten() == y_test))
     # # print("MSE Predictions:", predictions_mse.flatten())
-    # print("MSE Accuracy", np.mean(predictions_mse.flatten() == y_train))
+    # print("MSE Accuracy", np.mean(predictions_mse.flatten() == y_test))
 
     # autoencoder_knn_task()
 
-    # config = {
-    #     "hidden_layers": [32, 64],
-    #     "lr": 0.01,
-    #     "activation": "relu",
-    #     "optimizer": "mbgd",
-    #     "max_epochs": 100,
-    #     "batch_size": 16,12
-    # }
-    # prepare_and_train_mlp("data/interim/2/spotify_normalized_numerical.csv", config)
+    config = {
+        "hidden_layers": [32, 64],
+        "lr": 0.01,
+        "activation": "relu",
+        "optimizer": "mbgd",
+        "max_epochs": 100,
+        "batch_size": 16,
+    }
+    prepare_and_train_mlp("data/interim/2/spotify_normalized_numerical.csv", config)
 
     # unittest.main()

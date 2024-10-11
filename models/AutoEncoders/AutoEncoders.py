@@ -1,7 +1,7 @@
 import numpy as np
 from models.MLP.MLPRegression import MLPRegression
 class AutoEncoder:
-    def __init__(self, input_size, latent_size, encoder_layers, decoder_layers, learning_rate=0.01, activation='relu', optimizer='sgd', wandb_log=False):
+    def __init__(self, input_size, latent_size, encoder_layers, decoder_layers, learning_rate=0.01, activation='sigmoid', optimizer='sgd', wandb_log=False):
         self.encoder = MLPRegression(input_size=input_size, hidden_layers=encoder_layers, output_size=latent_size, 
                                      learning_rate=learning_rate, activation=activation, optimizer=optimizer, wandb_log=wandb_log)
         self.decoder = MLPRegression(input_size=latent_size, hidden_layers=decoder_layers, output_size=input_size, 
@@ -16,7 +16,7 @@ class AutoEncoder:
             self.decoder.update_parameters()
             self.encoder.backpropagation(X_train, latent_representation, latent_representation)
             self.encoder.update_parameters()
-            print(f"Epoch {epoch+1}/{max_epochs}, Loss: {loss}")
+            print(f"Epoch {epoch+1}/{max_epochs}, Loss: {loss}     ")
                 
     def get_latent(self, X):
         return self.encoder.forward_propagation(X)
