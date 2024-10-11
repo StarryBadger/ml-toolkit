@@ -105,6 +105,10 @@ using W&B.
 ![alt text](figures/2.3.2.png)
 ![alt text](figures/2.3.3.png)
 
+![alt text](figures/2.3.4.png)
+![alt text](figures/2.3.5.png)
+![alt text](figures/2.3.6.png)
+
 2. Generate a table listing all the hyperparameters tested and their corre-
 sponding metrics mentioned above
 
