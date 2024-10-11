@@ -83,6 +83,21 @@ The unit tests for gradient checking in the `TestMLPGradientChecking` class ensu
 
 All gradient checks confirm the correctness of the gradients across these configurations.
 
+```
+Gradient check passed!
+.Gradient check passed!
+.Gradient check passed!
+.Gradient check passed!
+.Gradient check passed!
+.Gradient check passed!
+.
+----------------------------------------------------------------------
+Ran 6 tests in 0.109s
+
+OK
+```
+Note: three of the tests are for regression tasks.
+
 ## 2.3 Model Training & Hyperparameter Tuning using W&B
 1. Plot the trend of accuracy scores with change in these hyperparameters
 using W&B.
@@ -1068,6 +1083,45 @@ These metrics suggest that while the model struggles with exact matches across a
 ![Histograms](./figures/regression_distributions.png)
 
 Normalized, standardized and partitioned in dat/interim/Housing
+
+## 3.2
+
+The unit tests for gradient checking in the `TestMLPGradientChecking` class ensure that the gradient computation is accurate for various configurations. All tests pass for the following scenarios:
+
+1. **Sigmoid Activation**: Tests gradient checking using a model with a hidden layer of 10 and 5 neurons, using stochastic gradient descent (SGD).
+   ```python
+   model.gradient_checking(self.X_train_regression[:20], self.y_train_regression[:20])
+   ```
+
+2. **ReLU Activation**: Tests gradient checking with a model having one hidden layer of 10 neurons, using batch gradient descent (BGD).
+   ```python
+   model.gradient_checking(self.X_train_regression[100:110], self.y_train_regression[100:110])
+   ```
+
+3. **Tanh Activation**: Tests gradient checking with a more complex model with three hidden layers (15, 5, and 3 neurons) and using mini-batch gradient descent (MBGD).
+   ```python
+   model.gradient_checking(self.X_train_regression[200:300], self.y_train_regression[200:300])
+   ```
+
+All gradient checks confirm the correctness of the gradients across these configurations.
+
+```
+Gradient check passed!
+.Gradient check passed!
+.Gradient check passed!
+.Gradient check passed!
+.Gradient check passed!
+.Gradient check passed!
+.
+----------------------------------------------------------------------
+Ran 6 tests in 0.109s
+
+OK
+```
+
+---
+
+Let me know if you need any further adjustments!
 
 ## 3.3 Model Training & Hyperparameter Tuning using W&B
 

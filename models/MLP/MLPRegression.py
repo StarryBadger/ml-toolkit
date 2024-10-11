@@ -207,7 +207,7 @@ class MLPRegression:
         return np.mean((y - y_pred) ** 2)  # Mean Squared Error
 
     def gradient_checking(self, X, y, epsilon=1e-7):
-        y_train = np.expand_dims(y_train, axis=1)
+        y = np.expand_dims(y, axis=1)
         y_pred = self.forward_propagation(X)
         self.backpropagation(X, y, y_pred)
 
