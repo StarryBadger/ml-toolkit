@@ -203,9 +203,9 @@ class MLPRegression:
         return self.forward_propagation(X)
 
     def _compute_loss(self, X, y):
-        y_pred = self.forward_propagation(X).squeeze()
-        return np.mean((y - y_pred) ** 2)  # Mean Squared Error
-
+        y_pred = self.forward_propagation(X)
+        return np.mean((y - y_pred) ** 2) 
+    
     def gradient_checking(self, X, y, epsilon=1e-7):
         y = np.expand_dims(y, axis=1)
         y_pred = self.forward_propagation(X)

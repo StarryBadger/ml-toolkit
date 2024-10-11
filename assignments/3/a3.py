@@ -27,48 +27,48 @@ class TestMLPGradientChecking(unittest.TestCase):
         self.X_train_regression = X_train_regression
         self.y_train_regression = y_train_regression
 
-    # def test_classification_gradient_checking_with_sigmoid(self):
-    #     model = MLPClassifier(
-    #         input_size=self.X_train_classification.shape[1],
-    #         hidden_layers=[10, 5],
-    #         num_classes=6,
-    #         learning_rate=0.01,
-    #         activation="sigmoid",
-    #         optimizer="sgd",
-    #     )
-    #     model.gradient_checking(
-    #         self.X_train_classification[:20], self.y_train_classification[:20]
-    #     )
+    def test_classification_gradient_checking_with_sigmoid(self):
+        model = MLPClassifier(
+            input_size=self.X_train_classification.shape[1],
+            hidden_layers=[10, 5],
+            num_classes=6,
+            learning_rate=0.01,
+            activation="sigmoid",
+            optimizer="sgd",
+        )
+        model.gradient_checking(
+            self.X_train_classification[:20], self.y_train_classification[:20]
+        )
 
-    # def test_classification_gradient_checking_with_relu(self):
-    #     model = MLPClassifier(
-    #         input_size=self.X_train_classification.shape[1],
-    #         hidden_layers=[10],
-    #         num_classes=6,
-    #         learning_rate=0.001,
-    #         activation="relu",
-    #         optimizer="bgd",
-    #     )
-    #     model.gradient_checking(
-    #         self.X_train_classification[100:110], self.y_train_classification[100:110]
-    #     )
+    def test_classification_gradient_checking_with_relu(self):
+        model = MLPClassifier(
+            input_size=self.X_train_classification.shape[1],
+            hidden_layers=[10],
+            num_classes=6,
+            learning_rate=0.001,
+            activation="relu",
+            optimizer="bgd",
+        )
+        model.gradient_checking(
+            self.X_train_classification[100:110], self.y_train_classification[100:110]
+        )
 
-    # def test_classification_gradient_checking_with_tanh(self):
-    #     model = MLPClassifier(
-    #         input_size=self.X_train_classification.shape[1],
-    #         hidden_layers=[15, 5, 3],
-    #         num_classes=6,
-    #         learning_rate=0.005,
-    #         activation="tanh",
-    #         optimizer="mbgd",
-    #     )
-    #     model.gradient_checking(
-    #         self.X_train_classification[200:300], self.y_train_classification[200:300]
-    #     )
+    def test_classification_gradient_checking_with_tanh(self):
+        model = MLPClassifier(
+            input_size=self.X_train_classification.shape[1],
+            hidden_layers=[15, 5, 3],
+            num_classes=6,
+            learning_rate=0.005,
+            activation="tanh",
+            optimizer="mbgd",
+        )
+        model.gradient_checking(
+            self.X_train_classification[200:300], self.y_train_classification[200:300]
+        )
 
     def test_regression_gradient_checking_with_sigmoid(self):
         model = MLPRegression(
-            input_size=self.X_train_classification.shape[1],
+            input_size=self.X_train_regression.shape[1],
             hidden_layers=[10, 5],
             output_size=1,
             learning_rate=0.01,
@@ -81,7 +81,7 @@ class TestMLPGradientChecking(unittest.TestCase):
 
     def test_regression_gradient_checking_with_relu(self):
         model = MLPRegression(
-            input_size=self.X_train_classification.shape[1],
+            input_size=self.X_train_regression.shape[1],
             hidden_layers=[10],
             output_size=1,
             learning_rate=0.001,
@@ -94,7 +94,7 @@ class TestMLPGradientChecking(unittest.TestCase):
 
     def test_regression_gradient_checking_with_tanh(self):
         model = MLPRegression(
-            input_size=self.X_train_classification.shape[1],
+            input_size=self.X_train_regression.shape[1],
             hidden_layers=[15, 5, 3],
             output_size=1,
             learning_rate=0.005,
