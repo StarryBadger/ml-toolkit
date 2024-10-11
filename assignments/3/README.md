@@ -14,6 +14,8 @@ To run the code for this assignment,
 python3 -m assignments.3.a3 # (without .py extension)
 ```
 Website references are mentioned in the code.
+Note: wandb plots are available on https://wandb.ai/shaunak-biswas-iiit-hyderabad/SMAI_A3
+The sweep names are mentioned in the csv files in the appropriate directories in data/interim/3
 
 ## 2.1 Data Preprocessing
 ### 1. Describe the dataset using mean, standard deviation, min, and max values for all attributes
