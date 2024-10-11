@@ -16,6 +16,7 @@ from models.MLP.MLPRegression import MLPRegression
 from models.MLP.MLPLogistic import MLPLogisticRegression
 from models.AutoEncoders.AutoEncoders import AutoEncoder
 
+
 class TestMLPGradientChecking(unittest.TestCase):
 
     def setUp(self):
@@ -31,10 +32,12 @@ class TestMLPGradientChecking(unittest.TestCase):
             hidden_layers=[10, 5],
             num_classes=6,
             learning_rate=0.01,
-            activation='sigmoid',
-            optimizer='sgd',
+            activation="sigmoid",
+            optimizer="sgd",
         )
-        model.gradient_checking(self.X_train_classification[:20], self.y_train_classification[:20]) 
+        model.gradient_checking(
+            self.X_train_classification[:20], self.y_train_classification[:20]
+        )
 
     def test_classification_gradient_checking_with_relu(self):
         model = MLPClassifier(
@@ -42,10 +45,12 @@ class TestMLPGradientChecking(unittest.TestCase):
             hidden_layers=[10],
             num_classes=6,
             learning_rate=0.001,
-            activation='relu',
-            optimizer='bgd',
+            activation="relu",
+            optimizer="bgd",
         )
-        model.gradient_checking(self.X_train_classification[100:110], self.y_train_classification[100:110])  
+        model.gradient_checking(
+            self.X_train_classification[100:110], self.y_train_classification[100:110]
+        )
 
     def test_classification_gradient_checking_with_tanh(self):
         model = MLPClassifier(
@@ -53,10 +58,13 @@ class TestMLPGradientChecking(unittest.TestCase):
             hidden_layers=[15, 5, 3],
             num_classes=6,
             learning_rate=0.005,
-            activation='tanh',
-            optimizer='mbgd',
+            activation="tanh",
+            optimizer="mbgd",
         )
-        model.gradient_checking(self.X_train_classification[200:300], self.y_train_classification[200:300])
+        model.gradient_checking(
+            self.X_train_classification[200:300], self.y_train_classification[200:300]
+        )
+
 
 def describe_dataset(df, file_path="data/interim/3/WineQT/WineQT_description.csv"):
     numerical_cols = df.to_numpy()
@@ -422,7 +430,7 @@ def test_on_best_wineqt():
         early_stopping=True,
         patience=config["max_epochs"] // 20,
     )
-    model.gradient_checking(X_train[:5], y_train[:5])
+    # model.gradient_checking(X_train[:5], y_train[:5])
     y_pred_test = model.predict(X_test)
     test_metrics = Metrics(y_test, y_pred_test, task="classification")
 
@@ -458,6 +466,7 @@ def test_on_best_housing():
         print_every=10,
         wandb_log=False,
     )
+    # model.gradient_checking(X_train[:5], y_train[:5])
     costs = model.fit(
         X_train,
         y_train,
@@ -613,13 +622,15 @@ def get_advertisement_data():
 
     return X_train, y_train, X_validation, y_validation, X_test, y_test
 
+
 import pandas as pd
 import numpy as np
 import os
 
+
 def process_diabetes_data():
-    input_file = 'data/interim/3/diabetes/diabetes.csv'
-    output_dir = 'data/interim/3/diabetes/'
+    input_file = "data/interim/3/diabetes/diabetes.csv"
+    output_dir = "data/interim/3/diabetes/"
     split_dir = f"{output_dir}split"
     os.makedirs(split_dir, exist_ok=True)
     data = pd.read_csv(input_file)
@@ -631,29 +642,30 @@ def process_diabetes_data():
     standardized_data = pd.concat([standardized_features, target], axis=1)
     standardized_data.to_csv(f"{output_dir}_standardized_diabetes.csv")
 
-    shuffled_data = standardized_data.sample(frac=1, random_state=42).reset_index(drop=True)
+    shuffled_data = standardized_data.sample(frac=1, random_state=42).reset_index(
+        drop=True
+    )
 
     train_size = int(0.7 * len(shuffled_data))
     validation_size = int(0.15 * len(shuffled_data))
-    
+
     X_train = shuffled_data.iloc[:train_size, :-1]
     y_train = shuffled_data.iloc[:train_size, -1]
-    
-    X_validation = shuffled_data.iloc[train_size:train_size + validation_size, :-1]
-    y_validation = shuffled_data.iloc[train_size:train_size + validation_size, -1]
-    
-    X_test = shuffled_data.iloc[train_size + validation_size:, :-1]
-    y_test = shuffled_data.iloc[train_size + validation_size:, -1]
 
-    X_train.to_csv(os.path.join(split_dir, 'X_train.csv'), index=False)
-    y_train.to_csv(os.path.join(split_dir, 'y_train.csv'), index=False)
-    X_validation.to_csv(os.path.join(split_dir, 'X_validation.csv'), index=False)
-    y_validation.to_csv(os.path.join(split_dir, 'y_validation.csv'), index=False)
-    X_test.to_csv(os.path.join(split_dir, 'X_test.csv'), index=False)
-    y_test.to_csv(os.path.join(split_dir, 'y_test.csv'), index=False)
+    X_validation = shuffled_data.iloc[train_size : train_size + validation_size, :-1]
+    y_validation = shuffled_data.iloc[train_size : train_size + validation_size, -1]
+
+    X_test = shuffled_data.iloc[train_size + validation_size :, :-1]
+    y_test = shuffled_data.iloc[train_size + validation_size :, -1]
+
+    X_train.to_csv(os.path.join(split_dir, "X_train.csv"), index=False)
+    y_train.to_csv(os.path.join(split_dir, "y_train.csv"), index=False)
+    X_validation.to_csv(os.path.join(split_dir, "X_validation.csv"), index=False)
+    y_validation.to_csv(os.path.join(split_dir, "y_validation.csv"), index=False)
+    X_test.to_csv(os.path.join(split_dir, "X_test.csv"), index=False)
+    y_test.to_csv(os.path.join(split_dir, "y_test.csv"), index=False)
 
     return X_train, y_train, X_validation, y_validation, X_test, y_test
-
 
 
 def split(X, train_ratio=0.8, val_ratio=0.1):
@@ -675,7 +687,6 @@ def autoencoder_knn_task():
     df = pd.read_csv(file_path_spotify)
     genres = df["track_genre"].values
     features = df.drop(columns=["track_genre"]).values
-
     input_size = features.shape[1]
     latent_size = 9
     encoder_layers = [10]
@@ -688,13 +699,11 @@ def autoencoder_knn_task():
         decoder_layers=decoder_layers,
     )
     autoencoder.fit(features, max_epochs=10)
-
     reduced_features = autoencoder.get_latent(features)
 
     features_df = pd.DataFrame(reduced_features)
     result_df = features_df.copy()
     result_df["track_genre"] = genres
-
     train, val, _ = split(df)
     classifier = KNN(k=64, distance_metric="manhattan")
     classifier.fit(
@@ -707,7 +716,6 @@ def autoencoder_knn_task():
         y_true=val["track_genre"].values, y_pred=y_pred, task="classification"
     ).print_metrics()
     print(f"{time_taken1=}")
-
     train, val, _ = split(result_df)
     classifier = KNN(k=64, distance_metric="manhattan")
     classifier.fit(
@@ -720,16 +728,73 @@ def autoencoder_knn_task():
         y_true=val["track_genre"].values, y_pred=y_pred, task="classification"
     ).print_metrics()
     print(f"{time_taken2=}")
-
     models = [f"Original (12 dim)", f"AutoEncoder ({latent_size} dim)"]
     times = [time_taken1, time_taken2]
-
     plt.figure(figsize=(8, 5))
     plt.bar(models, times, color=["skyblue", "lightgreen"])
     plt.ylabel("Inference Time (seconds)")
     plt.title("KNN Inference Time Comparison (Original vs AutoEncoder)")
     plt.savefig("assignments/3/figures/knn_og_vs_autoencoder_bar_2.png")
 
+
+def prepare_and_train_mlp(file_path, config):
+    # Load the dataset
+    df = pd.read_csv(file_path)
+    
+    # Sort unique genres and create a mapping
+    unique_genres = sorted(df['track_genre'].unique())
+    genre_to_number = {genre: idx for idx, genre in enumerate(unique_genres)}
+    df['track_genre'] = df['track_genre'].map(genre_to_number)
+
+    # Split the data into features and target variable
+    X = df.drop(columns=["track_genre"]).values
+    y = df['track_genre'].values
+
+    # Use your custom split function
+    train, val, test = split(df)
+
+    # Prepare training and validation sets
+    X_train = train.drop(columns=["track_genre"]).values
+    y_train = train["track_genre"].values
+    X_validation = val.drop(columns=["track_genre"]).values
+    y_validation = val["track_genre"].values
+    X_test = test.drop(columns=["track_genre"]).values
+    y_test = test["track_genre"].values
+
+    # Initialize and fit the MLP Classifier
+    model = MLPClassifier(
+        input_size=X_train.shape[1],
+        hidden_layers=config["hidden_layers"],
+        num_classes=len(unique_genres),  # Number of unique classes
+        learning_rate=config["lr"],
+        activation=config["activation"],
+        optimizer=config["optimizer"],
+        print_every=1,
+        wandb_log=False,
+    )
+    
+    costs = model.fit(
+        X_train,
+        y_train,
+        max_epochs=config["max_epochs"],
+        batch_size=config["batch_size"],
+        X_validation=X_validation,
+        y_validation=y_validation,
+        early_stopping=True,
+        patience=config["max_epochs"] // 20,
+    )
+    
+    # Predict on the test set
+    y_pred_test = model.predict(X_test)
+
+    # Calculate metrics
+    test_metrics = Metrics(y_test, y_pred_test, task="classification")
+
+    # Print the metrics
+    print(f"Test Accuracy: {test_metrics.accuracy()}")
+    print(f"Precision: {test_metrics.precision_score()}")
+    print(f"Recall: {test_metrics.recall_score()}")
+    print(f"F1 Score: {test_metrics.f1_score()}")
 
 if __name__ == "__main__":
     np.random.seed(6)
@@ -749,37 +814,37 @@ if __name__ == "__main__":
 
     # test_on_best_wineqt()
 
-    advertisement_preprocessing()
-    X_train, y_train, X_validation, y_validation, X_test, y_test = get_advertisement_data()
-    model = MultiLabelMLP(X_train.shape[1], [64,64], 8, learning_rate=0.1, activation='sigmoid', optimizer='sgd', print_every=10)
-    costs = model.fit(
-            X_train, y_train,
-            max_epochs=1500,
-            batch_size=32,
-            X_validation=X_validation,
-            y_validation=y_validation,
-            early_stopping=False,
-            patience=100
-        )
-    y_pred_test = model.predict(X_test)
+    # advertisement_preprocessing()
+    X_train, y_train, X_validation, y_validation, X_test, y_test = (get_advertisement_data())
+    # model = MultiLabelMLP(X_train.shape[1], [64,64], 8, learning_rate=0.1, activation='sigmoid', optimizer='sgd', print_every=10)
+    # costs = model.fit(
+    #         X_train, y_train,
+    #         max_epochs=1500,
+    #         batch_size=32,
+    #         X_validation=X_validation,
+    #         y_validation=y_validation,
+    #         early_stopping=False,
+    #         patience=100
+    #     )
+    # y_pred_test = model.predict(X_test)
     # print(y_pred_test)
     # print(y_test)
-    test_metrics = Metrics(y_test, y_pred_test, task="classification")
+    # test_metrics = Metrics(y_test, y_pred_test, task="classification")
 
-    test_accuracy = test_metrics.accuracy()
-    precision = test_metrics.precision_score()
-    recall = test_metrics.recall_score()
-    f1_score = test_metrics.f1_score()
-    hamming_loss = test_metrics.hamming_loss()
-    hamming_accuracy = test_metrics.hamming_accuracy()
+    # test_accuracy = test_metrics.accuracy(one_hot=True)
+    # precision = test_metrics.precision_score()
+    # recall = test_metrics.recall_score()
+    # f1_score = test_metrics.f1_score()
+    # hamming_loss = test_metrics.hamming_loss()
+    # hamming_accuracy = test_metrics.hamming_accuracy()
 
-    print(f'Accuracy: {test_accuracy}\
-          \nPrecision: {precision}\
-          \nRecall: {recall}\
-          \nF1 Score: {f1_score}')
-    
-    print(f'Hamming Loss: {hamming_loss}\
-        \nHamming Accuracy: {hamming_accuracy}')
+    # print(f'Accuracy: {test_accuracy}\
+    #       \nPrecision: {precision}\
+    #       \nRecall: {recall}\
+    #       \nF1 Score: {f1_score}')
+
+    # print(f'Hamming Loss: {hamming_loss}\
+    #     \nHamming Accuracy: {hamming_accuracy}')
 
     # housing_preprocessing()
     # np.random.seed(13)
@@ -813,10 +878,16 @@ if __name__ == "__main__":
     # # print("MSE Predictions:", predictions_mse.flatten())
     # print("MSE Accuracy", np.mean(predictions_mse.flatten() == y_train))
 
-
-
-
-
     # autoencoder_knn_task()
+
+    config = {
+        "hidden_layers": [32, 64],
+        "lr": 0.01,
+        "activation": "relu",
+        "optimizer": "mbgd",
+        "max_epochs": 100,
+        "batch_size": 16,
+    }
+    prepare_and_train_mlp("data/interim/2/spotify_normalized_numerical.csv", config)
 
     # unittest.main()

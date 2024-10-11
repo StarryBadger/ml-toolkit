@@ -32,26 +32,27 @@ class MLPRegression:
         weights = []
         biases = []
 
-        if num_layers == 0:
-            w = np.random.randn(self.input_size, self.output_size)
-            b = np.zeros((1, self.output_size))
-            weights.append(w)
-            biases.append(b)
-            return weights, biases
-
         for i in range(num_layers + 1):
             if i == 0:
-                w = np.random.randn(self.input_size, self.hidden_layers[0])
+                # Using Xavier initialization for sigmoid/tanh, He initialization for ReLU
+                if self.activation in ['sigmoid', 'tanh']:
+                    w = np.random.randn(self.input_size, self.hidden_layers[0]) * np.sqrt(1.0 / self.input_size)
+                else:  # for ReLU/linear
+                    w = np.random.randn(self.input_size, self.hidden_layers[0]) * np.sqrt(2.0 / self.input_size)
             elif i == num_layers:
-                w = np.random.randn(self.hidden_layers[-1], self.output_size)
+                w = np.random.randn(self.hidden_layers[-1], self.output_size) * np.sqrt(2.0 / self.hidden_layers[-1])
             else:
-                w = np.random.randn(self.hidden_layers[i - 1], self.hidden_layers[i])
+                if self.activation in ['sigmoid', 'tanh']:
+                    w = np.random.randn(self.hidden_layers[i - 1], self.hidden_layers[i]) * np.sqrt(1.0 / self.hidden_layers[i - 1])
+                else:  # for ReLU/linear
+                    w = np.random.randn(self.hidden_layers[i - 1], self.hidden_layers[i]) * np.sqrt(2.0 / self.hidden_layers[i - 1])
             
-            b = np.zeros((1, w.shape[1]))  # Bias should match the number of units in the current layer
+            b = np.zeros((1, w.shape[1]))
             weights.append(w)
             biases.append(b)
 
         return weights, biases
+
 
     
     def _activate(self, X, activation):
@@ -94,7 +95,8 @@ class MLPRegression:
         num_layers = len(self.weights)
         
         # delta = (y_pred.squeeze() - y.squeeze())
-        delta = (y_pred.squeeze() - y)[:, np.newaxis]
+        # delta = (y_pred.squeeze() - y)[:, np.newaxis]
+        delta = y_pred - y
         dW = (1 / m) * np.dot(self.layer_outputs[-2].T, delta)
         db = (1 / m) * np.sum(delta, axis=0, keepdims=True)
         self.gradients.append((dW, db))
@@ -121,7 +123,8 @@ class MLPRegression:
     def fit(self, X_train, y_train, X_validation=None, y_validation=None, max_epochs=10, batch_size=32, early_stopping=False, patience=100):
         best_loss = float("inf")
         patience_counter = 0
-
+        y_train = np.expand_dims(y_train, axis=1)
+        y_validation = np.expand_dims(y_validation, axis=1)
         for epoch in range(max_epochs):
             if self.optimizer == "bgd":
                 y_pred_train = self.forward_propagation(X_train)
@@ -204,7 +207,8 @@ class MLPRegression:
         return np.mean((y - y_pred) ** 2)  # Mean Squared Error
 
     def gradient_checking(self, X, y, epsilon=1e-7):
-        y_pred = self.forward_propagation(X).squeeze()
+        y_train = np.expand_dims(y_train, axis=1)
+        y_pred = self.forward_propagation(X)
         self.backpropagation(X, y, y_pred)
 
         parameters = self.weights + self.biases

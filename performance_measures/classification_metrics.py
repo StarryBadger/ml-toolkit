@@ -22,8 +22,9 @@ class Metrics:
         np.add.at(confusion, (true_indices, pred_indices), 1)
         return confusion
     # To handle np.sum(confusion, axis=n) = 0 for n=0 or 1, we add 1e-6 to each element. 
-    def accuracy(self):
-        # return np.sum(self.y_true == self.y_pred) / len(self.y_true)
+    def accuracy(self, one_hot = False):
+        if not one_hot:
+            return np.sum(self.y_true == self.y_pred) / len(self.y_true)
         return np.sum(np.all(self.y_true == self.y_pred, axis=1)) / self.y_true.shape[0]
 
 
