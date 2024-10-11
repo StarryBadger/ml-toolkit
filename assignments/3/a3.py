@@ -15,6 +15,7 @@ from models.MLP.MLPClassifier import MLPClassifier
 from models.MLP.MultiLabelMLP import MultiLabelMLP
 from models.MLP.MLPRegression import MLPRegression
 from models.MLP.MLPLogistic import MLPLogisticRegression
+from models.MLP.MLP import MLP
 from models.AutoEncoders.AutoEncoders import AutoEncoder
 
 
@@ -790,11 +791,18 @@ def test_on_best_housing():
             \nR2 Score: {r2}"
     )
 
-    individual_mse = np.square(y_pred_test - y_test)  # Squared errors for each datapoint
-    for i, (x_vals, true, pred, mse) in enumerate(zip(X_test, y_test, y_pred_test, individual_mse)):
-        x_vals_str = ", ".join([f"{x:.6f}" for x in x_vals])  # Convert X_test row to a string
-        print(f"Datapoint {i+1} - X: [{x_vals_str}] - True: {true:.6f}, Predicted: {pred:.6f}, MSE: {mse:.6f}     ")
-
+    # individual_mse = np.square(
+    #     y_pred_test - y_test
+    # ) 
+    # for i, (x_vals, true, pred, mse) in enumerate(
+    #     zip(X_test, y_test, y_pred_test, individual_mse)
+    # ):
+    #     x_vals_str = ", ".join(
+    #         [f"{x:.6f}" for x in x_vals]
+    #     ) 
+    #     print(
+    #         f"Datapoint {i+1} - X: [{x_vals_str}] - True: {true:.6f}, Predicted: {pred:.6f}, MSE: {mse:.6f}     "
+    #     )
 
 
 def test_on_best_advertisement(index_to_label):
@@ -1183,14 +1191,14 @@ def prepare_and_train_mlp(file_path, config):
     model = MLPClassifier(
         input_size=X_train.shape[1],
         hidden_layers=config["hidden_layers"],
-        num_classes=len(unique_genres),  
+        num_classes=len(unique_genres),
         learning_rate=config["lr"],
         activation=config["activation"],
         optimizer=config["optimizer"],
         print_every=1,
         wandb_log=False,
     )
-
+    st1=time.time()
     costs = model.fit(
         X_train,
         y_train,
@@ -1201,8 +1209,11 @@ def prepare_and_train_mlp(file_path, config):
         early_stopping=True,
         patience=config["max_epochs"] // 20,
     )
-
+    st = time.time()
     y_pred_test = model.predict(X_test)
+    time_taken1 = time.time() - st
+    time_taken2 = st - st1
+    print(time_taken1, time_taken2)
 
     test_metrics = Metrics(y_test, y_pred_test, task="classification")
 
@@ -1213,7 +1224,6 @@ def prepare_and_train_mlp(file_path, config):
     print(f"Micro Recall: {test_metrics.recall_score(average='micro')}")
     print(f"Macro F1 Score: {test_metrics.f1_score(average='macro')}")
     print(f"Micro F1 Score: {test_metrics.f1_score(average='micro')}")
-
 
 
 if __name__ == "__main__":
@@ -1233,6 +1243,47 @@ if __name__ == "__main__":
     # print_hyperparams_wineqt()
 
     # test_on_best_wineqt()
+    """"------------------------BONUS--------------------------------------"""
+
+    # with open("data/interim/3/WineQT/best_model_config.json", "r") as file:
+    #     config = json.load(file)
+    # model = MLP(
+    #     X_train.shape[1],
+    #     config["hidden_layers"],
+    #     6,
+    #     learning_rate=config["lr"],
+    #     activation=config["activation"],
+    #     optimizer=config["optimizer"],
+    #     print_every=10,
+    #     wandb_log=False,
+    #     task="classification",
+    # )
+    # costs = model.fit(
+    #     X_train,
+    #     y_train,
+    #     max_epochs=config["max_epochs"],
+    #     batch_size=config["batch_size"],
+    #     X_validation=X_validation,
+    #     y_validation=y_validation,
+    #     early_stopping=True,
+    #     patience=config["max_epochs"] // 20,
+    # )
+    # y_pred_test = model.predict(X_test)
+    # test_metrics = Metrics(y_test, y_pred_test, task="classification")
+    # print(y_test, y_pred_test)
+
+    # test_accuracy = test_metrics.accuracy()
+    # precision = test_metrics.precision_score()
+    # recall = test_metrics.recall_score()
+    # f1_score = test_metrics.f1_score()
+
+    # print(
+    #     f"Accuracy: {test_accuracy}\
+    #       \nPrecision: {precision}\
+    #       \nRecall: {recall}\
+    #       \nF1 Score: {f1_score}"
+    # )
+    """---------------------------------------------------------------------"""
 
     # analyze_model_impact()
 
@@ -1260,6 +1311,7 @@ if __name__ == "__main__":
     # np.random.seed(13)
     X_train, y_train, X_validation, y_validation, X_test, y_test = load_housing()
     X_train_regression, y_train_regression = copy.deepcopy((X_train, y_train))
+    # unittest.main()
     # best_model_params_regression = None
     # best_validation_mse = float("inf")
     # sweep_id_regression = wandb.sweep(sweep_config_housing, project="SMAI_A3")
@@ -1271,6 +1323,47 @@ if __name__ == "__main__":
     # wandb.finish()
     # print_hyperparams_housing()
     # test_on_best_housing()
+
+    """"------------------------BONUS--------------------------------------"""
+
+    # with open("data/interim/3/HousingData/best_model_config.json", "r") as file:
+    #     config = json.load(file)
+    # model = MLP(
+    #     X_train.shape[1],
+    #     config["hidden_layers"],
+    #     output_size=1,
+    #     learning_rate=config["lr"],
+    #     activation=config["activation"],
+    #     optimizer=config["optimizer"],
+    #     print_every=10,
+    #     wandb_log=False,
+    # )
+    # costs = model.fit(
+    #     X_train,
+    #     y_train,
+    #     max_epochs=config["max_epochs"],
+    #     batch_size=config["batch_size"],
+    #     X_validation=X_validation,
+    #     y_validation=y_validation,
+    #     early_stopping=True,
+    #     patience=config["max_epochs"] // 50,
+    # )
+    # y_pred_test = model.predict(X_test).squeeze()
+    # test_metrics = Metrics(y_test, y_pred_test, task="regression")
+
+    # mse = test_metrics.mse()
+    # mae = test_metrics.mae()
+    # r2 = test_metrics.r2_score()
+    # rmse = test_metrics.rmse()
+
+    # print(
+    #     f"MSE: {mse}\
+    #         \nMAE: {mae}\
+    #         \nRMSE: {rmse}\
+    #         \nR2 Score: {r2}"
+    # )
+
+    """--------------------------------------------------------------"""
 
     # X_train, y_train, X_validation, y_validation, X_test, y_test = process_diabetes_data()
 
@@ -1292,14 +1385,28 @@ if __name__ == "__main__":
 
     # autoencoder_knn_task()
 
-    # config = {
-    #     "hidden_layers": [32, 64],
-    #     "lr": 0.01,
-    #     "activation": "relu",
-    #     "optimizer": "mbgd",
-    #     "max_epochs": 100,
-    #     "batch_size": 16,
-    # }
-    # prepare_and_train_mlp("data/interim/2/spotify_normalized_numerical.csv", config)
+    config = {
+        "hidden_layers": [32, 64],
+        "lr": 0.01,
+        "activation": "relu",
+        "optimizer": "mbgd",
+        "max_epochs": 100,
+        "batch_size": 16,
+    }
+    prepare_and_train_mlp("data/interim/2/spotify_normalized_numerical.csv", config)
 
-    unittest.main()
+    # y_pred_test = model.predict(X_test)
+    # test_metrics = Metrics(y_test, y_pred_test, task="classification")
+    # print(y_test, y_pred_test)
+
+    # test_accuracy = test_metrics.accuracy()
+    # precision = test_metrics.precision_score()
+    # recall = test_metrics.recall_score()
+    # f1_score = test_metrics.f1_score()
+
+    # print(
+    #     f"Accuracy: {test_accuracy}\
+    #       \nPrecision: {precision}\
+    #       \nRecall: {recall}\
+    #       \nF1 Score: {f1_score}"
+    # )

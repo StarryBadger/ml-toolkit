@@ -954,31 +954,6 @@ Predicted:
    - The model struggles with rare classes, failing to predict them at all.
 
 
-### Performance on Multi-Label Classification:
-In the multi-label scenario, where the target is a multi-hot encoded vector of length 8, there are a few patterns to note:
-1. **Class Confusion and Overlap:**
-   - If there are overlapping labels in the multi-label output (i.e., one data point belongs to multiple classes), the model might find it difficult to distinguish between those classes, leading to higher classification errors.
-   
-2. **Rare Labels:**
-   - Labels that rarely appear together may not be learned well by the model. If there are labels that occur in only a few instances, the MLP may not get enough data during training to learn how to associate those labels correctly.
-
-### Potential Reasons for Class Performance:
-1. **Class Imbalance:**
-   - If the dataset has an imbalanced distribution of classes (as you hinted with Classes 4 and 5 being rare), the model is likely biased toward predicting the majority class. This could explain why your MLP frequently predicts Class 2 or Class 3 and performs poorly on Classes 0, 1, 4, and 5.
-
-2. **Complexity of Features:**
-   - If certain classes have more complex or overlapping features with other classes, the MLP might have a harder time distinguishing between them, especially if it's not deep enough to capture intricate patterns in the data.
-
-3. **Training Data Limitations:**
-   - If some classes are underrepresented in the dataset or have less distinguishing features compared to others, the model will naturally perform poorly on those classes. You might need to look at adding more training data for the underperforming classes or using techniques like SMOTE to generate synthetic examples.
-
-### Next Steps:
-- **Confusion Matrix:** It would help to create a confusion matrix to better visualize where the model is making classification errors. This would give you a clear picture of which specific classes are getting confused with each other.
-- **Class Balancing Techniques:** Consider oversampling the underrepresented classes or using a weighted loss function to give more importance to the minority classes during training.
-- **Further Model Tuning:** Adjusting the architecture of your MLP (e.g., more layers or neurons) or trying different activation functions could improve the model's ability to capture more complex relationships between classes.
-
-Would you like help generating a confusion matrix or implementing any of these techniques?
-
 ### Multi-label Classification Analysis
 
 Predictions [['beauty', 'books', 'home'], ['beauty'], ['clothing'], ['clothing', 'food'], ['sports'], ['electronics'], ['clothing', 'food'], ['books', 'electronics', 'sports'], ['beauty', 'clothing'], ['books', 'electronics'], ['books', 'home'], ['beauty', 'books', 'food'], ['furniture'], ['books', 'furniture', 'home'], ['home'], ['beauty'], ['food', 'furniture'], ['food', 'sports'], ['food'], ['books', 'home'], ['clothing'], ['clothing', 'furniture', 'home', 'sports'], ['beauty'], ['electronics'], ['books', 'clothing'], ['furniture'], ['books'], ['electronics', 'home'], ['electronics', 'furniture'], ['sports'], ['books'], ['sports'], ['beauty', 'furniture', 'sports'], ['furniture'], ['beauty'], ['food', 'home'], ['beauty'], ['sports'], ['books', 'home'], ['food', 'furniture', 'home'], ['clothing', 'sports'], ['sports'], ['home'], ['furniture', 'sports'], ['food', 'home'], ['beauty', 'books', 'clothing', 'sports'], ['beauty'], ['beauty'], ['beauty', 'food'], ['clothing'], ['books', 'electronics', 'sports'], ['beauty', 'food'], ['electronics'], ['beauty', 'clothing'], ['beauty', 'clothing', 'food'], ['electronics'], ['food', 'sports'], ['electronics'], ['books', 'home'], ['electronics', 'food', 'home'], ['home', 'sports'], ['beauty'], ['clothing', 'sports'], ['clothing', 'food'], ['beauty'], ['furniture'], ['clothing'], ['clothing'], ['books', 'food', 'furniture'], ['beauty', 'books'], ['books', 'food', 'home'], ['home'], ['clothing', 'electronics'], ['beauty', 'food'], ['clothing'], ['beauty', 'clothing'], ['food', 'furniture'], ['electronics', 'home'], ['beauty'], ['beauty'], ['sports'], ['sports'], ['sports'], ['clothing', 'food'], ['beauty', 'electronics'], ['books', 'home'], ['sports'], ['beauty', 'books'], ['furniture'], ['clothing', 'electronics', 'sports'], ['books', 'home'], ['food', 'furniture'], ['books', 'electronics'], ['beauty'], ['electronics'], ['food'], ['furniture'], ['books', 'electronics'], ['books', 'food'], ['books', 'electronics']]
@@ -1808,11 +1783,221 @@ Datapoint 78 - X: [0.039939, 0.000000, 0.014698, 0.000000, 0.000300, 0.319585, 0
 
 In general, high MSE seems to occur when the true value is extreme (either close to 0 or 1) or when there is a significant variation in the feature values. This is because MSE is sensitive to outliers due to the squaring of errors. This causes extreme values to have a significant impact on the model. (Datapoints which have features lying closer to extremes (0 or 1) have higher MSE)
 
-
+## BONUS: Using the MLP class with best model parameters
+```
+Epoch 0, Train Loss: 1.6591, Train Accuracy: 0.4256
+Validation Accuracy: 0.4474
+Epoch 10, Train Loss: 1.3523, Train Accuracy: 0.4201
+Validation Accuracy: 0.4561
+Epoch 20, Train Loss: 1.2661, Train Accuracy: 0.3961
+Validation Accuracy: 0.4474
+Epoch 30, Train Loss: 1.2297, Train Accuracy: 0.4147
+Validation Accuracy: 0.4561
+Epoch 40, Train Loss: 1.2074, Train Accuracy: 0.4365
+Validation Accuracy: 0.5175
+Epoch 50, Train Loss: 1.1916, Train Accuracy: 0.4606
+Validation Accuracy: 0.5351
+Epoch 60, Train Loss: 1.1794, Train Accuracy: 0.4934
+Validation Accuracy: 0.5351
+Epoch 70, Train Loss: 1.1696, Train Accuracy: 0.5175
+Validation Accuracy: 0.5526
+Epoch 80, Train Loss: 1.1614, Train Accuracy: 0.5219
+Validation Accuracy: 0.5439
+Epoch 90, Train Loss: 1.1543, Train Accuracy: 0.5317
+Validation Accuracy: 0.5439
+Epoch 100, Train Loss: 1.1479, Train Accuracy: 0.5295
+Validation Accuracy: 0.5614
+Epoch 110, Train Loss: 1.1421, Train Accuracy: 0.5339
+Validation Accuracy: 0.5614
+Epoch 120, Train Loss: 1.1367, Train Accuracy: 0.5438
+Validation Accuracy: 0.5789
+Epoch 130, Train Loss: 1.1316, Train Accuracy: 0.5591
+Validation Accuracy: 0.5877
+Epoch 140, Train Loss: 1.1268, Train Accuracy: 0.5667
+Validation Accuracy: 0.5965
+Epoch 150, Train Loss: 1.1221, Train Accuracy: 0.5613
+Validation Accuracy: 0.5789
+Epoch 160, Train Loss: 1.1176, Train Accuracy: 0.5689
+Validation Accuracy: 0.5965
+Epoch 170, Train Loss: 1.1132, Train Accuracy: 0.5678
+Validation Accuracy: 0.5965
+Epoch 180, Train Loss: 1.1089, Train Accuracy: 0.5678
+Validation Accuracy: 0.5877
+Epoch 190, Train Loss: 1.1047, Train Accuracy: 0.5656
+Validation Accuracy: 0.5877
+Epoch 200, Train Loss: 1.1006, Train Accuracy: 0.5667
+Validation Accuracy: 0.5789
+Epoch 210, Train Loss: 1.0965, Train Accuracy: 0.5722
+Validation Accuracy: 0.5702
+Epoch 220, Train Loss: 1.0925, Train Accuracy: 0.5744
+Validation Accuracy: 0.5789
+Epoch 230, Train Loss: 1.0886, Train Accuracy: 0.5755
+Validation Accuracy: 0.5789
+Epoch 240, Train Loss: 1.0847, Train Accuracy: 0.5766
+Validation Accuracy: 0.5789
+Epoch 250, Train Loss: 1.0809, Train Accuracy: 0.5744
+Validation Accuracy: 0.5789
+Epoch 260, Train Loss: 1.0772, Train Accuracy: 0.5700
+Validation Accuracy: 0.5702
+Epoch 270, Train Loss: 1.0735, Train Accuracy: 0.5744
+Validation Accuracy: 0.5702
+Epoch 280, Train Loss: 1.0698, Train Accuracy: 0.5744
+Validation Accuracy: 0.5702
+Epoch 290, Train Loss: 1.0662, Train Accuracy: 0.5766
+Validation Accuracy: 0.5789
+Epoch 300, Train Loss: 1.0627, Train Accuracy: 0.5777
+Validation Accuracy: 0.5789
+Epoch 310, Train Loss: 1.0593, Train Accuracy: 0.5766
+Validation Accuracy: 0.5789
+Epoch 320, Train Loss: 1.0559, Train Accuracy: 0.5755
+Validation Accuracy: 0.5789
+Epoch 330, Train Loss: 1.0526, Train Accuracy: 0.5766
+Validation Accuracy: 0.5789
+Epoch 340, Train Loss: 1.0494, Train Accuracy: 0.5766
+Validation Accuracy: 0.5789
+Epoch 350, Train Loss: 1.0462, Train Accuracy: 0.5777
+Validation Accuracy: 0.5965
+Epoch 360, Train Loss: 1.0432, Train Accuracy: 0.5777
+Validation Accuracy: 0.5965
+Epoch 370, Train Loss: 1.0401, Train Accuracy: 0.5799
+Validation Accuracy: 0.5965
+Epoch 380, Train Loss: 1.0372, Train Accuracy: 0.5788
+Validation Accuracy: 0.5877
+Epoch 390, Train Loss: 1.0343, Train Accuracy: 0.5810
+Validation Accuracy: 0.5877
+Epoch 400, Train Loss: 1.0316, Train Accuracy: 0.5810
+Validation Accuracy: 0.5877
+Epoch 410, Train Loss: 1.0289, Train Accuracy: 0.5810
+Validation Accuracy: 0.5877
+Epoch 420, Train Loss: 1.0263, Train Accuracy: 0.5821
+Validation Accuracy: 0.5965
+Epoch 430, Train Loss: 1.0237, Train Accuracy: 0.5821
+Validation Accuracy: 0.5965
+Epoch 440, Train Loss: 1.0212, Train Accuracy: 0.5821
+Validation Accuracy: 0.5965
+Epoch 450, Train Loss: 1.0188, Train Accuracy: 0.5799
+Validation Accuracy: 0.5965
+Epoch 460, Train Loss: 1.0165, Train Accuracy: 0.5810
+Validation Accuracy: 0.5965
+Epoch 470, Train Loss: 1.0142, Train Accuracy: 0.5810
+Validation Accuracy: 0.5965
+Epoch 480, Train Loss: 1.0121, Train Accuracy: 0.5810
+Validation Accuracy: 0.5965
+Epoch 490, Train Loss: 1.0099, Train Accuracy: 0.5832
+Validation Accuracy: 0.5877
+Epoch 500, Train Loss: 1.0079, Train Accuracy: 0.5777
+Validation Accuracy: 0.5877
+Epoch 510, Train Loss: 1.0059, Train Accuracy: 0.5799
+Validation Accuracy: 0.5877
+Epoch 520, Train Loss: 1.0040, Train Accuracy: 0.5777
+Validation Accuracy: 0.5877
+Epoch 530, Train Loss: 1.0022, Train Accuracy: 0.5788
+Validation Accuracy: 0.5877
+Epoch 540, Train Loss: 1.0004, Train Accuracy: 0.5777
+Validation Accuracy: 0.5877
+Epoch 550, Train Loss: 0.9987, Train Accuracy: 0.5810
+Validation Accuracy: 0.5877
+Epoch 560, Train Loss: 0.9970, Train Accuracy: 0.5810
+Validation Accuracy: 0.5877
+Epoch 570, Train Loss: 0.9954, Train Accuracy: 0.5788
+Validation Accuracy: 0.5877
+Epoch 580, Train Loss: 0.9938, Train Accuracy: 0.5810
+Validation Accuracy: 0.5877
+Epoch 590, Train Loss: 0.9923, Train Accuracy: 0.5799
+Validation Accuracy: 0.5877
+Epoch 600, Train Loss: 0.9909, Train Accuracy: 0.5821
+Validation Accuracy: 0.6053
+Epoch 610, Train Loss: 0.9895, Train Accuracy: 0.5832
+Validation Accuracy: 0.6053
+Epoch 620, Train Loss: 0.9881, Train Accuracy: 0.5810
+Validation Accuracy: 0.6053
+Epoch 630, Train Loss: 0.9868, Train Accuracy: 0.5788
+Validation Accuracy: 0.6053
+Epoch 640, Train Loss: 0.9855, Train Accuracy: 0.5799
+Validation Accuracy: 0.6053
+Epoch 650, Train Loss: 0.9843, Train Accuracy: 0.5799
+Validation Accuracy: 0.6140
+Epoch 660, Train Loss: 0.9831, Train Accuracy: 0.5799
+Validation Accuracy: 0.6140
+Epoch 670, Train Loss: 0.9820, Train Accuracy: 0.5788
+Validation Accuracy: 0.6140
+Epoch 680, Train Loss: 0.9808, Train Accuracy: 0.5777
+Validation Accuracy: 0.6140
+Epoch 690, Train Loss: 0.9798, Train Accuracy: 0.5799
+Validation Accuracy: 0.6140
+Epoch 700, Train Loss: 0.9787, Train Accuracy: 0.5788
+Validation Accuracy: 0.6140
+Epoch 710, Train Loss: 0.9777, Train Accuracy: 0.5842
+Validation Accuracy: 0.6228
+Epoch 720, Train Loss: 0.9768, Train Accuracy: 0.5832
+Validation Accuracy: 0.6228
+Epoch 730, Train Loss: 0.9758, Train Accuracy: 0.5842
+Validation Accuracy: 0.6228
+Epoch 740, Train Loss: 0.9749, Train Accuracy: 0.5832
+Validation Accuracy: 0.6228
+Epoch 750, Train Loss: 0.9740, Train Accuracy: 0.5842
+Validation Accuracy: 0.6228
+Epoch 760, Train Loss: 0.9732, Train Accuracy: 0.5842
+Validation Accuracy: 0.6140
+Epoch 770, Train Loss: 0.9723, Train Accuracy: 0.5832
+Validation Accuracy: 0.6140
+Epoch 780, Train Loss: 0.9715, Train Accuracy: 0.5842
+Validation Accuracy: 0.6140
+Epoch 790, Train Loss: 0.9708, Train Accuracy: 0.5842
+Validation Accuracy: 0.6140
+Epoch 799, Train Loss: 0.9701, Train Accuracy: 0.5842
+Validation Accuracy: 0.6140
+[2 3 3 3 3 3 4 3 5 1 3 3 2 3 2 2 3 3 3 3 2 2 2 3 3 3 3 3 3 4 3 2 3 3 2 2 3
+ 2 3 3 1 2 3 1 3 2 2 3 4 2 3 4 2 2 4 4 4 3 3 2 2 3 2 3 5 2 2 3 3 5 2 2 3 2
+ 3 2 2 2 3 3 2 4 3 2 3 2 2 3 3 2 4 2 2 3 3 2 2 2 0 2 3 2 0 3 2 3 3 2 3 3 2
+ 1 4 4 3] [2 3 4 2 3 2 3 3 3 2 3 3 2 3 2 2 3 3 3 2 2 2 2 2 3 3 2 2 3 3 3 2 3 3 3 2 3
+ 2 2 2 2 2 2 2 3 2 2 3 3 3 2 4 3 3 3 3 4 3 2 2 2 2 2 3 3 2 3 3 2 3 2 2 3 2
+ 2 2 2 2 3 3 2 3 3 2 3 2 2 3 2 2 3 2 3 3 3 2 2 2 2 3 3 2 2 3 2 3 3 2 2 2 2
+ 3 3 3 2]
+Accuracy: 0.6173913043478261          
+Precision: 0.31657957055234937          
+Recall: 0.2756071367593498          
+F1 Score: 0.294675945674385
+(359, 1)
+Epoch 0, Train Loss: 0.0244, Train MSE: 0.0244
+Validation MSE: 0.0197
+Epoch 10, Train Loss: 0.0132, Train MSE: 0.0132
+Validation MSE: 0.0095
+Epoch 20, Train Loss: 0.0119, Train MSE: 0.0119
+Validation MSE: 0.0087
+Epoch 30, Train Loss: 0.0107, Train MSE: 0.0107
+Validation MSE: 0.0079
+Epoch 40, Train Loss: 0.0098, Train MSE: 0.0098
+Validation MSE: 0.0073
+Epoch 50, Train Loss: 0.0092, Train MSE: 0.0092
+Validation MSE: 0.0070
+Epoch 60, Train Loss: 0.0088, Train MSE: 0.0088
+Validation MSE: 0.0069
+Epoch 70, Train Loss: 0.0086, Train MSE: 0.0086
+Validation MSE: 0.0069
+Epoch 80, Train Loss: 0.0085, Train MSE: 0.0085
+Validation MSE: 0.0069
+Epoch 90, Train Loss: 0.0083, Train MSE: 0.0083
+Validation MSE: 0.0069
+Epoch 100, Train Loss: 0.0082, Train MSE: 0.0082
+Validation MSE: 0.0069
+Epoch 110, Train Loss: 0.0080, Train MSE: 0.0080
+Validation MSE: 0.0069
+Early stopping at epoch 118
+0.019612398646343537
+0.14004427387916843
+MSE: 0.019612398646343537            
+MAE: 0.06929262733373137            
+RMSE: 0.14004427387916843            
+R2 Score: 0.6231094565949846
+```
 ## 4 AutoEncoders
 
 ![Plot](./figures/knn_og_vs_autoencoder_bar_2.png)
 
+
+
+---
 
 ##### Table 1: Performance Metrics without Dimensionality Reduction (KNN on the Original Dataset)
 
@@ -1827,7 +2012,24 @@ In general, high MSE seems to occur when the true value is extreme (either close
 | **F1-Score (micro)**     | 0.2561   |
 | **Time Taken**           | 74.9516 s|
 
-##### Table 2: Performance Metrics with Autoencoder-based Dimensionality Reduction (KNN on Reduced Dataset)
+---
+
+##### Table 2: Performance Metrics with PCA-based Dimensionality Reduction (KNN on Reduced Dataset)
+
+| Metric                  | Value    |
+|-------------------------|----------|
+| **Accuracy**             | 0.2207   |
+| **Precision (macro)**    | 0.1941   |
+| **Recall (macro)**       | 0.2135   |
+| **F1-Score (macro)**     | 0.2033   |
+| **Precision (micro)**    | 0.2207   |
+| **Recall (micro)**       | 0.2207   |
+| **F1-Score (micro)**     | 0.2207   |
+| **Time Taken**           | 60.4215 s|
+
+---
+
+##### Table 3: Performance Metrics with Autoencoder-based Dimensionality Reduction (KNN on Reduced Dataset)
 
 | Metric                  | Value    |
 |-------------------------|----------|
@@ -1840,16 +2042,27 @@ In general, high MSE seems to occur when the true value is extreme (either close
 | **F1-Score (micro)**     | 0.1601   |
 | **Time Taken**           | 59.6965 s|
 
+---
+
 #### 3. Comparison and Analysis
 
-The results from Tables 1 and 2 show a clear decrease in the performance of the KNN classifier when using the reduced dataset generated by the autoencoder. The accuracy, precision, recall, and F1-score all drop when the dimensionality is reduced using the autoencoder.
+The results from Tables 1, 2, and 3 show the performance of the KNN classifier on the original dataset, the PCA-reduced dataset, and the autoencoder-reduced dataset. The key observations are as follows:
 
-- **Accuracy**: The accuracy dropped from 0.2561 to 0.1601, indicating that the autoencoder did not preserve the discriminative properties of the original dataset for KNN classification.
-- **Precision (macro and micro)**: The precision values in both the macro and micro cases also dropped significantly, from 0.2340 (macro) to 0.1359 and from 0.2561 (micro) to 0.1601.
-- **Recall (macro and micro)**: The recall also experienced a decrease, reflecting a decline in the model's ability to correctly identify relevant instances after dimensionality reduction.
-- **F1-Score (macro and micro)**: The F1-score similarly decreased for both macro and micro metrics.
+- **Accuracy**: 
+  - The highest accuracy is achieved with the original dataset (0.2561). 
+  - After PCA-based reduction, the accuracy drops to 0.2207, indicating some loss of discriminative power but still maintaining reasonable classification performance.
+  - The autoencoder-based reduction yields the lowest accuracy (0.1601), suggesting that the autoencoder struggled to capture the important features required for effective KNN classification.
 
-One positive aspect, however, is that the **time taken** for the task decreased from 74.9516 seconds to 59.6965 seconds, reflecting that the KNN model processes the reduced dataset faster due to lower dimensionality.
+- **Precision, Recall, and F1-Score (macro and micro)**:
+  - In all cases, the original dataset performs the best across macro and micro precision, recall, and F1-score.
+  - PCA-based reduction results in a moderate drop in all performance metrics compared to the original dataset. For instance, macro F1-score drops from 0.2405 to 0.2033.
+  - Autoencoder-based reduction results in the most significant decline in performance metrics, with macro F1-score dropping to 0.1449 and micro precision and recall both decreasing to 0.1601.
+
+- **Time Taken**:
+  - The time taken for the KNN classification decreases as the dimensionality is reduced. The original dataset takes the longest (74.9516 seconds), while the autoencoder-reduced dataset has the shortest time (59.6965 seconds). 
+  - PCA reduction (60.4215 seconds) also improves the processing speed compared to the original dataset, equivalent to the auto encoder (same number of dimensions)
+
+Overall, while both PCA and autoencoder-based dimensionality reduction improve the speed of KNN classification, PCA preserves more of the original dataset's performance metrics compared to the autoencoder.
 
 #### 4. Epoch-wise Training Progress (Autoencoder)
 
@@ -2064,29 +2277,40 @@ config = {
 | **Recall (micro)**       | 0.2561                  | 0.1601                 | 0.2578                 |
 | **F1-Score (macro)**     | 0.2405                  | 0.1449                 | 0.2439                 |
 | **F1-Score (micro)**     | 0.2561                  | 0.1601                 | 0.2578                 |
-| **Time Taken (s)**       | 71.1714                 | 63.4309                | Not reported           |
+| **Time Taken (Training/Inference)**       | 74.9516 s  (Inference)       | 59.6965 s (Inference)    | 172.9960 s (Training), 0.0495 s (Inference) |
+
+---
 
 ### Analysis:
 
 1. **Accuracy**: 
-   - The MLP classifier achieved a slightly higher accuracy (0.2578) than both the KNN (without reduction) at 0.2561 and KNN with autoencoder at 0.1601. The difference in accuracy between MLP and KNN without reduction is minor, but the performance of KNN drastically drops when dimensionality reduction is applied.
+   - The MLP classifier achieved a slightly higher accuracy (0.2578) compared to KNN without reduction (0.2561) and performed significantly better than KNN with autoencoder reduction (0.1601). The difference in accuracy between MLP and KNN without reduction is minor, but the performance of KNN drastically drops when dimensionality reduction is applied.
 
 2. **Precision (macro and micro)**:
-   - MLP achieved a macro precision of 0.2379, which is slightly better than KNN without reduction (0.2340) and much better than KNN with autoencoder (0.1359). The micro precision follows a similar trend, with MLP showing marginal improvements over KNN without reduction and outperforming the autoencoder version.
+   - MLP achieved a macro precision of 0.2379, slightly better than KNN without reduction (0.2340) and significantly better than KNN with autoencoder (0.1359). Micro precision follows the same pattern, with MLP showing marginal improvements over KNN without reduction and outperforming the autoencoder version.
 
 3. **Recall (macro and micro)**:
-   - In terms of recall, MLP performs slightly better than KNN without reduction in both macro and micro settings (MLP macro recall 0.2503 vs. KNN without reduction macro recall 0.2472). KNN with autoencoder once again shows much lower performance (0.1552 for macro recall).
+   - In terms of recall, MLP performed slightly better than KNN without reduction in both macro and micro settings (MLP macro recall 0.2503 vs. KNN without reduction macro recall 0.2472). KNN with autoencoder exhibited much lower performance (0.1552 for macro recall).
 
 4. **F1-Score (macro and micro)**:
-   - MLP's macro and micro F1-scores are again slightly better than KNN without reduction. However, the KNN with autoencoder reduction significantly drops in performance.
+   - MLP's macro and micro F1-scores were also slightly better than KNN without reduction. However, KNN with autoencoder reduction saw a significant drop in performance.
 
-The MLP classifier slightly outperforms KNN without dimensionality reduction in terms of accuracy, precision, recall, and F1-score.
+Overall, the MLP classifier slightly outperforms KNN without dimensionality reduction in terms of accuracy, precision, recall, and F1-score.
 
-1. **MLP Inference vs. Training**: 
-   - **MLP inference** is much faster once the model is trained because it only involves a forward pass through the network, which is computationally light compared to KNN's distance calculations. However, **MLP training** is much slower due to the need for multiple forward and backward passes, weight updates, and gradient descent optimization. This makes MLP more time-consuming during training but highly efficient during inference.
+### 1. MLP Training vs. Inference
 
-2. **KNN Training vs. Inference**: 
-   - **KNN trains almost instantly** because it essentially memorizes the entire training dataset without performing any learning or parameter updates. However, **KNN inference** is much slower since it requires computing distances between the test point and all training points for every query, making it computationally expensive for large datasets. In other words, KNN's inference time scales poorly with dataset size.
+- **MLP training** takes **172.9960 seconds**, which is significantly longer than the KNN training (which is nearly instantaneous as KNN memorizes the dataset).
+- **MLP inference** takes only **0.0495 seconds**, much faster than KNN inference due to MLP's reliance on a simple forward pass after training. This highlights MLP's efficiency during inference, as the network only needs to propagate the input through the layers, avoiding the need for distance calculations typical in KNN.
+  
+MLP's training phase is computationally intensive due to the repeated forward and backward passes and weight updates across epochs. However, the **benefit is in the inference phase**, where it is much faster than KNN, particularly when dealing with larger datasets.
 
-### Hyperparameter Tuning:
-- **Better hyperparameter tuning** can further improve the MLP's performance. Tuning factors such as learning rate, batch size, number of hidden layers, and activation functions can significantly enhance the model's ability to generalize and perform well on unseen data.
+### 2. KNN Training vs. Inference
+
+- **KNN training** is essentially immediate because it does not involve actual learning—just storing the training data.
+- **KNN inference**, however, is slower and scales poorly with the size of the training data because it requires calculating distances between a test sample and all training samples. In the case of KNN with autoencoder reduction, although the reduced dimensionality leads to faster inference times (63.4309 seconds vs. 74.9516 seconds for KNN without reduction), the performance metrics drop significantly.
+
+### 3. Hyperparameter Tuning:
+
+- **Better hyperparameter tuning** could further improve the MLP's performance. Fine-tuning parameters such as learning rate, batch size, the number of hidden layers, and activation functions could enhance the model's ability to generalize better and perform more effectively on unseen data. Given that the training time for MLP is considerable, careful tuning could also help in reducing the time required to reach optimal performance.
+
+**MLP's long training time** is offset by its **fast inference time**, making it suitable for applications where quick predictions are needed after the model is trained. KNN, on the other hand, is much faster to set up but can struggle in inference time as the dataset size grows. The autoencoder's dimensionality reduction improved inference speed but at a significant cost to accuracy and other performance metrics.
