@@ -465,6 +465,47 @@ def print_hyperparams_wineqt(file_path="data/interim/3/WineQT/hyperparams_2fd1o2
     print(markdown_table)
     metrics_df.to_markdown("temp.md", index=False)
 
+def print_hyperparams_advertisement(file_path="data/interim/3/advertisement/hyperparams_2hry5c8h.csv"):
+    df = pd.read_csv(file_path)
+
+    metrics_df = df[
+        [
+            "activation",
+            "batch_size",
+            "hidden_layers",
+            "optimizer",
+            "lr",
+            "max_epochs",
+            "accuracy_val_final",
+            "epoch",
+            "f1_score_val_final",
+            "precision_val_final",
+            "recall_val_final",
+            "hamming_accuracy",
+            "hamming_loss"
+
+        ]
+    ]
+    metrics_df.columns = [
+        "Activation",
+        "Batch Size",
+        "Hidden Layers",
+        "Optimizer",
+        "Learning Rate",
+        "Max Epochs",
+        "Validation Accuracy",
+        "Epoch",
+        "F1 Score",
+        "Precision",
+        "Recall",
+        "Hamming Accuracy",
+        "Hamming Loss"
+    ]
+
+    markdown_table = metrics_df.to_markdown(index=False)
+    print(markdown_table)
+    metrics_df.to_markdown("temp.md", index=False)
+
 def test_on_best_wineqt():
     with open("data/interim/3/WineQT/best_model_config.json", "r") as file:
         config = json.load(file)
@@ -491,6 +532,7 @@ def test_on_best_wineqt():
     # model.gradient_checking(X_train[:5], y_train[:5])
     y_pred_test = model.predict(X_test)
     test_metrics = Metrics(y_test, y_pred_test, task="classification")
+    print(y_test, y_pred_test)
 
     test_accuracy = test_metrics.accuracy()
     precision = test_metrics.precision_score()
@@ -651,6 +693,67 @@ def test_on_best_housing():
             \nR2 Score: {r2}"
     )
 
+def test_on_best_advertisement(index_to_label):
+    with open("data/interim/3/advertisement/best_model_config.json", "r") as file:
+        config = json.load(file)
+    model = MultiLabelMLP(
+        input_size=X_train.shape[1],
+        hidden_layers=config["hidden_layers"],
+        output_size=8,
+        learning_rate=config["lr"],
+        activation=config["activation"],
+        optimizer=config["optimizer"],
+        wandb_log=False,
+        print_every=100
+    )
+    costs = model.fit(
+        X_train,
+        y_train,
+        max_epochs=config["max_epochs"],
+        batch_size=config["batch_size"],
+        X_validation=X_validation,
+        y_validation=y_validation,
+        early_stopping=True,
+        patience=config["max_epochs"]// 20,
+    )
+    
+    y_pred_test = model.predict(X_test)
+
+    all_labels = []
+
+    for multi_hot_vector in y_pred_test:
+        labels = [index_to_label[idx] for idx, value in enumerate(multi_hot_vector) if value == 1]
+        all_labels.append(labels)
+
+    print('Predictions',all_labels)
+
+    print('Multi Hot Encoding of predictions', y_pred_test)
+
+    for multi_hot_vector in y_test:
+        labels = [index_to_label[idx] for idx, value in enumerate(multi_hot_vector) if value == 1]
+        all_labels.append(labels)
+
+    print('Actual', all_labels)
+
+    print('Multi Hot Encoding of actual', y_test)
+ 
+    test_metrics = Metrics(y_test, y_pred_test, task="classification")
+
+    test_accuracy = test_metrics.accuracy(one_hot=True)
+    precision = test_metrics.precision_score()
+    recall = test_metrics.recall_score()
+    f1_score = test_metrics.f1_score()
+    hamming_loss = test_metrics.hamming_loss()
+    hamming_accuracy = test_metrics.hamming_accuracy()
+
+    print(f'Accuracy: {test_accuracy}\
+          \nPrecision: {precision}\
+          \nRecall: {recall}\
+          \nF1 Score: {f1_score}')
+
+    print(f'Hamming Loss: {hamming_loss}\
+        \nHamming Accuracy: {hamming_accuracy}')
+
 
 def multi_hot_encode(labels):
     unique_labels = set(label for sublist in labels for label in sublist.split())
@@ -763,6 +866,7 @@ def encode_labels(dataset):
         unique_labels.update(label_list.split())
     unique_labels = sorted(unique_labels)
     label_to_index = {label: idx for idx, label in enumerate(unique_labels)}
+    print(label_to_index)
     index_to_label = {idx: label for label, idx in label_to_index.items()}
 
     def multi_hot_encode(labels):
@@ -775,12 +879,12 @@ def encode_labels(dataset):
             encoded_array.append(encoded)
         return encoded_array
 
-    return multi_hot_encode(dataset["labels"])
+    return multi_hot_encode(dataset["labels"]), index_to_label
 
 
 def get_advertisement_data():
     dataset = pd.read_csv("data/interim/3/advertisement/advertisement_encoded.csv")
-    labels = encode_labels(dataset)
+    labels, index_to_label = encode_labels(dataset)
     dataset["labels"] = labels
 
     shuffled_indices = np.random.permutation(len(dataset))
@@ -802,7 +906,7 @@ def get_advertisement_data():
     X_test = test_dataset.drop(columns="labels").values
     y_test = np.array(test_dataset["labels"].tolist())
 
-    return X_train, y_train, X_validation, y_validation, X_test, y_test
+    return X_train, y_train, X_validation, y_validation, X_test, y_test, index_to_label
 
 import os
 
@@ -990,12 +1094,13 @@ if __name__ == "__main__":
 
     # print_hyperparams_wineqt()
 
-    test_on_best_wineqt()
+    # test_on_best_wineqt()
 
-    analyze_model_impact()
+    # analyze_model_impact()
+
 
     # advertisement_preprocessing()
-    # X_train, y_train, X_validation, y_validation, X_test, y_test = (get_advertisement_data())
+    X_train, y_train, X_validation, y_validation, X_test, y_test, index_to_label = (get_advertisement_data())
     # best_model_params = None
     # best_validation_accuracy = 0
 
@@ -1008,35 +1113,9 @@ if __name__ == "__main__":
 
     # wandb.finish()
 
-    # model = MultiLabelMLP(X_train.shape[1], [64,64], 8, learning_rate=0.1, activation='sigmoid', optimizer='sgd', print_every=10)
-    # costs = model.fit(
-    #         X_train, y_train,
-    #         max_epochs=1500,
-    #         batch_size=32,
-    #         X_validation=X_validation,
-    #         y_validation=y_validation,
-    #         early_stopping=False,
-    #         patience=100
-    #     )
-    # y_pred_test = model.predict(X_test)
-    # print(y_pred_test)
-    # print(y_test)
-    # test_metrics = Metrics(y_test, y_pred_test, task="classification")
+    test_on_best_advertisement(index_to_label)
 
-    # test_accuracy = test_metrics.accuracy(one_hot=True)
-    # precision = test_metrics.precision_score()
-    # recall = test_metrics.recall_score()
-    # f1_score = test_metrics.f1_score()
-    # hamming_loss = test_metrics.hamming_loss()
-    # hamming_accuracy = test_metrics.hamming_accuracy()
-
-    # print(f'Accuracy: {test_accuracy}\
-    #       \nPrecision: {precision}\
-    #       \nRecall: {recall}\
-    #       \nF1 Score: {f1_score}')
-
-    # print(f'Hamming Loss: {hamming_loss}\
-    #     \nHamming Accuracy: {hamming_accuracy}')
+    # print_hyperparams_advertisement()
 
     # housing_preprocessing()
     # np.random.seed(13)

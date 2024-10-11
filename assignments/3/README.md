@@ -761,9 +761,292 @@ sponding metrics mentioned above
 
    **Observation**: Smaller batch sizes (16, 32) lead to faster convergence but with more noise, whereas larger batch sizes (64, 128) smooth out the learning but slow down the convergence. Batch size 32 appears to be the best compromise between convergence speed and stability.
 
-   ## 2.6 Multi-Label Classification
+## 2.6 Multi-Label Classification
 
+![Plot](./figures/2.6.1.png)
+
+<details>
+  <summary>View Table</summary>
+
+| Activation   |   Batch Size | Hidden Layers   | Optimizer   |   Learning Rate |   Max Epochs |   Validation Accuracy |   Epoch |   F1 Score |   Precision |   Recall |   Hamming Accuracy |   Hamming Loss |
+|:-------------|-------------:|:----------------|:------------|----------------:|-------------:|----------------------:|--------:|-----------:|------------:|---------:|-------------------:|---------------:|
+| sigmoid      |           16 | [128,64]        | sgd         |            0.1  |         1500 |                  0.11 |    1500 |   0.692005 |    0.727483 | 0.659827 |            0.73875 |        0.26125 |
+| sigmoid      |           32 | [128,64]        | sgd         |            0.01 |         1500 |                  0.06 |    1500 |   0.593874 |    0.618561 | 0.571082 |            0.67    |        0.33    |
+| relu         |           16 | [128]           | mbgd        |            0.05 |         1500 |                  0.05 |    1500 |   0.664255 |    0.663834 | 0.664675 |            0.69625 |        0.30375 |
+| tanh         |           64 | [64,64]         | sgd         |            0.01 |         1500 |                  0.05 |    1500 |   0.552861 |    0.553342 | 0.552381 |            0.6     |        0.4     |
+| relu         |           64 | [128,64]        | bgd         |            0.2  |         1500 |                  0.02 |     217 |   0.563987 |    0.583624 | 0.545628 |            0.6525  |        0.3475  |
+| tanh         |           64 | [64,64,32]      | sgd         |            0.2  |         1500 |                  0.01 |     236 |   0.539263 |    0.540961 | 0.537576 |            0.59875 |        0.40125 |
+| sigmoid      |           16 | [64,64,32]      | sgd         |            0.05 |         1500 |                  0.01 |    1500 |   0.617054 |    0.656833 | 0.581818 |            0.6875  |        0.3125  |
+| relu         |           64 | [64,32]         | bgd         |            0.2  |         1500 |                  0.01 |     249 |   0.542047 |    0.580128 | 0.508658 |            0.65625 |        0.34375 |
+| relu         |           64 | [64,32]         | bgd         |            0.2  |         1500 |                  0.01 |     137 |   0.506441 |    0.510522 | 0.502424 |            0.64125 |        0.35875 |
+| relu         |           64 | [128,64]        | mbgd        |            0.2  |         1500 |                  0.01 |     214 |   0.533115 |    0.549813 | 0.517403 |            0.645   |        0.355   |
+| sigmoid      |           16 | [64,32]         | sgd         |            0.01 |         1500 |                  0.01 |    1500 |   0.562842 |    0.605957 | 0.525455 |            0.66125 |        0.33875 |
+| sigmoid      |           16 | [64,64,32]      | sgd         |            0.01 |         1500 |                  0.01 |    1500 |   0.528458 |    0.55617  | 0.503377 |            0.655   |        0.345   |
+| relu         |           64 | [64,64,32]      | mbgd        |            0.1  |         1500 |                  0    |     198 |   0.460169 |    0.427673 | 0.498009 |            0.6525  |        0.3475  |
+| relu         |           16 | [64,64,32]      | bgd         |            0.05 |         1500 |                  0    |     294 |   0.523973 |    0.538203 | 0.510476 |            0.645   |        0.355   |
+| relu         |           64 | [128,64]        | mbgd        |            0.2  |         1500 |                  0    |     143 |   0.497065 |    0.494672 | 0.499481 |            0.64875 |        0.35125 |
+| relu         |           64 | [64,64,32]      | mbgd        |            0.2  |         1500 |                  0    |     169 |   0.396226 |    0.328125 | 0.5      |            0.65625 |        0.34375 |
+| relu         |           64 | [64,64,32]      | mbgd        |            0.2  |         1500 |                  0    |     155 |   0.396226 |    0.328125 | 0.5      |            0.65625 |        0.34375 |
+| relu         |           64 | [128,64]        | sgd         |            0.2  |         1500 |                  0    |     173 |   0.592377 |    0.67356  | 0.528658 |            0.67    |        0.33    |
+| relu         |           64 | [64,32]         | sgd         |            0.2  |         1500 |                  0    |     358 |   0.626584 |    0.828947 | 0.503636 |            0.65875 |        0.34125 |
+| relu         |           64 | [128,64]        | sgd         |            0.2  |         1500 |                  0    |     726 |   0.554182 |    0.614844 | 0.504416 |            0.6575  |        0.3425  |
+| relu         |           64 | [128,64]        | bgd         |            0.2  |         1500 |                  0    |     173 |   0.396226 |    0.328125 | 0.5      |            0.65625 |        0.34375 |
+| relu         |           64 | [64,64,32]      | bgd         |            0.1  |         1500 |                  0    |     277 |   0.396226 |    0.328125 | 0.5      |            0.65625 |        0.34375 |
+| relu         |           64 | [64,64,32]      | bgd         |            0.2  |         1500 |                  0    |     457 |   0.396226 |    0.328125 | 0.5      |            0.65625 |        0.34375 |
+| relu         |           64 | [64,64,32]      | mbgd        |            0.2  |         1500 |                  0    |     170 |   0.396226 |    0.328125 | 0.5      |            0.65625 |        0.34375 |
+| relu         |           64 | [64,64,32]      | mbgd        |            0.2  |         1500 |                  0    |     150 |   0.396226 |    0.328125 | 0.5      |            0.65625 |        0.34375 |
+| relu         |           64 | [64,32]         | bgd         |            0.2  |         1500 |                  0    |     154 |   0.554256 |    0.603704 | 0.512294 |            0.65875 |        0.34125 |
+| relu         |           64 | [64,64,32]      | mbgd        |            0.2  |         1500 |                  0    |     279 |   0.396226 |    0.328125 | 0.5      |            0.65625 |        0.34375 |
+| relu         |           64 | [64,64,32]      | mbgd        |            0.2  |         1500 |                  0    |     294 |   0.396226 |    0.328125 | 0.5      |            0.65625 |        0.34375 |
+| relu         |           64 | [64,64,32]      | mbgd        |            0.2  |         1500 |                  0    |     156 |   0.396226 |    0.328125 | 0.5      |            0.65625 |        0.34375 |
+| relu         |           64 | [64,64,32]      | bgd         |            0.2  |         1500 |                  0    |     170 |   0.396226 |    0.328125 | 0.5      |            0.65625 |        0.34375 |
+| relu         |           32 | [64,64,32]      | mbgd        |            0.1  |         1500 |                  0    |     382 |   0.396226 |    0.328125 | 0.5      |            0.65625 |        0.34375 |
+| relu         |           64 | [64,64,32]      | bgd         |            0.2  |         1500 |                  0    |     218 |   0.396226 |    0.328125 | 0.5      |            0.65625 |        0.34375 |
+| relu         |           64 | [64,64,32]      | mbgd        |            0.2  |         1500 |                  0    |     161 |   0.396226 |    0.328125 | 0.5      |            0.65625 |        0.34375 |
+| relu         |           64 | [64,64,32]      | mbgd        |            0.2  |         1500 |                  0    |     716 |   0.396226 |    0.328125 | 0.5      |            0.65625 |        0.34375 |
+| relu         |           64 | [128,64]        | mbgd        |            0.2  |         1500 |                  0    |     626 |   0.497277 |    0.494752 | 0.499827 |            0.65375 |        0.34625 |
+| relu         |           64 | [64,32]         | bgd         |            0.2  |         1500 |                  0    |     259 |   0.591243 |    0.705177 | 0.509004 |            0.66125 |        0.33875 |
+| relu         |           64 | [128,64]        | bgd         |            0.2  |         1500 |                  0    |     277 |   0.506855 |    0.511905 | 0.501905 |            0.64625 |        0.35375 |
+| relu         |           64 | [64,64,32]      | mbgd        |            0.2  |         1500 |                  0    |     438 |   0.396226 |    0.328125 | 0.5      |            0.65625 |        0.34375 |
+| relu         |           64 | [64,64,32]      | mbgd        |            0.2  |         1500 |                  0    |     136 |   0.396226 |    0.328125 | 0.5      |            0.65625 |        0.34375 |
+| relu         |           64 | [64,64,32]      | bgd         |            0.2  |         1500 |                  0    |     169 |   0.47481  |    0.452889 | 0.498961 |            0.65375 |        0.34625 |
+| relu         |           64 | [64,64,32]      | mbgd        |            0.2  |         1500 |                  0    |     155 |   0.396226 |    0.328125 | 0.5      |            0.65625 |        0.34375 |
+| relu         |           64 | [64,64,32]      | mbgd        |            0.2  |         1500 |                  0    |     143 |   0.396226 |    0.328125 | 0.5      |            0.65625 |        0.34375 |
+| relu         |           32 | [64,64,32]      | mbgd        |            0.1  |         1500 |                  0    |     258 |   0.396226 |    0.328125 | 0.5      |            0.65625 |        0.34375 |
+| relu         |           64 | [64,32]         | sgd         |            0.2  |         1500 |                  0    |     311 |   0.553968 |    0.599463 | 0.514892 |            0.65875 |        0.34125 |
+| relu         |           64 | [128,64]        | sgd         |            0.2  |         1500 |                  0    |     123 |   0.501177 |    0.502098 | 0.50026  |            0.6475  |        0.3525  |
+| relu         |           64 | [64,64,32]      | mbgd        |            0.1  |         1500 |                  0    |     269 |   0.396226 |    0.328125 | 0.5      |            0.65625 |        0.34375 |
+| relu         |           64 | [64,64,32]      | bgd         |            0.2  |         1500 |                  0    |     719 |   0.396226 |    0.328125 | 0.5      |            0.65625 |        0.34375 |
+| relu         |           64 | [128,64]        | bgd         |            0.2  |         1500 |                  0    |     126 |   0.483723 |    0.470465 | 0.497749 |            0.64875 |        0.35125 |
+| relu         |           64 | [64,64,32]      | bgd         |            0.2  |         1500 |                  0    |     689 |   0.396226 |    0.328125 | 0.5      |            0.65625 |        0.34375 |
+| relu         |           64 | [64,64,32]      | mbgd        |            0.1  |         1500 |                  0    |     254 |   0.396226 |    0.328125 | 0.5      |            0.65625 |        0.34375 |
+| relu         |           64 | [64,64,32]      | bgd         |            0.2  |         1500 |                  0    |     210 |   0.396226 |    0.328125 | 0.5      |            0.65625 |        0.34375 |
+| tanh         |           16 | [64,64,32]      | bgd         |            0.05 |         1500 |                  0    |     970 |   0.532479 |    0.532836 | 0.532121 |            0.5825  |        0.4175  |
+| relu         |           64 | [64,64,32]      | mbgd        |            0.2  |         1500 |                  0    |     167 |   0.396226 |    0.328125 | 0.5      |            0.65625 |        0.34375 |
+| relu         |           64 | [128,64]        | sgd         |            0.2  |         1500 |                  0    |     241 |   0.488093 |    0.477848 | 0.498788 |            0.65125 |        0.34875 |
+| relu         |           64 | [64,64,32]      | mbgd        |            0.2  |         1500 |                  0    |     163 |   0.396226 |    0.328125 | 0.5      |            0.65625 |        0.34375 |
+| relu         |           64 | [64,64,32]      | mbgd        |            0.05 |         1500 |                  0    |     391 |   0.396226 |    0.328125 | 0.5      |            0.65625 |        0.34375 |
+| relu         |           64 | [128,64]        | bgd         |            0.2  |         1500 |                  0    |     166 |   0.396226 |    0.328125 | 0.5      |            0.65625 |        0.34375 |
+| relu         |           64 | [128,64]        | sgd         |            0.2  |         1500 |                  0    |     337 |   0.497277 |    0.494752 | 0.499827 |            0.65375 |        0.34625 |
+| relu         |           64 | [64,64,32]      | mbgd        |            0.2  |         1500 |                  0    |     163 |   0.396226 |    0.328125 | 0.5      |            0.65625 |        0.34375 |
+| relu         |           64 | [64,64,32]      | bgd         |            0.2  |         1500 |                  0    |     152 |   0.396226 |    0.328125 | 0.5      |            0.65625 |        0.34375 |
+| relu         |           64 | [128,64]        | mbgd        |            0.2  |         1500 |                  0    |     122 |   0.542629 |    0.580334 | 0.509524 |            0.65625 |        0.34375 |
+| relu         |           64 | [64,64,32]      | mbgd        |            0.1  |         1500 |                  0    |     245 |   0.396226 |    0.328125 | 0.5      |            0.65625 |        0.34375 |
+| relu         |           64 | [64,64,32]      | bgd         |            0.2  |         1500 |                  0    |     473 |   0.396226 |    0.328125 | 0.5      |            0.65625 |        0.34375 |
+| relu         |           64 | [64,64,32]      | mbgd        |            0.1  |         1500 |                  0    |     283 |   0.396226 |    0.328125 | 0.5      |            0.65625 |        0.34375 |
+
+</details>
+
+3. To assess the performance of the best model identified through hyperparameter tuning, evaluate it on the test set and report the metrics as outlined above
+
+| Parameter                   | Value        |
+|-----------------------------|--------------|
+| Activation                  | sigmoid      |
+| Batch Size                  | 16           |
+| Hidden Layers               | [128, 64]    |
+| Learning Rate               | 0.1          |
+| Max Epochs                  | 1500         |
+| Optimizer                   | sgd          |
+
+On test set,
+
+| Metric           | Value                          |
+|------------------|--------------------------------|
+| Accuracy         | 0.07                           |
+| Precision        | 0.689729222513694              |
+| Recall           | 0.6378038179033538             |
+| F1 Score         | 0.6627510096480106             |
+| Hamming Loss     | 0.2925                         |
+| Hamming Accuracy | 0.7075                         |
+
+## 2.7 Analysis
+
+### Single lbel classifiction
+
+True:
+[2 3 3 3 3 3 4 3 5 1 3 3 2 3 2 2 3 3 3 3 2 2 2 3 3 3 3 3 3 4 3 2 3 3 2 2 3
+ 2 3 3 1 2 3 1 3 2 2 3 4 2 3 4 2 2 4 4 4 3 3 2 2 3 2 3 5 2 2 3 3 5 2 2 3 2
+ 3 2 2 2 3 3 2 4 3 2 3 2 2 3 3 2 4 2 2 3 3 2 2 2 0 2 3 2 0 3 2 3 3 2 3 3 2
+ 1 4 4 3] 
+
+Predicted:
+[2 3 4 2 3 2 3 3 3 2 3 3 2 3 2 2 3 3 3 3 2 2 2 2 3 3 2 2 3 3 3 2 3 3 3 3 3
+ 2 3 3 2 2 2 3 3 2 2 3 3 3 3 4 3 3 3 3 4 3 2 2 3 2 2 3 3 2 3 3 2 4 2 2 3 2
+ 2 2 2 2 3 3 2 3 3 2 3 2 2 3 2 2 3 2 3 2 3 2 2 2 2 2 3 2 2 3 2 3 3 2 3 2 2
+ 2 3 4 2]
+
+## Class Distribution (Original → Adjusted)
+0 → 3: Least frequent
+5 → 8: Second least frequent
+1 → 4: Third least frequent
+4 → 7: Fourth most frequent
+3 → 6: Second most frequent
+2 → 5: Most frequent
+
+## Class-wise Performance
+
+### Class 3 
+- Actual occurrences: 2
+- Correct predictions: 0
+- Accuracy: 0%
+
+### Class 8 
+- Actual occurrences: 3
+- Correct predictions: 0
+- Accuracy: 0%
+
+### Class 4 
+- Actual occurrences: 4
+- Correct predictions: 0
+- Accuracy: 0%
+
+### Class 7 
+- Actual occurrences: 8
+- Correct predictions: 2
+- Accuracy: 25%
+
+### Class 6 
+- Actual occurrences: 53
+- Correct predictions: 37
+- Accuracy: 69.81%
+
+### Class 5
+- Actual occurrences: 44
+- Correct predictions: 30
+- Accuracy: 68.18%
+
+## Analysis
+
+1. Best performing classes:
+   - Class 6 (69.81% accuracy)
+   - Class 5 (68.18% accuracy)
    
+   These classes are also the two most frequent in the dataset, which  contributed to their better performance. The model had more examples to learn from, leading to more accurate predictions.
+
+2. Moderate performing class:
+   - Class 7 (25% accuracy)
+   
+   This class had fewer examples, which may have limited the model's ability to learn its characteristics effectively.
+
+3. Worst performing classes:
+   - Classes 3, 8, and 4 (0% accuracy)
+   
+   These classes had very few examples in the dataset, which severely limited the model's ability to learn and predict them accurately. The model likely defaulted to predicting the more common classes instead.
+
+4. Overall trends:
+   - The model's performance strongly correlates with the frequency of classes in the dataset.
+   - There's a clear imbalance in the dataset, with classes 5 and 6 dominating.
+   - The model struggles with rare classes, failing to predict them at all.
+
+
+### Performance on Multi-Label Classification:
+In the multi-label scenario, where the target is a multi-hot encoded vector of length 8, there are a few patterns to note:
+1. **Class Confusion and Overlap:**
+   - If there are overlapping labels in the multi-label output (i.e., one data point belongs to multiple classes), the model might find it difficult to distinguish between those classes, leading to higher classification errors.
+   
+2. **Rare Labels:**
+   - Labels that rarely appear together may not be learned well by the model. If there are labels that occur in only a few instances, the MLP may not get enough data during training to learn how to associate those labels correctly.
+
+### Potential Reasons for Class Performance:
+1. **Class Imbalance:**
+   - If the dataset has an imbalanced distribution of classes (as you hinted with Classes 4 and 5 being rare), the model is likely biased toward predicting the majority class. This could explain why your MLP frequently predicts Class 2 or Class 3 and performs poorly on Classes 0, 1, 4, and 5.
+
+2. **Complexity of Features:**
+   - If certain classes have more complex or overlapping features with other classes, the MLP might have a harder time distinguishing between them, especially if it's not deep enough to capture intricate patterns in the data.
+
+3. **Training Data Limitations:**
+   - If some classes are underrepresented in the dataset or have less distinguishing features compared to others, the model will naturally perform poorly on those classes. You might need to look at adding more training data for the underperforming classes or using techniques like SMOTE to generate synthetic examples.
+
+### Next Steps:
+- **Confusion Matrix:** It would help to create a confusion matrix to better visualize where the model is making classification errors. This would give you a clear picture of which specific classes are getting confused with each other.
+- **Class Balancing Techniques:** Consider oversampling the underrepresented classes or using a weighted loss function to give more importance to the minority classes during training.
+- **Further Model Tuning:** Adjusting the architecture of your MLP (e.g., more layers or neurons) or trying different activation functions could improve the model's ability to capture more complex relationships between classes.
+
+Would you like help generating a confusion matrix or implementing any of these techniques?
+
+### Multi-label Classification Analysis
+
+Predictions [['beauty', 'books', 'home'], ['beauty'], ['clothing'], ['clothing', 'food'], ['sports'], ['electronics'], ['clothing', 'food'], ['books', 'electronics', 'sports'], ['beauty', 'clothing'], ['books', 'electronics'], ['books', 'home'], ['beauty', 'books', 'food'], ['furniture'], ['books', 'furniture', 'home'], ['home'], ['beauty'], ['food', 'furniture'], ['food', 'sports'], ['food'], ['books', 'home'], ['clothing'], ['clothing', 'furniture', 'home', 'sports'], ['beauty'], ['electronics'], ['books', 'clothing'], ['furniture'], ['books'], ['electronics', 'home'], ['electronics', 'furniture'], ['sports'], ['books'], ['sports'], ['beauty', 'furniture', 'sports'], ['furniture'], ['beauty'], ['food', 'home'], ['beauty'], ['sports'], ['books', 'home'], ['food', 'furniture', 'home'], ['clothing', 'sports'], ['sports'], ['home'], ['furniture', 'sports'], ['food', 'home'], ['beauty', 'books', 'clothing', 'sports'], ['beauty'], ['beauty'], ['beauty', 'food'], ['clothing'], ['books', 'electronics', 'sports'], ['beauty', 'food'], ['electronics'], ['beauty', 'clothing'], ['beauty', 'clothing', 'food'], ['electronics'], ['food', 'sports'], ['electronics'], ['books', 'home'], ['electronics', 'food', 'home'], ['home', 'sports'], ['beauty'], ['clothing', 'sports'], ['clothing', 'food'], ['beauty'], ['furniture'], ['clothing'], ['clothing'], ['books', 'food', 'furniture'], ['beauty', 'books'], ['books', 'food', 'home'], ['home'], ['clothing', 'electronics'], ['beauty', 'food'], ['clothing'], ['beauty', 'clothing'], ['food', 'furniture'], ['electronics', 'home'], ['beauty'], ['beauty'], ['sports'], ['sports'], ['sports'], ['clothing', 'food'], ['beauty', 'electronics'], ['books', 'home'], ['sports'], ['beauty', 'books'], ['furniture'], ['clothing', 'electronics', 'sports'], ['books', 'home'], ['food', 'furniture'], ['books', 'electronics'], ['beauty'], ['electronics'], ['food'], ['furniture'], ['books', 'electronics'], ['books', 'food'], ['books', 'electronics']]
+
+
+Actual [['beauty', 'books', 'home'], ['beauty'], ['clothing'], ['clothing', 'food'], ['sports'], ['electronics'], ['clothing', 'food'], ['books', 'electronics', 'sports'], ['beauty', 'clothing'], ['books', 'electronics'], ['books', 'home'], ['beauty', 'books', 'food'], ['furniture'], ['books', 'furniture', 'home'], ['home'], ['beauty'], ['food', 'furniture'], ['food', 'sports'], ['food'], ['books', 'home'], ['clothing'], ['clothing', 'furniture', 'home', 'sports'], ['beauty'], ['electronics'], ['books', 'clothing'], ['furniture'], ['books'], ['electronics', 'home'], ['electronics', 'furniture'], ['sports'], ['books'], ['sports'], ['beauty', 'furniture', 'sports'], ['furniture'], ['beauty'], ['food', 'home'], ['beauty'], ['sports'], ['books', 'home'], ['food', 'furniture', 'home'], ['clothing', 'sports'], ['sports'], ['home'], ['furniture', 'sports'], ['food', 'home'], ['beauty', 'books', 'clothing', 'sports'], ['beauty'], ['beauty'], ['beauty', 'food'], ['clothing'], ['books', 'electronics', 'sports'], ['beauty', 'food'], ['electronics'], ['beauty', 'clothing'], ['beauty', 'clothing', 'food'], ['electronics'], ['food', 'sports'], ['electronics'], ['books', 'home'], ['electronics', 'food', 'home'], ['home', 'sports'], ['beauty'], ['clothing', 'sports'], ['clothing', 'food'], ['beauty'], ['furniture'], ['clothing'], ['clothing'], ['books', 'food', 'furniture'], ['beauty', 'books'], ['books', 'food', 'home'], ['home'], ['clothing', 'electronics'], ['beauty', 'food'], ['clothing'], ['beauty', 'clothing'], ['food', 'furniture'], ['electronics', 'home'], ['beauty'], ['beauty'], ['sports'], ['sports'], ['sports'], ['clothing', 'food'], ['beauty', 'electronics'], ['books', 'home'], ['sports'], ['beauty', 'books'], ['furniture'], ['clothing', 'electronics', 'sports'], ['books', 'home'], ['food', 'furniture'], ['books', 'electronics'], ['beauty'], ['electronics'], ['food'], ['furniture'], ['books', 'electronics'], ['books', 'food'], ['books', 'electronics'], ['beauty', 'food', 'home', 'sports'], ['beauty', 'furniture', 'home', 'sports'], ['clothing', 'food', 'furniture', 'home'], ['beauty', 'clothing', 'furniture'], ['sports'], ['electronics', 'food'], ['food', 'furniture'], ['beauty', 'books', 'home', 'sports'], ['beauty', 'books', 'furniture'], ['beauty', 'clothing', 'electronics', 'food', 'home', 'sports'], ['beauty', 'books', 'clothing', 'sports'], ['beauty', 'sports'], ['clothing', 'electronics', 'furniture', 'sports'], ['home'], ['home'], ['beauty', 'electronics', 'furniture'], ['clothing', 'electronics', 'food', 'furniture', 'sports'], ['food'], ['beauty', 'clothing', 'electronics', 'food'], ['beauty', 'food', 'home', 'sports'], ['clothing'], ['books', 'home'], ['beauty', 'electronics'], ['books', 'electronics'], ['books', 'clothing', 'furniture'], ['beauty', 'electronics', 'furniture'], ['books', 'clothing', 'electronics'], ['food', 'home'], ['clothing', 'electronics', 'home'], ['furniture', 'sports'], ['books', 'clothing'], ['sports'], ['clothing', 'sports'], ['beauty', 'furniture', 'sports'], ['beauty', 'furniture'], ['books', 'home', 'sports'], ['beauty', 'food', 'sports'], ['sports'], ['beauty', 'books'], ['electronics', 'food', 'home'], ['clothing', 'food', 'furniture'], ['clothing', 'furniture', 'home', 'sports'], ['books', 'clothing', 'electronics', 'home'], ['clothing', 'electronics', 'home', 'sports'], ['clothing', 'home', 'sports'], ['clothing', 'electronics', 'furniture', 'sports'], ['beauty'], ['beauty', 'books'], ['beauty', 'home'], ['clothing', 'food'], ['books'], ['beauty', 'books', 'clothing', 'furniture', 'home'], ['clothing', 'electronics', 'furniture', 'home'], ['clothing', 'electronics', 'home'], ['food', 'home'], ['beauty', 'clothing', 'electronics', 'home'], ['food'], ['beauty', 'electronics'], ['clothing', 'food', 'home'], ['beauty', 'food', 'home'], ['beauty', 'books', 'clothing', 'food', 'sports'], ['beauty', 'clothing', 'home'], ['beauty', 'books', 'sports'], ['clothing'], ['beauty', 'home', 'sports'], ['beauty', 'books', 'electronics', 'furniture', 'home'], ['beauty', 'clothing', 'food'], ['books', 'clothing', 'food', 'furniture', 'home'], ['books', 'electronics', 'food', 'sports'], ['beauty', 'furniture', 'sports'], ['beauty', 'food'], ['beauty', 'home', 'sports'], ['books', 'clothing', 'sports'], ['electronics', 'food', 'home', 'sports'], ['beauty', 'clothing', 'electronics'], ['clothing', 'furniture'], ['beauty', 'books', 'furniture', 'sports'], ['clothing', 'electronics', 'furniture', 'home'], ['beauty', 'food', 'furniture', 'home'], ['beauty', 'clothing'], ['books', 'electronics', 'food', 'home', 'sports'], ['books', 'sports'], ['electronics', 'home', 'sports'], ['food', 'furniture'], ['beauty'], ['books', 'clothing', 'electronics', 'food'], ['electronics', 'sports'], ['beauty'], ['beauty', 'books', 'furniture'], ['clothing'], ['books', 'furniture', 'sports'], ['books', 'electronics', 'furniture', 'sports'], ['books', 'electronics', 'home'], ['beauty', 'clothing', 'electronics', 'food'], ['electronics', 'food', 'sports'], ['books', 'food'], ['beauty', 'clothing', 'food', 'furniture'], ['books', 'electronics'], ['beauty', 'books', 'clothing', 'food', 'home'], ['beauty', 'books', 'clothing', 'furniture']]
+
+1. Beauty
+   - Generally good performance
+   - Often correctly identified
+   - Some false negatives (missed classifications)
+
+2. Books
+   - Moderate performance
+   - Some accurate predictions, but also misses
+
+3. Clothing
+   - Mixed performance
+   - Some accurate predictions, but also misses and false positives
+
+4. Electronics
+   - Good performance
+   - Often correctly identified when present
+   - Few false positives
+
+5. Food
+   - Moderate performance
+   - Some accurate predictions, but also misses
+
+6. Furniture
+   - Poor performance
+   - Often missed or incorrectly predicted
+
+7. Home
+   - Moderate performance
+   - Some accurate predictions, but also misses
+
+8. Sports
+   - Good performance
+   - Often correctly identified when present
+   - Few false positives
+
+1. Best performing classes:
+   - Electronics and Sports
+   - Reason: These categories might have more distinct features or patterns that the model can easily recognize.
+
+2. Worst performing class:
+   - Furniture
+   - Reason: This category might have overlapping features with other categories (e.g., Home) or might not have enough distinct characteristics for the model to learn.
+
+3. Moderate performing classes:
+   - Books, Clothing, Food, and Home
+   - These categories might have some distinct features but also share similarities with other categories, making classification more challenging.
+
+4. Beauty category:
+   - Good performance overall, but with some missed classifications
+   - This could be due to its potential overlap with other categories like Clothing or Home
+
+## Exact Matches
+
+1. ['beauty']
+2. ['clothing']
+3. ['sports']
+4. ['electronics']
+5. ['furniture']
+6. ['books']
+7. ['home']
+8. ['food']
+9. ['books', 'electronics']
+10. ['clothing', 'food']
+
+These exact matches demonstrate that the model correctly predicts single-label instances much more often, and 2 label instances at maximum. Beyond 3 labels, the predictions never match exactly.
+
+- Accuracy: 0.07 (This seems low, but it's for exact matches across all labels, which is challenging in multi-label classification)
+- Precision: 0.6897 (About 69% of predicted labels are correct)
+- Recall: 0.6378 (About 64% of actual labels are correctly predicted)
+- F1 Score: 0.6628 
+- Hamming Accuracy: 0.7075 (About 71% of individual label predictions are correct)
+
+These metrics suggest that while the model struggles with exact matches across all labels (low accuracy), it performs reasonably well in predicting individual labels (higher Hamming Accuracy, Precision, and Recall).
+
+
+
 
 
 
