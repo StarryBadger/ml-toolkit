@@ -2,23 +2,45 @@ import numpy as np
 import wandb
 from performance_measures.classification_metrics import Metrics
 
+
 class MLPRegression:
 
-    def __init__(self, input_size, hidden_layers, output_size=1, learning_rate=0.01, activation='sigmoid', optimizer='sgd', wandb_log=False, print_every=10):
-        assert activation.lower() in ['sigmoid', 'relu', 'tanh', 'linear'], "Activation function must be either 'sigmoid', 'relu', 'tanh', or 'linear'"
-        assert optimizer.lower() in ['sgd', 'bgd', 'mbgd'], "Optimizer must be either 'sgd', 'bgd' or 'mbgd'"
+    def __init__(
+        self,
+        input_size,
+        hidden_layers,
+        output_size=1,
+        learning_rate=0.01,
+        activation="sigmoid",
+        optimizer="sgd",
+        wandb_log=False,
+        print_every=10,
+    ):
+        assert activation.lower() in [
+            "sigmoid",
+            "relu",
+            "tanh",
+            "linear",
+        ], "Activation function must be either 'sigmoid', 'relu', 'tanh', or 'linear'"
+        assert optimizer.lower() in [
+            "sgd",
+            "bgd",
+            "mbgd",
+        ], "Optimizer must be either 'sgd', 'bgd' or 'mbgd'"
         assert input_size > 0, "Input size must be greater than 0"
         assert output_size > 0, "Output size must be greater than 0"
         assert learning_rate > 0, "Learning rate must be greater than 0"
-        assert type(hidden_layers) == list and len(hidden_layers) > 0, "Hidden layers must be a list of size greater than 0"
-        
+        assert (
+            type(hidden_layers) == list and len(hidden_layers) > 0
+        ), "Hidden layers must be a list of size greater than 0"
+
         self.input_size = input_size
         self.hidden_layers = hidden_layers
         self.output_size = output_size
         self.learning_rate = learning_rate
         self.activation = activation
         self.optimizer = optimizer
-        
+
         self.weights, self.biases = self._initialize_weights_and_biases()
         self.train_losses = []
         self.validation_losses = []
@@ -35,26 +57,34 @@ class MLPRegression:
         for i in range(num_layers + 1):
             if i == 0:
                 # Using Xavier initialization for sigmoid/tanh, He initialization for ReLU
-                if self.activation in ['sigmoid', 'tanh']:
-                    w = np.random.randn(self.input_size, self.hidden_layers[0]) * np.sqrt(1.0 / self.input_size)
+                if self.activation in ["sigmoid", "tanh"]:
+                    w = np.random.randn(
+                        self.input_size, self.hidden_layers[0]
+                    ) * np.sqrt(1.0 / self.input_size)
                 else:  # for ReLU/linear
-                    w = np.random.randn(self.input_size, self.hidden_layers[0]) * np.sqrt(2.0 / self.input_size)
+                    w = np.random.randn(
+                        self.input_size, self.hidden_layers[0]
+                    ) * np.sqrt(2.0 / self.input_size)
             elif i == num_layers:
-                w = np.random.randn(self.hidden_layers[-1], self.output_size) * np.sqrt(2.0 / self.hidden_layers[-1])
+                w = np.random.randn(self.hidden_layers[-1], self.output_size) * np.sqrt(
+                    2.0 / self.hidden_layers[-1]
+                )
             else:
-                if self.activation in ['sigmoid', 'tanh']:
-                    w = np.random.randn(self.hidden_layers[i - 1], self.hidden_layers[i]) * np.sqrt(1.0 / self.hidden_layers[i - 1])
+                if self.activation in ["sigmoid", "tanh"]:
+                    w = np.random.randn(
+                        self.hidden_layers[i - 1], self.hidden_layers[i]
+                    ) * np.sqrt(1.0 / self.hidden_layers[i - 1])
                 else:  # for ReLU/linear
-                    w = np.random.randn(self.hidden_layers[i - 1], self.hidden_layers[i]) * np.sqrt(2.0 / self.hidden_layers[i - 1])
-            
+                    w = np.random.randn(
+                        self.hidden_layers[i - 1], self.hidden_layers[i]
+                    ) * np.sqrt(2.0 / self.hidden_layers[i - 1])
+
             b = np.zeros((1, w.shape[1]))
             weights.append(w)
             biases.append(b)
 
         return weights, biases
 
-
-    
     def _activate(self, X, activation):
         if activation == "sigmoid":
             return 1 / (1 + np.exp(-X))
@@ -84,7 +114,9 @@ class MLPRegression:
 
         for i in range(len(self.weights)):
             Z = np.dot(self.layer_outputs[-1], self.weights[i]) + self.biases[i]
-            A = self._activate(Z, self.activation if i < len(self.weights) - 1 else "linear")
+            A = self._activate(
+                Z, self.activation if i < len(self.weights) - 1 else "linear"
+            )
             self.layer_outputs.append(A)
 
         return self.layer_outputs[-1]
@@ -93,10 +125,10 @@ class MLPRegression:
         m = X.shape[0]
         self.gradients = []
         num_layers = len(self.weights)
-        
+
         # delta = (y_pred.squeeze() - y.squeeze())
         # delta = (y_pred.squeeze() - y)[:, np.newaxis]
-        delta = 2*(y_pred - y)
+        delta = 2 * (y_pred - y)
         dW = (1 / m) * np.dot(self.layer_outputs[-2].T, delta)
         db = (1 / m) * np.sum(delta, axis=0, keepdims=True)
         self.gradients.append((dW, db))
@@ -120,7 +152,17 @@ class MLPRegression:
             else:
                 raise ValueError("Unsupported optimizer")
 
-    def fit(self, X_train, y_train, X_validation=None, y_validation=None, max_epochs=10, batch_size=32, early_stopping=False, patience=100):
+    def fit(
+        self,
+        X_train,
+        y_train,
+        X_validation=None,
+        y_validation=None,
+        max_epochs=10,
+        batch_size=32,
+        early_stopping=False,
+        patience=100,
+    ):
         best_loss = float("inf")
         patience_counter = 0
         y_train = np.expand_dims(y_train, axis=1)
@@ -131,9 +173,9 @@ class MLPRegression:
                 self.backpropagation(X_train, y_train, y_pred_train)
                 self.update_parameters()
             elif self.optimizer == "sgd":
-                for i in range(X_train.shape[0]): 
-                    X_sample = X_train[i:i+1] 
-                    y_sample = y_train[i:i+1] 
+                for i in range(X_train.shape[0]):
+                    X_sample = X_train[i : i + 1]
+                    y_sample = y_train[i : i + 1]
                     y_pred_sample = self.forward_propagation(X_sample)
                     self.backpropagation(X_sample, y_sample, y_pred_sample)
                     self.update_parameters()
@@ -141,7 +183,7 @@ class MLPRegression:
                 indices = np.arange(X_train.shape[0])
                 np.random.shuffle(indices)
                 for start_idx in range(0, X_train.shape[0], batch_size):
-                    batch_indices = indices[start_idx:start_idx + batch_size]
+                    batch_indices = indices[start_idx : start_idx + batch_size]
                     X_batch = X_train[batch_indices]
                     y_batch = y_train[batch_indices]
 
@@ -164,12 +206,14 @@ class MLPRegression:
                     if early_stopping and patience_counter > patience:
                         print(f"Early stopping at epoch {epoch+1}")
                         break
-            
+
             y_pred_train = self.predict(X_train).squeeze()
             y_pred_validation = self.predict(X_validation).squeeze()
 
             train_metrics = Metrics(y_train, y_pred_train, task="regression")
-            validation_metrics = Metrics(y_validation, y_pred_validation, task="regression")
+            validation_metrics = Metrics(
+                y_validation, y_pred_validation, task="regression"
+            )
 
             train_mse = train_metrics.mse()
             train_mae = train_metrics.mae()
@@ -180,19 +224,21 @@ class MLPRegression:
             validation_r2 = validation_metrics.r2_score()
 
             if self.wandb_log:
-                wandb.log({
-                    "epoch": epoch+1,
-                    "train_loss": current_loss,
-                    "validation_loss": validation_loss,
-                    "train_mse": train_mse,
-                    "train_mae": train_mae,
-                    "train_r2": train_r2,
-                    "validation_mse": validation_mse,
-                    "validation_mae": validation_mae,
-                    "validation_r2": validation_r2,
-                })
+                wandb.log(
+                    {
+                        "epoch": epoch + 1,
+                        "train_loss": current_loss,
+                        "validation_loss": validation_loss,
+                        "train_mse": train_mse,
+                        "train_mae": train_mae,
+                        "train_r2": train_r2,
+                        "validation_mse": validation_mse,
+                        "validation_mae": validation_mae,
+                        "validation_r2": validation_r2,
+                    }
+                )
 
-            if epoch % self.print_every == 0 or epoch == max_epochs-1:
+            if epoch % self.print_every == 0 or epoch == max_epochs - 1:
                 print(
                     f"Epoch {epoch}, Train Loss: {current_loss:.4f}, Train MSE: {train_mse:.4f}, Validation MSE: {validation_mse:.4f}"
                 )
@@ -204,8 +250,8 @@ class MLPRegression:
 
     def _compute_loss(self, X, y):
         y_pred = self.forward_propagation(X)
-        return np.mean((y - y_pred) ** 2) 
-    
+        return np.mean((y - y_pred) ** 2)
+
     def gradient_checking(self, X, y, epsilon=1e-7):
         y = np.expand_dims(y, axis=1)
         y_pred = self.forward_propagation(X)
