@@ -271,7 +271,7 @@ class MLP:
     def _compute_loss(self, X, y):
         y_pred = self.forward_propagation(X)
         if self.task == 'regression':
-            return np.mean((y - y_pred) ** 2)
+            return 0.5 * np.mean((y - y_pred) ** 2)
         else: 
             return -np.mean(np.sum(y * np.log(y_pred + 1e-8), axis=1))
         

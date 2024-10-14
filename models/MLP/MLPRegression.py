@@ -96,7 +96,7 @@ class MLPRegression:
         
         # delta = (y_pred.squeeze() - y.squeeze())
         # delta = (y_pred.squeeze() - y)[:, np.newaxis]
-        delta = y_pred - y
+        delta = 2*(y_pred - y)
         dW = (1 / m) * np.dot(self.layer_outputs[-2].T, delta)
         db = (1 / m) * np.sum(delta, axis=0, keepdims=True)
         self.gradients.append((dW, db))
