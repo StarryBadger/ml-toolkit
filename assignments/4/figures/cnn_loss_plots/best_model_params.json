@@ -1,0 +1,14 @@
+{
+    "best_classification_combination": {
+        "lr": 0.001,
+        "dropout_rate": 0.3,
+        "num_conv_layers": 2,
+        "optimizer_choice": "adam"
+    },
+    "best_regression_combination": {
+        "lr": 0.001,
+        "dropout_rate": 0.3,
+        "num_conv_layers": 2,
+        "optimizer_choice": "adam"
+    }
+}

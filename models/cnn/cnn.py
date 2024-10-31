@@ -6,24 +6,37 @@ from tqdm import tqdm
 import matplotlib.pyplot as plt
 
 class CNN(nn.Module):
-    def __init__(self, task='classification', num_classes=4, num_conv_layers=3, dropout_rate=0, optimizer_choice='adam', device='cpu'):
+    def __init__(self, task='classification', num_classes=4, num_conv_layers=3, dropout_rate=0, optimizer_choice='adam', activation_function='relu', device='cpu', loss_figure_save_path='./figures/cnn_loss_plots/plot.png'):
         super(CNN, self).__init__()
+        print(loss_figure_save_path)
         assert task in ['classification', 'regression'], "Task must be either 'classification' or 'regression'."
+        assert activation_function in ['relu', 'sigmoid', 'tanh', 'leaky_relu'], "Activation function must be one of 'relu', 'sigmoid', 'tanh', or 'leaky_relu'."
+        
         self.task = task
         self.device = device
+        self.loss_figure_save_path = loss_figure_save_path
+        
+        # Mapping activation functions
+        activation_map = {
+            'relu': nn.ReLU(),
+            'sigmoid': nn.Sigmoid(),
+            'tanh': nn.Tanh(),
+            'leaky_relu': nn.LeakyReLU(0.2),
+        }
+        self.activation_function = activation_map[activation_function]
         
         layers = []
         in_channels = 1
         for i in range(num_conv_layers):
             out_channels = 32 * (2 ** i)
             layers.append(nn.Conv2d(in_channels=in_channels, out_channels=out_channels, kernel_size=3, padding=1))
-            layers.append(nn.ReLU())
+            layers.append(self.activation_function)
             layers.append(nn.MaxPool2d(kernel_size=2, stride=2))
             in_channels = out_channels
         
         self.conv_layers = nn.Sequential(*layers)
         
-        self.fc1 = nn.Linear(((28//(2**num_conv_layers))**2)*32*(2**(num_conv_layers-1)), 64)
+        self.fc1 = nn.Linear(((28 // (2 ** num_conv_layers)) ** 2) * 32 * (2 ** (num_conv_layers - 1)), 64)
         self.dropout = nn.Dropout(p=dropout_rate)
         self.fc2 = nn.Linear(64, num_classes if task == 'classification' else 1)
         
@@ -106,4 +119,5 @@ class CNN(nn.Module):
         plt.ylabel("Loss")
         plt.title("Training and Validation Loss")
         plt.legend()
-        plt.show()
+        plt.savefig(self.loss_figure_save_path)
+        plt.close()
