@@ -44,12 +44,21 @@ class CNN(nn.Module):
         
         self.optimizer_choice = optimizer_choice
 
-    def forward(self, x):
-        x = self.conv_layers(x)
+    def forward(self, x, return_feature_maps=False):
+        feature_maps = []
+
+        for layer in self.conv_layers:
+            x = layer(x)
+            if isinstance(layer, nn.MaxPool2d): 
+                feature_maps.append(x)
+        
         x = x.view(x.size(0), -1)
         x = self.dropout(self.fc1(x))
         x = self.fc2(x)
-        return self.output_activation(x)
+        
+        output = self.output_activation(x)
+        return (output, feature_maps) if return_feature_maps else output
+
 
     def fit(self, train_loader, val_loader, epochs=10, lr=0.001):
         criterion = nn.CrossEntropyLoss() if self.task == 'classification' else nn.MSELoss()
