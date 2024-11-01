@@ -4,50 +4,70 @@ import torch.optim as optim
 from tqdm import tqdm
 
 class MultiLabelCNN(nn.Module):
-    def __init__(self, device='cpu'):
+    def __init__(self, 
+                 num_conv_layers=3, 
+                 dropout_rate=0.5, 
+                 optimizer_choice='adam', 
+                 activation_function='relu', 
+                 device='cpu'):
         super(MultiLabelCNN, self).__init__()
-
+        
         self.device = device
+        self.optimizer_choice = optimizer_choice
+        self.num_conv_layers = num_conv_layers
 
-        self.conv1 = nn.Conv2d(in_channels=1, out_channels=32, kernel_size=3, padding=1)
-        self.conv2 = nn.Conv2d(in_channels=32, out_channels=64, kernel_size=3, padding=1)
-        self.conv3 = nn.Conv2d(in_channels=64, out_channels=128, kernel_size=3, padding=1)
+        activation_map = {
+            'relu': nn.ReLU(),
+            'sigmoid': nn.Sigmoid(),
+            'tanh': nn.Tanh(),
+            'leaky_relu': nn.LeakyReLU(0.2),
+        }
+        self.activation_function = activation_map[activation_function]
 
-        self.relu = nn.ReLU()
-        self.pool = nn.MaxPool2d(kernel_size=2, stride=2)
-
-        self.fc1 = nn.Linear(1152, 128)
-        self.fc2 = nn.Linear(128, 64)
-        self.fc3 = nn.Linear(64, 33)  
-
+        layers = []
+        in_channels = 1
+        for i in range(num_conv_layers):
+            out_channels = 32 * (2 ** i)
+            layers.append(nn.Conv2d(in_channels, out_channels, kernel_size=3, padding=1))
+            layers.append(self.activation_function)
+            layers.append(nn.MaxPool2d(kernel_size=2, stride=2))
+            in_channels = out_channels
+        
+        self.conv_layers = nn.Sequential(*layers)
+        
+        fc_input_size = ((28 // (2 ** num_conv_layers)) ** 2) * 32 * (2 ** (num_conv_layers - 1))
+        self.fc1 = nn.Linear(fc_input_size, 128)
+        # self.fc2 = nn.Linear(128, 64)
+        self.fc3 = nn.Linear(128, 33) 
+        self.dropout = nn.Dropout(p=dropout_rate)
+        
     def forward(self, x):
-        x = x.to(torch.float32)  
-        x = self.pool(self.relu(self.conv1(x)))
-        x = self.pool(self.relu(self.conv2(x)))
-        x = self.pool(self.relu(self.conv3(x)))
-
+        x = x.to(torch.float32)
+        x = self.conv_layers(x)
         x = x.view(x.size(0), -1)
-
-        x = self.relu(self.fc1(x))
-        x = self.relu(self.fc2(x))
-        x = self.fc3(x)
-
+        x = self.dropout(self.activation_function(self.fc1(x)))
+        # x = self.dropout(self.activation_function(self.fc2(x)))
+        x = self.fc3(x)  
         return x
 
     def fit(self, train_loader, val_loader, epochs=10, lr=0.001):
         criterion = nn.CrossEntropyLoss()
-        optimizer = optim.Adam(self.parameters(), lr=lr)
+        optimizer = self._get_optimizer(lr)
 
         for epoch in range(epochs):
             self.train()
             train_loss = 0.0
             for inputs, labels in tqdm(train_loader, desc=f"Training Epoch {epoch+1}/{epochs}"):
-                inputs, labels = inputs.to(self.device), labels.to(self.device).long()  # Ensure labels are long
+                inputs, labels = inputs.to(self.device), labels.to(self.device).long()
                 optimizer.zero_grad()
                 
                 outputs = self(inputs)
                 labels = labels.float()
-                loss = sum(criterion(outputs[:, i:i+11], labels[:, i:i+11]) for i in range(0, 33, 11))
+                # loss = sum(criterion(outputs[:, i:i+11], labels[:, i:i+11]) for i in range(0, 33, 11))
+                new_outputs = torch.stack([outputs[:, i:i+11] for i in range(0, 33, 11)], dim=1)
+                new_labels = torch.stack([labels[:, i:i+11] for i in range(0, 33, 11)], dim=1)
+                loss = criterion(new_outputs,new_labels)
+
                 
                 loss.backward()
                 optimizer.step()
@@ -68,7 +88,10 @@ class MultiLabelCNN(nn.Module):
                 outputs = self(inputs)
                 outputs = outputs.squeeze()
                 labels = labels.float()
-                loss = sum(criterion(outputs[:, i:i+11], labels[:, i:i+11]) for i in range(0, 33, 11))
+                # loss = sum(criterion(outputs[:, i:i+11], labels[:, i:i+11]) for i in range(0, 33, 11))
+                new_outputs = torch.stack([outputs[:, i:i+11] for i in range(0, 33, 11)], dim=1)
+                new_labels = torch.stack([labels[:, i:i+11] for i in range(0, 33, 11)], dim=1)
+                loss = criterion(new_outputs,new_labels)
                 total_loss += loss.item()
         avg_loss = total_loss / len(loader)
         return avg_loss
@@ -84,6 +107,14 @@ class MultiLabelCNN(nn.Module):
                 predictions.append(preds.cpu())
         return torch.cat(predictions)
     
+    def _get_optimizer(self, lr):
+        if self.optimizer_choice.lower() == 'adam':
+            return optim.Adam(self.parameters(), lr=lr)
+        elif self.optimizer_choice.lower() == 'sgd':
+            return optim.SGD(self.parameters(), lr=lr, momentum=0.9)
+        else:
+            raise ValueError("Unsupported optimizer choice: choose 'adam' or 'sgd'.")
+
     def _set_segment_max_to_one(self, tensor):
         modified_tensor = torch.zeros_like(tensor)
         
