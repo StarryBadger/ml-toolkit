@@ -8,7 +8,6 @@ class CNNAutoencoder(nn.Module):
     def __init__(self, num_filters=[16, 32, 64], kernel_sizes=[3, 3, 7], activation=nn.ReLU, device = 'cpu'):
         super(CNNAutoencoder, self).__init__()
         self.device = device
-        # Encoder
         self.encoder = nn.Sequential(
             nn.Conv2d(in_channels=1, out_channels=num_filters[0], kernel_size=kernel_sizes[0], stride=2, padding=1),
             activation(),
@@ -17,7 +16,6 @@ class CNNAutoencoder(nn.Module):
             nn.Conv2d(in_channels=num_filters[1], out_channels=num_filters[2], kernel_size=kernel_sizes[2])
         )
         
-        # Decoder
         self.decoder = nn.Sequential(
             nn.ConvTranspose2d(in_channels=num_filters[2], out_channels=num_filters[1], kernel_size=kernel_sizes[2]),
             activation(),
