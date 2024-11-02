@@ -122,8 +122,9 @@ class CNN(nn.Module):
 
     def plot_loss(self, history):
         plt.figure(figsize=(10, 5))
-        plt.plot(history['train_loss'], label="Training Loss")
-        plt.plot(history['val_loss'], label="Validation Loss")
+        epochs = range(1, len(history['train_loss']) + 1) 
+        plt.plot(epochs, history['train_loss'], label="Training Loss")
+        plt.plot(epochs, history['val_loss'], label="Validation Loss")
         plt.xlabel("Epochs")
         plt.ylabel("Loss")
         plt.title("Training and Validation Loss")
