@@ -1,3 +1,5 @@
 venv
 **/__pycache__
 wandb
+data/external/fashion_mnist
+data/interim/4/fashion_mnist
