@@ -16,7 +16,6 @@ class CNN(nn.Module):
         self.device = device
         self.loss_figure_save_path = loss_figure_save_path
         
-        # Mapping activation functions
         activation_map = {
             'relu': nn.ReLU(),
             'sigmoid': nn.Sigmoid(),
@@ -39,9 +38,7 @@ class CNN(nn.Module):
         self.fc1 = nn.Linear(((28 // (2 ** num_conv_layers)) ** 2) * 32 * (2 ** (num_conv_layers - 1)), 64)
         self.dropout = nn.Dropout(p=dropout_rate)
         self.fc2 = nn.Linear(64, num_classes if task == 'classification' else 1)
-        
-        self.output_activation = nn.LogSoftmax(dim=1) if task == 'classification' else nn.Identity()
-        
+        self.task = task
         self.optimizer_choice = optimizer_choice
 
     def forward(self, x, return_feature_maps=False):
@@ -55,6 +52,8 @@ class CNN(nn.Module):
         x = x.view(x.size(0), -1)
         x = self.dropout(self.fc1(x))
         x = self.fc2(x)
+        
+        self.output_activation = nn.LogSoftmax(dim=1) if self.task == 'classification' else nn.Identity()
         
         output = self.output_activation(x)
         return (output, feature_maps) if return_feature_maps else output
