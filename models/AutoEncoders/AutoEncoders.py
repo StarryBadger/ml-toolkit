@@ -1,4 +1,6 @@
 import numpy as np
+import sys
+sys.path.append('./../../')
 from models.MLP.MLPRegression import MLPRegression
 class AutoEncoder:
     def __init__(self, input_size, latent_size, encoder_layers, decoder_layers, learning_rate=0.01, activation='sigmoid', optimizer='sgd', wandb_log=False):
@@ -20,3 +22,8 @@ class AutoEncoder:
                 
     def get_latent(self, X):
         return self.encoder.forward_propagation(X)
+    
+    def reconstruct(self, X):
+        latent_representation = self.encoder.forward_propagation(X)
+        reconstructed_X = self.decoder.forward_propagation(latent_representation)
+        return reconstructed_X
