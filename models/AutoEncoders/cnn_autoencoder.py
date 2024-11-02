@@ -1,13 +1,14 @@
 import torch
 import torch.nn as nn
 import torch.optim as optim
+import matplotlib.pyplot as plt
 from tqdm import tqdm
-import itertools
 
 class CNNAutoencoder(nn.Module):
-    def __init__(self, num_filters=[16, 32, 64], kernel_sizes=[3, 3, 7], activation=nn.ReLU, device = 'cpu'):
+    def __init__(self, num_filters=[16, 32, 64], kernel_sizes=[3, 3, 7], activation=nn.ReLU, device='cpu', save_path='figures/cnn_autoencoder_loss_plots/plot.png'):
         super(CNNAutoencoder, self).__init__()
         self.device = device
+        self.save_path = save_path
         self.encoder = nn.Sequential(
             nn.Conv2d(in_channels=1, out_channels=num_filters[0], kernel_size=kernel_sizes[0], stride=2, padding=1),
             activation(),
@@ -25,6 +26,10 @@ class CNNAutoencoder(nn.Module):
             nn.Sigmoid()
         )
 
+        # Initialize lists for storing losses
+        self.train_losses = []
+        self.val_losses = []
+
     def encode(self, x):
         return self.encoder(x)
 
@@ -35,7 +40,7 @@ class CNNAutoencoder(nn.Module):
         z = self.encode(x)
         return self.decode(z)
 
-    def fit(self, train_loader, num_epochs=10, learning_rate=0.001, optimizer_choice='adam'):
+    def fit(self, train_loader, val_loader=None, num_epochs=10, learning_rate=0.001, optimizer_choice='adam'):
         if optimizer_choice.lower() == 'adam':
             optimizer = optim.Adam(self.parameters(), lr=learning_rate)
         elif optimizer_choice.lower() == 'sgd':
@@ -58,7 +63,43 @@ class CNNAutoencoder(nn.Module):
                 running_loss += loss.item() * images.size(0)
 
             epoch_loss = running_loss / len(train_loader.dataset)
+            self.train_losses.append(epoch_loss)  # Store training loss
             print(f'Epoch [{epoch+1}/{num_epochs}], Loss: {epoch_loss:.4f}')
+
+            # Validation phase
+            if val_loader is not None:
+                val_loss = self.validate(val_loader)
+                self.val_losses.append(val_loss)  # Store validation loss
+
+    def validate(self, val_loader):
+        criterion = nn.MSELoss()
+        self.eval() 
+        
+        total_loss = 0.0
+        with torch.no_grad():
+            for images, _ in tqdm(val_loader, desc='Evaluating', unit='batch'):
+                images = images.to(self.device)
+                
+                outputs = self.forward(images)
+                loss = criterion(outputs, images)
+                
+                total_loss += loss.item() * images.size(0)
+
+        avg_loss = total_loss / len(val_loader.dataset)
+        print(f'Validation Loss: {avg_loss:.4f}')
+        return avg_loss
+
+    def plot_losses(self):
+        plt.figure(figsize=(10, 5))
+        plt.plot(self.train_losses, label='Training Loss', color='blue')
+        if self.val_losses:
+            plt.plot(self.val_losses, label='Validation Loss', color='orange')
+        plt.title('Training and Validation Loss')
+        plt.xlabel('Epoch')
+        plt.ylabel('Loss')
+        plt.legend()
+        plt.grid(True)
+        plt.savefig(self.save_path)
 
     def evaluate(self, test_loader):
         criterion = nn.MSELoss()
