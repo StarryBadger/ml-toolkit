@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from tqdm import tqdm
+import matplotlib.pyplot as plt
 
 class MultiLabelCNN(nn.Module):
     def __init__(self, 
@@ -9,12 +10,14 @@ class MultiLabelCNN(nn.Module):
                  dropout_rate=0.5, 
                  optimizer_choice='adam', 
                  activation_function='relu', 
-                 device='cpu'):
+                 device='cpu',
+                 loss_figure_save_path='./figures/cnn_loss_plots/plot.png'):
         super(MultiLabelCNN, self).__init__()
         
         self.device = device
         self.optimizer_choice = optimizer_choice
         self.num_conv_layers = num_conv_layers
+        self.loss_figure_save_path = loss_figure_save_path
 
         activation_map = {
             'relu': nn.ReLU(),
@@ -36,9 +39,9 @@ class MultiLabelCNN(nn.Module):
         self.conv_layers = nn.Sequential(*layers)
         
         fc_input_size = ((28 // (2 ** num_conv_layers)) ** 2) * 32 * (2 ** (num_conv_layers - 1))
-        self.fc1 = nn.Linear(fc_input_size, 128)
+        self.fc1 = nn.Linear(fc_input_size, 256)
         # self.fc2 = nn.Linear(128, 64)
-        self.fc3 = nn.Linear(128, 33) 
+        self.fc3 = nn.Linear(256, 33) 
         self.dropout = nn.Dropout(p=dropout_rate)
         
     def forward(self, x):
@@ -54,6 +57,8 @@ class MultiLabelCNN(nn.Module):
         criterion = nn.CrossEntropyLoss()
         optimizer = self._get_optimizer(lr)
 
+        history = {'train_loss': [], 'val_loss': []}
+
         for epoch in range(epochs):
             self.train()
             train_loss = 0.0
@@ -63,10 +68,10 @@ class MultiLabelCNN(nn.Module):
                 
                 outputs = self(inputs)
                 labels = labels.float()
-                # loss = sum(criterion(outputs[:, i:i+11], labels[:, i:i+11]) for i in range(0, 33, 11))
-                new_outputs = torch.stack([outputs[:, i:i+11] for i in range(0, 33, 11)], dim=1)
-                new_labels = torch.stack([labels[:, i:i+11] for i in range(0, 33, 11)], dim=1)
-                loss = criterion(new_outputs,new_labels)
+                loss = sum(criterion(outputs[:, i:i+11], labels[:, i:i+11]) for i in range(0, 33, 11))
+                # new_outputs = torch.stack([outputs[:, i:i+11] for i in range(0, 33, 11)], dim=1)
+                # new_labels = torch.stack([labels[:, i:i+11] for i in range(0, 33, 11)], dim=1)
+                # loss = criterion(new_outputs,new_labels)
 
                 
                 loss.backward()
@@ -78,6 +83,10 @@ class MultiLabelCNN(nn.Module):
 
             val_loss = self.evaluate(val_loader, criterion)
             print(f"Epoch [{epoch+1}/{epochs}], Validation Loss: {val_loss:.4f}")
+            history['train_loss'].append(avg_train_loss)
+            history['val_loss'].append(val_loss)
+
+        self.plot_loss(history)
 
     def evaluate(self, loader, criterion):
         self.eval()
@@ -86,12 +95,11 @@ class MultiLabelCNN(nn.Module):
             for inputs, labels in loader:
                 inputs, labels = inputs.to(self.device), labels.to(self.device).long()
                 outputs = self(inputs)
-                outputs = outputs.squeeze()
                 labels = labels.float()
-                # loss = sum(criterion(outputs[:, i:i+11], labels[:, i:i+11]) for i in range(0, 33, 11))
-                new_outputs = torch.stack([outputs[:, i:i+11] for i in range(0, 33, 11)], dim=1)
-                new_labels = torch.stack([labels[:, i:i+11] for i in range(0, 33, 11)], dim=1)
-                loss = criterion(new_outputs,new_labels)
+                loss = sum(criterion(outputs[:, i:i+11], labels[:, i:i+11]) for i in range(0, 33, 11))
+                # new_outputs = torch.stack([outputs[:, i:i+11] for i in range(0, 33, 11)], dim=1)
+                # new_labels = torch.stack([labels[:, i:i+11] for i in range(0, 33, 11)], dim=1)
+                # loss = criterion(new_outputs,new_labels)
                 total_loss += loss.item()
         avg_loss = total_loss / len(loader)
         return avg_loss
@@ -135,3 +143,15 @@ class MultiLabelCNN(nn.Module):
             modified_tensor[i, 22 + max_index3] = 1  
         
         return modified_tensor
+    
+    def plot_loss(self, history):
+        plt.figure(figsize=(10, 5))
+        epochs = range(1, len(history['train_loss']) + 1)  # Create 1-indexed epochs
+        plt.plot(epochs, history['train_loss'], label="Training Loss")
+        plt.plot(epochs, history['val_loss'], label="Validation Loss")
+        plt.xlabel("Epochs")
+        plt.ylabel("Loss")
+        plt.title("Training and Validation Loss")
+        plt.legend()
+        plt.savefig(self.loss_figure_save_path)
+        plt.close()
