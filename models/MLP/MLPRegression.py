@@ -30,9 +30,9 @@ class MLPRegression:
         assert input_size > 0, "Input size must be greater than 0"
         assert output_size > 0, "Output size must be greater than 0"
         assert learning_rate > 0, "Learning rate must be greater than 0"
-        assert (
-            type(hidden_layers) == list and len(hidden_layers) > 0
-        ), "Hidden layers must be a list of size greater than 0"
+        # assert (
+        #     type(hidden_layers) == list and len(hidden_layers) > 0
+        # ), "Hidden layers must be a list of size greater than 0"
 
         self.input_size = input_size
         self.hidden_layers = hidden_layers
@@ -54,36 +54,39 @@ class MLPRegression:
         weights = []
         biases = []
 
-        for i in range(num_layers + 1):
-            if i == 0:
-                # Using Xavier initialization for sigmoid/tanh, He initialization for ReLU
-                if self.activation in ["sigmoid", "tanh"]:
-                    w = np.random.randn(
-                        self.input_size, self.hidden_layers[0]
-                    ) * np.sqrt(1.0 / self.input_size)
-                else:  # for ReLU/linear
-                    w = np.random.randn(
-                        self.input_size, self.hidden_layers[0]
-                    ) * np.sqrt(2.0 / self.input_size)
-            elif i == num_layers:
-                w = np.random.randn(self.hidden_layers[-1], self.output_size) * np.sqrt(
-                    2.0 / self.hidden_layers[-1]
-                )
-            else:
-                if self.activation in ["sigmoid", "tanh"]:
-                    w = np.random.randn(
-                        self.hidden_layers[i - 1], self.hidden_layers[i]
-                    ) * np.sqrt(1.0 / self.hidden_layers[i - 1])
-                else:  # for ReLU/linear
-                    w = np.random.randn(
-                        self.hidden_layers[i - 1], self.hidden_layers[i]
-                    ) * np.sqrt(2.0 / self.hidden_layers[i - 1])
-
-            b = np.zeros((1, w.shape[1]))
+        if num_layers == 0:
+            if self.activation in ["sigmoid", "tanh"]:
+                w = np.random.randn(self.input_size, self.output_size) * np.sqrt(1.0 / self.input_size)
+            else:  
+                w = np.random.randn(self.input_size, self.output_size) * np.sqrt(2.0 / self.input_size)
+            
+            b = np.zeros((1, self.output_size))
             weights.append(w)
             biases.append(b)
+        
+        else:
+            for i in range(num_layers + 1):
+                if i == 0:
+                    if self.activation in ["sigmoid", "tanh"]:
+                        w = np.random.randn(self.input_size, self.hidden_layers[0]) * np.sqrt(1.0 / self.input_size)
+                    else:  
+                        w = np.random.randn(self.input_size, self.hidden_layers[0]) * np.sqrt(2.0 / self.input_size)
+                elif i == num_layers:
+                   
+                    w = np.random.randn(self.hidden_layers[-1], self.output_size) * np.sqrt(2.0 / self.hidden_layers[-1])
+                else:
+                  
+                    if self.activation in ["sigmoid", "tanh"]:
+                        w = np.random.randn(self.hidden_layers[i - 1], self.hidden_layers[i]) * np.sqrt(1.0 / self.hidden_layers[i - 1])
+                    else:  
+                        w = np.random.randn(self.hidden_layers[i - 1], self.hidden_layers[i]) * np.sqrt(2.0 / self.hidden_layers[i - 1])
+
+                b = np.zeros((1, w.shape[1]))
+                weights.append(w)
+                biases.append(b)
 
         return weights, biases
+
 
     def _activate(self, X, activation):
         if activation == "sigmoid":
@@ -166,7 +169,8 @@ class MLPRegression:
         best_loss = float("inf")
         patience_counter = 0
         y_train = np.expand_dims(y_train, axis=1)
-        y_validation = np.expand_dims(y_validation, axis=1)
+        if y_validation!=None:
+            y_validation = np.expand_dims(y_validation, axis=1)
         for epoch in range(max_epochs):
             if self.optimizer == "bgd":
                 y_pred_train = self.forward_propagation(X_train)
