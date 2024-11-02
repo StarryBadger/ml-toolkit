@@ -40,7 +40,6 @@ class MultiLabelCNN(nn.Module):
         
         fc_input_size = ((28 // (2 ** num_conv_layers)) ** 2) * 32 * (2 ** (num_conv_layers - 1))
         self.fc1 = nn.Linear(fc_input_size, 256)
-        # self.fc2 = nn.Linear(128, 64)
         self.fc3 = nn.Linear(256, 33) 
         self.dropout = nn.Dropout(p=dropout_rate)
         
@@ -49,7 +48,6 @@ class MultiLabelCNN(nn.Module):
         x = self.conv_layers(x)
         x = x.view(x.size(0), -1)
         x = self.dropout(self.activation_function(self.fc1(x)))
-        # x = self.dropout(self.activation_function(self.fc2(x)))
         x = self.fc3(x)  
         return x
 
@@ -57,11 +55,14 @@ class MultiLabelCNN(nn.Module):
         criterion = nn.CrossEntropyLoss()
         optimizer = self._get_optimizer(lr)
 
-        history = {'train_loss': [], 'val_loss': []}
+        history = {'train_loss': [], 'val_loss': [], 'train_acc': [], 'val_acc': []}
 
         for epoch in range(epochs):
             self.train()
             train_loss = 0.0
+            correct = 0
+            total = 0
+            
             for inputs, labels in tqdm(train_loader, desc=f"Training Epoch {epoch+1}/{epochs}"):
                 inputs, labels = inputs.to(self.device), labels.to(self.device).long()
                 optimizer.zero_grad()
@@ -69,40 +70,50 @@ class MultiLabelCNN(nn.Module):
                 outputs = self(inputs)
                 labels = labels.float()
                 loss = sum(criterion(outputs[:, i:i+11], labels[:, i:i+11]) for i in range(0, 33, 11))
-                # new_outputs = torch.stack([outputs[:, i:i+11] for i in range(0, 33, 11)], dim=1)
-                # new_labels = torch.stack([labels[:, i:i+11] for i in range(0, 33, 11)], dim=1)
-                # loss = criterion(new_outputs,new_labels)
-
                 
                 loss.backward()
                 optimizer.step()
                 train_loss += loss.item()
 
-            avg_train_loss = train_loss / len(train_loader)
-            print(f"Epoch [{epoch+1}/{epochs}], Training Loss: {avg_train_loss:.4f}")
+                # Calculate exact match accuracy
+                preds = self._set_segment_max_to_one(outputs)
+                correct += self.exact_match_accuracy(preds, labels)
+                total += labels.size(0)
 
-            val_loss = self.evaluate(val_loader, criterion)
-            print(f"Epoch [{epoch+1}/{epochs}], Validation Loss: {val_loss:.4f}")
+            avg_train_loss = train_loss / len(train_loader)
+            avg_train_acc = correct / total * 100
+            print(f"Epoch [{epoch+1}/{epochs}], Training Loss: {avg_train_loss:.4f}, Training Accuracy: {avg_train_acc:.2f}%")
+
+            val_loss, val_acc = self.evaluate(val_loader, criterion)
+            print(f"Epoch [{epoch+1}/{epochs}], Validation Loss: {val_loss:.4f}, Validation Accuracy: {val_acc:.2f}%")
             history['train_loss'].append(avg_train_loss)
+            history['train_acc'].append(avg_train_acc)
             history['val_loss'].append(val_loss)
+            history['val_acc'].append(val_acc)
 
         self.plot_loss(history)
 
     def evaluate(self, loader, criterion):
         self.eval()
         total_loss = 0.0
+        correct = 0
+        total = 0
+        
         with torch.no_grad():
             for inputs, labels in loader:
                 inputs, labels = inputs.to(self.device), labels.to(self.device).long()
                 outputs = self(inputs)
                 labels = labels.float()
                 loss = sum(criterion(outputs[:, i:i+11], labels[:, i:i+11]) for i in range(0, 33, 11))
-                # new_outputs = torch.stack([outputs[:, i:i+11] for i in range(0, 33, 11)], dim=1)
-                # new_labels = torch.stack([labels[:, i:i+11] for i in range(0, 33, 11)], dim=1)
-                # loss = criterion(new_outputs,new_labels)
                 total_loss += loss.item()
+
+                preds = self._set_segment_max_to_one(outputs)
+                correct += self.exact_match_accuracy(preds, labels)
+                total += labels.size(0)
+
         avg_loss = total_loss / len(loader)
-        return avg_loss
+        avg_acc = correct / total * 100
+        return avg_loss, avg_acc
 
     def predict(self, loader):
         self.eval()
@@ -143,10 +154,14 @@ class MultiLabelCNN(nn.Module):
             modified_tensor[i, 22 + max_index3] = 1  
         
         return modified_tensor
-    
+
+    def exact_match_accuracy(self, preds, labels):
+        """Calculates the exact match accuracy between predictions and labels."""
+        return (preds == labels).all(dim=1).float().sum().item()
+
     def plot_loss(self, history):
         plt.figure(figsize=(10, 5))
-        epochs = range(1, len(history['train_loss']) + 1)  # Create 1-indexed epochs
+        epochs = range(1, len(history['train_loss']) + 1)
         plt.plot(epochs, history['train_loss'], label="Training Loss")
         plt.plot(epochs, history['val_loss'], label="Validation Loss")
         plt.xlabel("Epochs")
@@ -154,4 +169,15 @@ class MultiLabelCNN(nn.Module):
         plt.title("Training and Validation Loss")
         plt.legend()
         plt.savefig(self.loss_figure_save_path)
+        plt.close()
+
+        # Optional: Plot accuracy as well
+        plt.figure(figsize=(10, 5))
+        plt.plot(epochs, history['train_acc'], label="Training Accuracy")
+        plt.plot(epochs, history['val_acc'], label="Validation Accuracy")
+        plt.xlabel("Epochs")
+        plt.ylabel("Accuracy (%)")
+        plt.title("Training and Validation Accuracy")
+        plt.legend()
+        plt.savefig(self.loss_figure_save_path.replace('.png', '_accuracy.png'))
         plt.close()
