@@ -56,7 +56,7 @@ class KNN:
         self.X_train = X
         self.y_train = y
         if self.distance_metric== "cosine":
-            self.norm_X_train = np.linalg.norm(self.X_train, axis=1)
+            self.norm_X_train_T = (self.X_train / np.linalg.norm(self.X_train, axis=1, keepdims=True)).T
 
     def predict(self, X_test):
         """
@@ -72,26 +72,30 @@ class KNN:
         np.ndarray
             Predicted labels for the test data.
         """
-        predictions = [self._predict(x) for x in X_test]
-        return np.array(predictions)
-
-    def _predict(self, x):
-        distances = self.calculate_distances(x)
-        k_indices = np.argsort(distances)[: self.k]
+        distances = self.calculate_distances(X_test)
+        k_indices = np.argsort(distances, axis=1)[:, :self.k]
         k_nearest_labels = self.y_train[k_indices]
-        # ? https://stackoverflow.com/questions/16330831/most-efficient-way-to-find-mode-in-numpy-array
-        unique_labels, counts = np.unique(k_nearest_labels, return_counts=True)
-        return unique_labels[np.argmax(counts)]
+        predictions = np.array([np.bincount(labels).argmax() for labels in k_nearest_labels])
+        return predictions
 
-    def _euclidean_distances(self, x):
-        return np.sqrt(np.sum((self.X_train - x) ** 2, axis=1))
+    def _euclidean_distances(self, X_test):
+        # Calculate the squared differences and sum them along the feature axis
+        return np.sqrt(np.sum((X_test[:, np.newaxis, :] - self.X_train[np.newaxis, :, :]) ** 2, axis=2))
 
-    def _manhattan_distances(self, x):
-        return np.sum(np.abs(self.X_train - x), axis=1)
+    def _manhattan_distances(self, X_test):
+        # Calculate the absolute differences and sum them along the feature axis
+        return np.sum(np.abs(X_test[:, np.newaxis, :] - self.X_train[np.newaxis, :, :]), axis=2)
+
+
 
     def _cosine_distances(self, x):
-        dot_product = np.dot(self.X_train, x)
-        norm_x = np.linalg.norm(x)
-        cosine_similarity = dot_product / (self.norm_X_train * norm_x)
-        # ? https://stackoverflow.com/questions/18424228/cosine-similarity-between-2-number-lists
-        return 1 - cosine_similarity
+        # dot_product = np.dot(self.X_train, x)
+        # norm_x = np.linalg.norm(x)
+        # cosine_similarity = dot_product / (self.norm_X_train * norm_x)
+        # # ? https://stackoverflow.com/questions/18424228/cosine-similarity-between-2-number-lists
+        # return 1 - cosine_similarity
+        # X_train_norm = self.X_train / np.linalg.norm(self.X_train, axis=1, keepdims=True)
+        X_test_norm = x / np.linalg.norm(x, axis=1, keepdims=True)
+        # Calculate cosine distance as 1 - cosine similarity
+        cosine_similarity = np.dot(X_test_norm, self.norm_X_train_T)
+        return 1 - cosine_similarity  # Cosine distance
