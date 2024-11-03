@@ -9,24 +9,26 @@ class CNNAutoencoder(nn.Module):
         super(CNNAutoencoder, self).__init__()
         self.device = device
         self.save_path = save_path
-        self.encoder = nn.Sequential(
-            nn.Conv2d(in_channels=1, out_channels=num_filters[0], kernel_size=kernel_sizes[0], stride=2, padding=1),
-            activation(),
-            nn.Conv2d(in_channels=num_filters[0], out_channels=num_filters[1], kernel_size=kernel_sizes[1], stride=2, padding=1),
-            activation(),
-            nn.Conv2d(in_channels=num_filters[1], out_channels=num_filters[2], kernel_size=kernel_sizes[2])
-        )
         
-        self.decoder = nn.Sequential(
-            nn.ConvTranspose2d(in_channels=num_filters[2], out_channels=num_filters[1], kernel_size=kernel_sizes[2]),
-            activation(),
-            nn.ConvTranspose2d(in_channels=num_filters[1], out_channels=num_filters[0], kernel_size=kernel_sizes[1], stride=2, padding=1, output_padding=1),
-            activation(),
-            nn.ConvTranspose2d(in_channels=num_filters[0], out_channels=1, kernel_size=kernel_sizes[0], stride=2, padding=1, output_padding=1),
-            nn.Sigmoid()
-        )
-
-        # Initialize lists for storing losses
+        encoder_layers = []
+        in_channels = 1
+        
+        for i in range(len(num_filters)):
+            encoder_layers.append(nn.Conv2d(in_channels, num_filters[i], kernel_size=kernel_sizes[i], stride=2, padding=1))
+            encoder_layers.append(activation())
+            in_channels = num_filters[i]
+        
+        self.encoder = nn.Sequential(*encoder_layers)
+        
+        decoder_layers = []
+        for i in reversed(range(len(num_filters))):
+            out_channels = num_filters[i - 1] if i > 0 else 1 
+            decoder_layers.append(nn.ConvTranspose2d(num_filters[i], out_channels, kernel_size=kernel_sizes[i], stride=2, padding=1, output_padding=1 if i < len(num_filters) - 1 else 0))
+            if i > 0:  
+                decoder_layers.append(activation())
+        
+        self.decoder = nn.Sequential(*decoder_layers)
+        
         self.train_losses = []
         self.val_losses = []
 
