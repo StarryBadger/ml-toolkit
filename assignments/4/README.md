@@ -1,0 +1,1 @@
+Locate the report within the Jupyter notebooks **CNN.ipynb** and **AutoEncoder.ipynb**
