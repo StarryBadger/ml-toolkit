@@ -58,17 +58,22 @@ class AutoEncoder:
 
     def plot_loss(self):
         plt.figure(figsize=(10, 5))
-        plt.plot(self.train_losses, label='Training Loss', color='blue')
+        plt.plot(range(1, len(self.train_losses) + 1), self.train_losses, label='Training Loss', color='blue')
+        
         if self.val_losses:
-            plt.plot(self.val_losses, label='Validation Loss', color='orange')
+            plt.plot(range(1, len(self.val_losses) + 1), self.val_losses, label='Validation Loss', color='orange')
+        
         plt.title('Training and Validation Loss')
         plt.xlabel('Epochs')
         plt.ylabel('Loss')
         plt.legend()
         plt.grid()
+        
         if self.plot_file_path:
             plt.savefig(self.plot_file_path)
+        
         plt.show()
+
 
     def get_latent(self, X):
         return self.encoder.forward_propagation(X)
