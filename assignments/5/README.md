@@ -334,3 +334,5 @@ The Random Baseline MAE grows significantly with the sequence length. This is ex
 - By epoch 10, most predictions are either identical to or very close to the actual ground truth (e.g., in epoch 10: "potassium" vs. "potassium").
 
 I calculated the Average Number of Correct Characters (ANCC) as the total correct characters divided by the total characters across all words, averaged over the dataset. This approach provides a more consistent measure of character-level performance, avoiding bias from varying word lengths.
+
+!Note: Due to some last moment changes, please revert back to Commit a1c4bc9 if any issues faced
