@@ -1,20 +1,8 @@
-
-import os
-import random
-import nltk
-import numpy as np
 import torch
-from torch import nn, optim
-from torch.utils.data import Dataset, DataLoader, random_split
-from torch.nn.utils.rnn import pad_sequence
-from PIL import Image, ImageDraw, ImageFont
-from torchvision import transforms
-from tqdm import tqdm
-from collections import defaultdict
-from nltk.corpus import words
+from torch import nn
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-print(device)
+
 
 
 class OCRModel(nn.Module):
