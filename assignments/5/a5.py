@@ -11,7 +11,6 @@ np.random.seed(42)
 import matplotlib.pyplot as plt
 import seaborn as sns
 from hmmlearn import hmm
-from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
 from models.kde.kde import KDE
 from models.gmm.gmm import GMM
@@ -87,6 +86,14 @@ def predict_digit(models, mfcc):
             max_score = score
             best_digit = digit
     return best_digit
+
+def accuracy_score(true_labels, predicted_labels):
+    if len(true_labels) != len(predicted_labels):
+        raise ValueError("The number of true labels and predicted labels must be the same.")
+    correct_predictions = sum(1 for true, predicted in zip(true_labels, predicted_labels) if true == predicted)
+    accuracy = correct_predictions / len(true_labels)  
+    return accuracy
+
 
 def evaluate_model(models, mfcc_features, labels):
     predictions = [predict_digit(models, mfcc) for mfcc in mfcc_features]
