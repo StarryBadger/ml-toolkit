@@ -1,4 +1,9 @@
 import os
+import torch
+import torch.nn as nn
+from torch.utils.data import DataLoader, Dataset
+from torch.nn.utils.rnn import pad_sequence
+import matplotlib.pyplot as plt
 import pandas as pd
 import librosa
 import numpy as np
@@ -10,6 +15,7 @@ from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
 from models.kde.kde import KDE
 from models.gmm.gmm import GMM
+from models.rnn.rnn import RNNBitCounter
 
 DATA_PATH = "data/interim/5/fsdd/recordings/"
 
@@ -155,24 +161,167 @@ def apply_gmm_and_plot(k=2):
     plt.grid(True)
     plt.savefig('assignments/5/figures/gmm.png')
 
+def collate_fn(batch):
+    sequences, labels = zip(*batch)
+    padded_sequences = pad_sequence([torch.tensor(seq, dtype=torch.float32) for seq in sequences], 
+                                     batch_first=True, 
+                                     padding_value=0)
+    labels = torch.tensor(labels, dtype=torch.float32)
+    return padded_sequences, labels
+
+def generate_bit_sequences(num_samples=100000, max_length=16):
+    sequences = []
+    labels = []
+    for _ in range(num_samples):
+        length = np.random.randint(1, max_length + 1)
+        sequence = np.random.randint(0, 2, size=(length,)).tolist()
+        count = sum(sequence)
+        sequences.append(sequence)
+        labels.append(count)
+    return sequences, labels
+
+def split_dataset(sequences, labels, train_ratio=0.8, val_ratio=0.1):
+    total = len(sequences)
+    train_size = int(train_ratio * total)
+    val_size = int(val_ratio * total)
+
+    train_seq, train_labels = sequences[:train_size], labels[:train_size]
+    val_seq, val_labels = sequences[train_size:train_size + val_size], labels[train_size:train_size + val_size]
+    test_seq, test_labels = sequences[train_size + val_size:], labels[train_size + val_size:]
+
+    return (train_seq, train_labels), (val_seq, val_labels), (test_seq, test_labels)
+
+class BitSequenceDataset(Dataset):
+    def __init__(self, sequences, labels):
+        self.sequences = sequences
+        self.labels = labels
+
+    def __len__(self):
+        return len(self.sequences)
+
+    def __getitem__(self, idx):
+        seq = self.sequences[idx]
+        label = self.labels[idx]
+        return torch.tensor(seq, dtype=torch.float32), torch.tensor(label, dtype=torch.float32)
+
+def train_epoch(model, dataloader, criterion, optimizer):
+    model.train()
+    running_loss = 0.0
+    for seqs, counts in dataloader:
+        optimizer.zero_grad()
+        outputs = model(seqs)
+        loss = criterion(outputs, counts)
+        loss.backward()
+        optimizer.step()
+        running_loss += loss.item()
+    return running_loss / len(dataloader)
+
+def evaluate_model(model, dataloader, criterion):
+    model.eval()
+    total_loss = 0.0
+    with torch.no_grad():
+        for seqs, counts in dataloader:
+            outputs = model(seqs)
+            loss = criterion(outputs, counts)
+            total_loss += loss.item()
+    return total_loss / len(dataloader)
+
+def evaluate_random_baseline(loader):
+    criterion = nn.L1Loss()
+    total_loss = 0.0
+    total_samples = 0
+    with torch.no_grad():
+        for seqs, counts in loader:
+            random_preds = torch.tensor([np.random.randint(0, len(seq)) for seq in seqs], dtype=torch.float32)
+            loss = criterion(random_preds, counts)
+            total_loss += loss.item() * len(counts)
+            total_samples += len(counts)
+    return total_loss / total_samples
+
+
+
 def main():
     # kde_load_and_plot_dataset()
     # apply_gmm_and_plot(2)
     # kde_fit_and_visualize()
     
-    audio_data, labels = load_audio_files()
-    
-    mfcc_features = extract_mfcc_features(audio_data)
-    visualize_mfcc(mfcc_features, labels, digit=3)
-    
-    mfcc_train, mfcc_test, labels_train, labels_test = train_test_split(mfcc_features, labels, test_size=0.2, random_state=42)
-    models = train_hmm_models(mfcc_train, labels_train)
-    test_accuracy = evaluate_model(models, mfcc_test, labels_test)
-    print(f"Test Accuracy: {test_accuracy * 100:.2f}%")
-    my_audio_data, my_labels = load_my_audio_files(path="data/interim/5/fsdd/my_voice")
-    my_mfcc_features = extract_mfcc_features(my_audio_data)
-    my_test_accuracy = evaluate_model(models, my_mfcc_features, my_labels)
-    print(f"Test Accuracy on My Voice: {my_test_accuracy * 100:.2f}%")
+    # audio_data, labels = load_audio_files()
+    # mfcc_features = extract_mfcc_features(audio_data)
+    # visualize_mfcc(mfcc_features, labels, digit=3)
+    # mfcc_train, mfcc_test, labels_train, labels_test = train_test_split(mfcc_features, labels, test_size=0.2, random_state=42)
+    # models = train_hmm_models(mfcc_train, labels_train)
+    # test_accuracy = evaluate_model(models, mfcc_test, labels_test)
+    # print(f"Test Accuracy: {test_accuracy * 100:.2f}%")
+    # my_audio_data, my_labels = load_my_audio_files(path="data/interim/5/fsdd/my_voice")
+    # my_mfcc_features = extract_mfcc_features(my_audio_data)
+    # my_test_accuracy = evaluate_model(models, my_mfcc_features, my_labels)
+    # print(f"Test Accuracy on My Voice: {my_test_accuracy * 100:.2f}%")
+
+    sequences, labels = generate_bit_sequences()
+    train_data, val_data, test_data = split_dataset(sequences, labels)
+    hidden_size = 32
+    num_layers = 1
+    learning_rate = 0.0001
+    batch_size = 32
+    epochs = 5
+
+    train_loader = DataLoader(BitSequenceDataset(*train_data), batch_size=batch_size, shuffle=True, collate_fn=collate_fn)
+    val_loader = DataLoader(BitSequenceDataset(*val_data), batch_size=batch_size, collate_fn=collate_fn)
+    test_loader = DataLoader(BitSequenceDataset(*test_data), batch_size=batch_size, collate_fn=collate_fn)
+
+    model = RNNBitCounter(input_size=1, hidden_size=hidden_size, num_layers=num_layers)
+    criterion = nn.L1Loss() 
+    optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
+
+    train_losses = []
+    val_losses = []
+
+    for epoch in range(epochs):
+        train_loss = train_epoch(model, train_loader, criterion, optimizer)
+        val_loss = evaluate_model(model, val_loader, criterion)
+        train_losses.append(train_loss)
+        val_losses.append(val_loss)
+        print(f"Epoch {epoch+1}/{epochs} - Train Loss: {train_loss:.4f}, Validation Loss: {val_loss:.4f}")
+
+    lengths = list(range(1, 33))
+    rnn_mae_per_length = []
+    random_mae_per_length = []
+
+    for length in lengths:
+        sequences, labels = generate_bit_sequences(num_samples=1000, max_length=length)
+        loader = DataLoader(BitSequenceDataset(sequences, labels), batch_size=batch_size, collate_fn=collate_fn)
+        
+        rnn_mae = evaluate_model(model, loader, criterion)
+        rnn_mae_per_length.append(rnn_mae)
+        
+        random_mae = evaluate_random_baseline(loader)
+        random_mae_per_length.append(random_mae)
+
+    plt.figure(figsize=(10, 6))
+    plt.plot(lengths, rnn_mae_per_length, marker='o', label="RNN MAE")
+    plt.xlabel("Sequence Length")
+    plt.ylabel("Mean Absolute Error")
+    plt.title("MAE vs sequence length")
+    plt.legend()
+    plt.grid()
+    plt.ylim(0, 1)
+    plt.savefig('./assignments/5/figures/mae_vs_sequence.png')
+
+
+    plt.figure(figsize=(10, 6))
+    plt.plot(lengths, rnn_mae_per_length, marker='o', label="RNN MAE")
+    plt.plot(lengths, random_mae_per_length, marker='s', linestyle="--", label="Random Baseline MAE")
+    plt.xlabel("Sequence Length")
+    plt.ylabel("Mean Absolute Error")
+    plt.title("MAE Comparison: RNN vs Random Baseline")
+    plt.legend()
+    plt.grid()
+    plt.savefig('assignments/5/figures/mae_comparison_rnn_vs_random.png')
+    plt.close()
+
+    for length, rnn_mae, random_mae in zip(lengths, rnn_mae_per_length, random_mae_per_length):
+        print(f"Length: {length}, RNN Mean Absolute Error: {rnn_mae:.4f}, Random Baseline Mean Absolute Error: {random_mae:.4f}")
+
 
 if __name__ == "__main__":
     main()

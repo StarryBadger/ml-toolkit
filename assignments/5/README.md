@@ -248,8 +248,62 @@ Analysis:
    - Accent differences from training data
 
 Note: Adding 5 of my audio recordings to the test set increased the accuracy to 85.71%
+## RNNs
+
+![Alt text](./figures/mae_comparison_rnn_vs_random.png)
+![Alt text](./figures/mae_length_run_1.png)
+![Alt text](./figures/mae_length_run_2.png)
+
+| Sequence Length | RNN MAE  | Random Baseline MAE |
+|-----------------|----------|---------------------|
+| 1               | 0.0430   | 0.5370              |
+| 2               | 0.0840   | 0.5880              |
+| 3               | 0.1046   | 0.9220              |
+| 4               | 0.0750   | 1.1970              |
+| 5               | 0.0519   | 1.5320              |
+| 6               | 0.0471   | 1.7740              |
+| 7               | 0.0421   | 2.1150              |
+| 8               | 0.0374   | 2.5320              |
+| 9               | 0.0317   | 2.7350              |
+| 10              | 0.0258   | 3.1160              |
+| 11              | 0.0205   | 3.4060              |
+| 12              | 0.0138   | 3.7780              |
+| 13              | 0.0098   | 4.0160              |
+| 14              | 0.0048   | 4.1470              |
+| 15              | 0.0077   | 4.7260              |
+| 16              | 0.0119   | 5.1630              |
+| 17              | 0.0183   | 5.3340              |
+| 18              | 0.0254   | 5.6900              |
+| 19              | 0.0307   | 6.0100              |
+| 20              | 0.0361   | 6.3430              |
+| 21              | 0.0436   | 6.7110              |
+| 22              | 0.0505   | 6.8430              |
+| 23              | 0.0567   | 7.1700              |
+| 24              | 0.0619   | 7.7440              |
+| 25              | 0.0667   | 8.2550              |
+| 26              | 0.0721   | 8.1750              |
+| 27              | 0.0807   | 8.3850              |
+| 28              | 0.0858   | 8.9300              |
+| 29              | 0.0917   | 9.0570              |
+| 30              | 0.0971   | 9.1860              |
+| 31              | 0.1042   | 10.0300             |
+| 32              | 0.1085   | 10.0060             |
+
+The RNN consistently performs well across varying sequence lengths. Its MAE values remain significantly lower than the Random Baseline MAE. For shorter lengths (e.g., 2 to 17), the RNN maintains low MAE values. For larger lengths (e.g., 18 to 32), RNN MAE starts to increase but remains relatively low compared to the Random Baseline. This indicates that the RNN has been able to decently generalise for longer sequences. Although the increase in MAE is visible, it stays beclow 0.1 for upto sequence length 30. For very short sequences, the RNN has enough capacity to learn the immediate dependencies between data points, but it may not have sufficient context to capture longer-term patterns. 
+
+The Random Baseline MAE grows significantly with the sequence length. This is expected because it does not have any learning mechanism and essentially outputs random guesses, leading to large deviations from the true count.
 
 ## RNNs [OCR]
+
+### Dataset
+
+![Alt text](../../data/interim/5/words/image_34_dissuasory.png)
+![Alt text](../../data/interim/5/words/image_28_juventude.png)
+![Alt text](../../data/interim/5/words/image_68_Erastianism.png)
+![Alt text](../../data/interim/5/words/image_42_Soga.png)
+![Alt text](../../data/interim/5/words/image_16_jump.png)
+
+
 
 ### Training Progress and Results
 
@@ -278,3 +332,5 @@ Note: Adding 5 of my audio recordings to the test set increased the accuracy to 
 ### Observations on Predictions:
 - In earlier epochs, some predictions are significantly different from the actual targets (e.g., in epoch 1: "poiassism" vs. "potassium").
 - By epoch 10, most predictions are either identical to or very close to the actual ground truth (e.g., in epoch 10: "potassium" vs. "potassium").
+
+I calculated the Average Number of Correct Characters (ANCC) as the total correct characters divided by the total characters across all words, averaged over the dataset. This approach provides a more consistent measure of character-level performance, avoiding bias from varying word lengths.
