@@ -141,7 +141,7 @@ def kde_load_and_plot_dataset():
 def kde_fit_and_visualize():
     df = pd.read_csv('data/interim/5/kde_dataset.csv')
     X = df.values
-    kde = KDE(kernel='box', bandwidth=0.5)
+    kde = KDE(kernel='triangular', bandwidth=0.5)
     kde.fit(X)
     point = np.array([0, 0])
     print(f"Density at {point}: {kde.predict(point)}")
@@ -241,21 +241,21 @@ def evaluate_random_baseline(loader):
 
 
 def main():
-    # kde_load_and_plot_dataset()
-    # apply_gmm_and_plot(2)
-    # kde_fit_and_visualize()
+    kde_load_and_plot_dataset()
+    apply_gmm_and_plot(2)
+    kde_fit_and_visualize()
     
-    # audio_data, labels = load_audio_files()
-    # mfcc_features = extract_mfcc_features(audio_data)
-    # visualize_mfcc(mfcc_features, labels, digit=3)
-    # mfcc_train, mfcc_test, labels_train, labels_test = train_test_split(mfcc_features, labels, test_size=0.2, random_state=42)
-    # models = train_hmm_models(mfcc_train, labels_train)
-    # test_accuracy = evaluate_model(models, mfcc_test, labels_test)
-    # print(f"Test Accuracy: {test_accuracy * 100:.2f}%")
-    # my_audio_data, my_labels = load_my_audio_files(path="data/interim/5/fsdd/my_voice")
-    # my_mfcc_features = extract_mfcc_features(my_audio_data)
-    # my_test_accuracy = evaluate_model(models, my_mfcc_features, my_labels)
-    # print(f"Test Accuracy on My Voice: {my_test_accuracy * 100:.2f}%")
+    audio_data, labels = load_audio_files()
+    mfcc_features = extract_mfcc_features(audio_data)
+    visualize_mfcc(mfcc_features, labels, digit=3)
+    mfcc_train, mfcc_test, labels_train, labels_test = train_test_split(mfcc_features, labels, test_size=0.2, random_state=42)
+    models = train_hmm_models(mfcc_train, labels_train)
+    test_accuracy = evaluate_model(models, mfcc_test, labels_test)
+    print(f"Test Accuracy: {test_accuracy * 100:.2f}%")
+    my_audio_data, my_labels = load_my_audio_files(path="data/interim/5/fsdd/my_voice")
+    my_mfcc_features = extract_mfcc_features(my_audio_data)
+    my_test_accuracy = evaluate_model(models, my_mfcc_features, my_labels)
+    print(f"Test Accuracy on My Voice: {my_test_accuracy * 100:.2f}%")
 
     sequences, labels = generate_bit_sequences()
     train_data, val_data, test_data = split_dataset(sequences, labels)
