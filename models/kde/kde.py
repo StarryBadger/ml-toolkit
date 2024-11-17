@@ -73,15 +73,3 @@ class KDE:
         plt.colorbar(label='Density')
         plt.legend()
         plt.savefig('assignments/5/figures/kde.png')
-
-
-
-
-if __name__ == '__main__':
-    np.random.seed(0)
-    data = np.random.randn(100, 2)
-    kde = KDE(kernel='gaussian', bandwidth=0.2)
-    kde.fit(data)
-    point = np.array([0, 0])
-    print(f"Density at {point}: {kde.predict(point)}")
-    kde.visualize()
