@@ -153,7 +153,7 @@ Bandwidth = 0.9:
 - The peak density starts shifting towards the center of the overall distribution
 - Loses important local density information by excessive smoothing
 
-This illustrates the classic bandwidth selection trade-off in KDE:
+Bandwidth selection trade-off in KDE:
 - Too small (0.3): Fits noise, more jagged density estimation
 - Too large (0.9): Over-smooths, loses important local structure
 - The middle value (0.6) provides a better balance between noise reduction and maintaining important density features
