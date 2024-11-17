@@ -13,7 +13,6 @@ import matplotlib.pyplot as plt
 from models.rnn.rnn import RNNBitCounter
 from torch.nn.utils.rnn import pad_sequence
 from torch.utils.data import DataLoader, Dataset
-from sklearn.model_selection import train_test_split
 
 DATA_PATH = "data/interim/5/fsdd/recordings/"
 
@@ -63,6 +62,17 @@ def visualize_mfcc(mfcc_features, labels, digit=2, save_path='assignments/5/figu
     plt.tight_layout()
     plt.savefig(f"{save_path}_{digit}.png")
 
+def train_test_split(features, labels, test_size=0.25, random_state=None):
+    if random_state is not None:
+        np.random.seed(random_state)
+    indices = np.arange(len(features))
+    np.random.shuffle(indices)
+    test_size = int(len(features) * test_size)
+    test_indices = indices[:test_size]
+    train_indices = indices[test_size:]
+    X_train, X_test = features[train_indices], features[test_indices]
+    y_train, y_test = labels[train_indices], labels[test_indices]
+    return X_train, X_test, y_train, y_test
 
 
 def train_hmm_models(mfcc_features, labels, n_states=5):
