@@ -39,20 +39,26 @@ def load_my_audio_files(path="data/interim/5/fsdd/my_voice"):
     return audio_data, labels
 
 
-def extract_mfcc_features(audio_data, sr=4000, n_mfcc=13, n_fft=512, hop_length=64):
+def extract_mfcc_features(audio_data, sr=4000, n_mfcc=13, n_fft=512, hop_length=256):
     mfcc_features = []
     for signal in audio_data:
         mfcc = librosa.feature.mfcc(y=signal, sr=sr, n_mfcc=n_mfcc, n_fft=n_fft, hop_length=hop_length)
         mfcc_features.append(mfcc.T)  
     return mfcc_features
 
-def visualize_mfcc(mfcc_features, digit=0):
+def visualize_mfcc(mfcc_features, labels, digit=2, save_path='assignments/5/figures/spectrogram'):
+    digit_samples = [mfcc_features[i] for i in range(len(labels)) if labels[i] == digit]
+    if len(digit_samples) == 0:
+        print(f"No samples found for digit {digit}.")
+        return
     plt.figure(figsize=(10, 4))
-    sns.heatmap(mfcc_features[digit].T, cmap='viridis')
-    plt.title(f'MFCC for Digit {digit}')
+    sns.heatmap(digit_samples[0].T, cmap='viridis', cbar=True)
+    plt.title(f'MFCC Spectrogram for Digit {digit}')
     plt.xlabel('Time Frames')
     plt.ylabel('MFCC Coefficients')
-    plt.savefig('assignments/5/figures/spectrogram.png')
+    plt.tight_layout()
+    plt.savefig(f"{save_path}_{digit}.png")
+
 
 
 def train_hmm_models(mfcc_features, labels, n_states=5):
@@ -129,7 +135,7 @@ def kde_load_and_plot_dataset():
 def kde_fit_and_visualize():
     df = pd.read_csv('data/interim/5/kde_dataset.csv')
     X = df.values
-    kde = KDE(kernel='box', bandwidth=0.6)
+    kde = KDE(kernel='box', bandwidth=0.5)
     kde.fit(X)
     point = np.array([0, 0])
     print(f"Density at {point}: {kde.predict(point)}")
@@ -152,20 +158,21 @@ def apply_gmm_and_plot(k=2):
 def main():
     # kde_load_and_plot_dataset()
     # apply_gmm_and_plot(2)
-    kde_fit_and_visualize()
+    # kde_fit_and_visualize()
     
-    # audio_data, labels = load_audio_files()
+    audio_data, labels = load_audio_files()
     
-    # mfcc_features = extract_mfcc_features(audio_data)
-    # visualize_mfcc(mfcc_features, digit=0)
-    # mfcc_train, mfcc_test, labels_train, labels_test = train_test_split(mfcc_features, labels, test_size=0.2, random_state=42)
-    # models = train_hmm_models(mfcc_train, labels_train)
-    # test_accuracy = evaluate_model(models, mfcc_test, labels_test)
-    # print(f"Test Accuracy: {test_accuracy * 100:.2f}%")
-    # my_audio_data, my_labels = load_my_audio_files(path="data/interim/5/fsdd/my_voice")
-    # my_mfcc_features = extract_mfcc_features(my_audio_data)
-    # my_test_accuracy = evaluate_model(models, my_mfcc_features, my_labels)
-    # print(f"Test Accuracy on My Voice: {my_test_accuracy * 100:.2f}%")
+    mfcc_features = extract_mfcc_features(audio_data)
+    visualize_mfcc(mfcc_features, labels, digit=3)
+    
+    mfcc_train, mfcc_test, labels_train, labels_test = train_test_split(mfcc_features, labels, test_size=0.2, random_state=42)
+    models = train_hmm_models(mfcc_train, labels_train)
+    test_accuracy = evaluate_model(models, mfcc_test, labels_test)
+    print(f"Test Accuracy: {test_accuracy * 100:.2f}%")
+    my_audio_data, my_labels = load_my_audio_files(path="data/interim/5/fsdd/my_voice")
+    my_mfcc_features = extract_mfcc_features(my_audio_data)
+    my_test_accuracy = evaluate_model(models, my_mfcc_features, my_labels)
+    print(f"Test Accuracy on My Voice: {my_test_accuracy * 100:.2f}%")
 
 if __name__ == "__main__":
     main()
