@@ -1,0 +1,14 @@
+numpy
+pandas
+matplotlib
+scipy
+torch
+torchvision
+torchaudio
+wandb
+imageio
+tqdm
+scikit-learn
+librosa
+hmmlearn
+nltk

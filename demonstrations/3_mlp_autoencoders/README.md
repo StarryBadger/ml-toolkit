@@ -1,5 +1,3 @@
-# Assignment 3 Report
-
 To install dependencies, use 
 ```bash
 pip install -r requirements.txt
